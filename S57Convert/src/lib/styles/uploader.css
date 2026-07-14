@@ -1,0 +1,121 @@
+.s57-uploader-panel {
+  padding: 16px;
+  font-family: 'Inter', sans-serif;
+  color: #f3f4f6;
+  background: rgba(30, 41, 59, 0.7);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.s57-uploader-panel h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #60a5fa;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+
+.s57-uploader-panel .description {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+
+.upload-zone {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.upload-zone input[type="file"] {
+  display: none;
+}
+
+.upload-button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  text-align: center;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.upload-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+.upload-button.loading {
+  background: #475569;
+  cursor: not-allowed;
+  animation: pulse 1.5s infinite;
+}
+
+.error-message {
+  padding: 10px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  color: #fca5a5;
+  font-size: 0.8rem;
+  margin-bottom: 16px;
+}
+
+.loaded-section {
+  background: rgba(15, 23, 42, 0.5);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.loaded-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.loaded-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+  font-size: 0.8rem;
+}
+
+.loaded-section li {
+  padding: 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reset-button {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.2s;
+}
+
+.reset-button:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
