@@ -1,0 +1,8 @@
+{
+  "id": "my-plugin",
+  "name": "My Plugin",
+  "version": "1.0.0",
+  "entry": "index.js",
+  "description": "Adds a sample GeoJSON point layer to the map using the GeoLibre Plugin API.",
+  "style": "style.css"
+}
