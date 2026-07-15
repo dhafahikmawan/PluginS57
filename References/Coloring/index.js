@@ -224,13 +224,13 @@ function styleGeoJsonLayer(app, name, layerId, attempt = 0) {
     return;
   }
   const styleLayers = map.getStyle().layers || [];
-  const candidates = [name, layerId, `${name}-layer`, `${layerId}-layer`, `source-${name}`, `source-${layerId}`];
+  const candidates = [];
   styleLayers.forEach((layer) => {
     if (!layer?.id) {
       return;
     }
     const id = layer.id;
-    if (id.includes(name) || id.includes(layerId) || id.includes("geojson") || id.includes("layer")) {
+    if (id.includes(layerId)) {
       candidates.push(id);
     }
   });

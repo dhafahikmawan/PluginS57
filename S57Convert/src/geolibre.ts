@@ -1,19 +1,81 @@
 import { createRoot } from 'react-dom/client';
 import React from 'react';
-import type { GeoLibreAppAPI, GeoLibrePlugin, GeoLibreNativeLayerStyle } from './lib/geolibre/host-api';
+import type { GeoLibreAppAPI, GeoLibrePlugin } from './lib/geolibre/host-api';
 import { S57Uploader } from './lib/components/S57Uploader';
 import { S57LayerData } from './lib/utils/s57Converter';
-import { selectS57LayerStyle } from './lib/styles/s57StyleRegistry';
+import { selectS57LayerStyle, StyleReapplier, StyleTracker, type S57StyleSelection } from './lib/styles/s57StyleRegistry';
 import './lib/styles/uploader.css';
 
 let appAPI: GeoLibreAppAPI | null = null;
+let styleTracker = new StyleTracker();
+let styleReapplier = new StyleReapplier(styleTracker);
+let enableDebug = true;
+let pendingReapplyTimer: ReturnType<typeof setTimeout> | null = null;
+let attachedMap: any = null;
+let styleRefreshHandler: (() => void) | null = null;
+let styleLoadHandler: (() => void) | null = null;
+let layerMutationHandler: (() => void) | null = null;
 
-var enableDebug = false;
+
 
 
 function writeDebug(message : any){
     if(!enableDebug) return;
     console.log(message);
+}
+
+function queueStyleReapply(map: any) {
+  if (!map) {
+    return;
+  }
+
+  if (pendingReapplyTimer) {
+    clearTimeout(pendingReapplyTimer);
+  }
+
+  pendingReapplyTimer = setTimeout(() => {
+    pendingReapplyTimer = null;
+    void styleReapplier.reapplyAllStyles(map);
+  }, 125);
+}
+
+function attachStylePersistenceListeners(map: any) {
+  if (!map || (attachedMap === map && styleRefreshHandler && styleLoadHandler && layerMutationHandler)) {
+    return;
+  }
+
+  detachStylePersistenceListeners();
+
+  styleRefreshHandler = () => queueStyleReapply(map);
+  styleLoadHandler = () => setTimeout(() => queueStyleReapply(map), 250);
+  layerMutationHandler = () => queueStyleReapply(map);
+
+  map.on('data', styleRefreshHandler);
+  map.on('style.load', styleLoadHandler);
+  map.on('layer', layerMutationHandler);
+
+  attachedMap = map;
+}
+
+function detachStylePersistenceListeners() {
+  if (!attachedMap) {
+    return;
+  }
+
+  if (styleRefreshHandler) {
+    attachedMap.off?.('data', styleRefreshHandler);
+  }
+  if (styleLoadHandler) {
+    attachedMap.off?.('style.load', styleLoadHandler);
+  }
+  if (layerMutationHandler) {
+    attachedMap.off?.('layer', layerMutationHandler);
+  }
+
+  styleRefreshHandler = null;
+  styleLoadHandler = null;
+  layerMutationHandler = null;
+  attachedMap = null;
 }
 
 export const s57ReaderPlugin: GeoLibrePlugin = {
@@ -23,6 +85,11 @@ export const s57ReaderPlugin: GeoLibrePlugin = {
 
   activate(app: GeoLibreAppAPI) {
     appAPI = app;
+    const map = app.getMap?.();
+
+    if (map) {
+      attachStylePersistenceListeners(map);
+    }
 
     if (app.registerRightPanel) {
       app.registerRightPanel({
@@ -51,15 +118,17 @@ export const s57ReaderPlugin: GeoLibrePlugin = {
     if (app.unregisterRightPanel) {
       app.unregisterRightPanel("s57-uploader-panel");
     }
+    detachStylePersistenceListeners();
+    styleTracker.resetAll();
     appAPI = null;
     return true;
   }
 };
 
-function applyS57Style(map: any, name: string, hostedLayerId: string, s: GeoLibreNativeLayerStyle, attempt = 0) {
+async function applyS57Style(map: any, name: string, hostedLayerId: string, styleSelection: S57StyleSelection, attempt = 0) {
   if (!map || typeof map.getStyle !== "function") {
     if (attempt < 4) {
-      setTimeout(() => applyS57Style(map, name, hostedLayerId, s, attempt + 1), 250);
+      setTimeout(() => { void applyS57Style(map, name, hostedLayerId, styleSelection, attempt + 1); }, 250 * (attempt + 1));
     }
     else if(enableDebug){
       writeDebug("################################################");
@@ -70,77 +139,18 @@ function applyS57Style(map: any, name: string, hostedLayerId: string, s: GeoLibr
     }
     return;
   }
-  
-  const styleLayers = map.getStyle().layers || [];
-  //const candidates = [name, hostedLayerId, `${name}-layer`, `${hostedLayerId}-layer`, `source-${name}`, `source-${hostedLayerId}`];
-  const candidates : string[] = [];
-  writeDebug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-  writeDebug("Search Matching Layer For ID: " + hostedLayerId + ", Name: " + name);
-  styleLayers.forEach((layer: any) => {
-    if (!layer?.id) return;
-    const id = layer.id;
-    writeDebug("ID: " + id);
-    if (id.includes(hostedLayerId)) {
-      candidates.push(id);
-      writeDebug("Yes");
-    }
-  });
-  writeDebug("End Searching");
-  writeDebug("===============================================================");
-  writeDebug("Final Result: ");
-  writeDebug(candidates);
-  writeDebug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
+  const applied = await styleReapplier.reapplyStyle(map, hostedLayerId, styleSelection, undefined, {}, name);
 
-  
-  const uniqueIds = [...new Set(candidates.filter(Boolean))];
-  
-  const paintOps: [string, any][] = [];
-  if (s.fillColor) {
-    paintOps.push(['fill-color', s.fillColor]);
-    paintOps.push(['circle-color', s.fillColor]);
+  if (!applied && attempt < 4) {
+    setTimeout(() => { void applyS57Style(map, name, hostedLayerId, styleSelection, attempt + 1); }, 250 * (attempt + 1));
   }
-  if (s.fillOpacity !== undefined) {
-    paintOps.push(['fill-opacity', s.fillOpacity]);
-    paintOps.push(['circle-opacity', s.fillOpacity]);
-  }
-  if (s.strokeColor) {
-    paintOps.push(['line-color', s.strokeColor]);
-    paintOps.push(['circle-stroke-color', s.strokeColor]);
-  }
-  if (s.strokeWidth !== undefined) {
-    paintOps.push(['line-width', s.strokeWidth]);
-    paintOps.push(['circle-stroke-width', s.strokeWidth]);
-  }
-  if (s.strokeDasharray && s.strokeDasharray !== 'none') {
-    paintOps.push(['line-dasharray', s.strokeDasharray.split(',').map(Number)]);
-  }
-  if (s.circleRadius !== undefined) {
-    paintOps.push(['circle-radius', s.circleRadius]);
-  }
-
-  uniqueIds.forEach(layerId => {
-    writeDebug("____________________________________");
-    writeDebug("Layer ID: " + layerId);
-    writeDebug("Layer Name: " + name);
-    paintOps.forEach(([property, value]) => {
-      try {
-        writeDebug("Paint Options: " + property + " | " + value);
-        map.setPaintProperty(layerId, property, value);
-      } catch (err) {}
-    });
-    writeDebug("____________________________________");
-  });
-  
-  if (uniqueIds.length === 0 && attempt < 4) {
-    setTimeout(() => applyS57Style(map, name, hostedLayerId, s, attempt + 1), 250);
-  }else{
+  else if(enableDebug){
     writeDebug("*************************************************");
     writeDebug("Painting succeeds in " + attempt + " attempts");
     writeDebug("*************************************************");
   }
 }
-
 /**
  * Registers S-57 layers in GeoLibre's Layers Panel via addGeoJsonLayer,
  * then overrides their styling using getMap() for full MapLibre paint control.
@@ -163,7 +173,6 @@ function handleLayersLoaded(layers: S57LayerData[]) {
   for (const layer of orderedLayers) {
     const sampleProperties = (layer.metadata?.sampleProperties as Record<string, unknown>) ?? {};
     const styleSelection = selectS57LayerStyle(layer.classCode, sampleProperties);
-    const s = styleSelection.style;
 
     // Register in GeoLibre's Layers Panel
     const hostedLayerId = appAPI.addGeoJsonLayer(
@@ -173,8 +182,10 @@ function handleLayersLoaded(layers: S57LayerData[]) {
     );
     writeDebug(hostedLayerId + " : " + layer.layerName);
 
+    styleTracker.trackStyle(hostedLayerId, styleSelection, layer.classCode, sampleProperties);
+
     if (map) {
-      setTimeout(() => applyS57Style(map, layer.layerName, hostedLayerId, s), 0);
+      setTimeout(() => { void applyS57Style(map, layer.layerName, hostedLayerId, styleSelection); }, 0);
     }
   }
   writeDebug("++++++++++++++++++++++++++++++++++++++++++");
