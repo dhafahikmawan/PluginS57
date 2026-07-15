@@ -8,6 +8,14 @@ import './lib/styles/uploader.css';
 
 let appAPI: GeoLibreAppAPI | null = null;
 
+var enableDebug = false;
+
+
+function writeDebug(message : any){
+    if(!enableDebug) return;
+    console.log(message);
+}
+
 export const s57ReaderPlugin: GeoLibrePlugin = {
   id: "geolibre-s57-reader",
   name: "S-57 Marine Chart Reader",
@@ -53,19 +61,37 @@ function applyS57Style(map: any, name: string, hostedLayerId: string, s: GeoLibr
     if (attempt < 4) {
       setTimeout(() => applyS57Style(map, name, hostedLayerId, s, attempt + 1), 250);
     }
+    else if(enableDebug){
+      writeDebug("################################################");
+      writeDebug("Layer ID: " + hostedLayerId);
+      writeDebug("Attempts: " + attempt);
+      writeDebug("Function Timed Out");
+      writeDebug("________________________________________________")
+    }
     return;
   }
   
   const styleLayers = map.getStyle().layers || [];
-  const candidates = [name, hostedLayerId, `${name}-layer`, `${hostedLayerId}-layer`, `source-${name}`, `source-${hostedLayerId}`];
-  
+  //const candidates = [name, hostedLayerId, `${name}-layer`, `${hostedLayerId}-layer`, `source-${name}`, `source-${hostedLayerId}`];
+  const candidates : string[] = [];
+  writeDebug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  writeDebug("Search Matching Layer For ID: " + hostedLayerId + ", Name: " + name);
   styleLayers.forEach((layer: any) => {
     if (!layer?.id) return;
     const id = layer.id;
-    if (id.includes(name) || id.includes(hostedLayerId) || id.includes("geojson") || id.includes("layer")) {
+    writeDebug("ID: " + id);
+    if (id.includes(hostedLayerId)) {
       candidates.push(id);
+      writeDebug("Yes");
     }
   });
+  writeDebug("End Searching");
+  writeDebug("===============================================================");
+  writeDebug("Final Result: ");
+  writeDebug(candidates);
+  writeDebug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+
   
   const uniqueIds = [...new Set(candidates.filter(Boolean))];
   
@@ -94,19 +120,24 @@ function applyS57Style(map: any, name: string, hostedLayerId: string, s: GeoLibr
   }
 
   uniqueIds.forEach(layerId => {
-    console.log("____________________________________");
-    console.log("Layer ID: ", layerId);
+    writeDebug("____________________________________");
+    writeDebug("Layer ID: " + layerId);
+    writeDebug("Layer Name: " + name);
     paintOps.forEach(([property, value]) => {
       try {
-        console.log("Paint Options: ", property, " | ", value);
+        writeDebug("Paint Options: " + property + " | " + value);
         map.setPaintProperty(layerId, property, value);
       } catch (err) {}
     });
-    console.log("____________________________________");
+    writeDebug("____________________________________");
   });
   
   if (uniqueIds.length === 0 && attempt < 4) {
     setTimeout(() => applyS57Style(map, name, hostedLayerId, s, attempt + 1), 250);
+  }else{
+    writeDebug("*************************************************");
+    writeDebug("Painting succeeds in " + attempt + " attempts");
+    writeDebug("*************************************************");
   }
 }
 
@@ -125,7 +156,10 @@ function handleLayersLoaded(layers: S57LayerData[]) {
     const styleB = selectS57LayerStyle(b.classCode, (b.metadata?.sampleProperties as Record<string, unknown>) ?? {});
     return styleA.priority - styleB.priority;
   });
+  
 
+  writeDebug("++++++++++++++++++++++++++++++++++++++++++");
+  writeDebug("Layer rendering order: ")
   for (const layer of orderedLayers) {
     const sampleProperties = (layer.metadata?.sampleProperties as Record<string, unknown>) ?? {};
     const styleSelection = selectS57LayerStyle(layer.classCode, sampleProperties);
@@ -137,11 +171,13 @@ function handleLayersLoaded(layers: S57LayerData[]) {
       layer.geojson as any,
       layer.fileName, // groups layers under the filename in the panel
     );
+    writeDebug(hostedLayerId + " : " + layer.layerName);
 
     if (map) {
       setTimeout(() => applyS57Style(map, layer.layerName, hostedLayerId, s), 0);
     }
   }
+  writeDebug("++++++++++++++++++++++++++++++++++++++++++");
 }
 
 // Default export untuk dibaca oleh bundling system GeoLibre

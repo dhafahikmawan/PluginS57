@@ -216,11 +216,16 @@ export function selectS57LayerStyle(
   }
 
   if (NAVIGATION_CLASSES.has(normalizedCode)) {
+    const labelField = normalizedCode === 'LIGHTS' || normalizedCode === 'LITFLT'
+      ? (asString(normalizedAttributes._light_label) ? '_light_label' : asString(normalizedAttributes.OBJNAM) ? 'OBJNAM' : undefined)
+      : undefined;
+
     return {
       family: 'navigation',
       priority: 70000,
       minZoom: 4,
       style: buildNavigationStyle(normalizedAttributes),
+      labelField,
     };
   }
 
