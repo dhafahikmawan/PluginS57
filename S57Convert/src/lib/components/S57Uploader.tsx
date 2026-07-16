@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { convertS57ToGeoJSONLayers, S57LayerData } from '../utils/s57Converter';
+import { buildS57ConversionBundle, S57ConversionBundle, S57LayerData } from '../utils/s57Converter';
+import { triggerGeoJsonZipDownload } from '../utils/downloadZip';
 
 interface S57UploaderProps {
   // Callback untuk meregistrasikan layer baru ke GeoLibre Host
@@ -12,6 +13,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadedFiles, setLoadedFiles] = useState<string[]>([]);
+  const [conversionBundle, setConversionBundle] = useState<S57ConversionBundle | null>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -35,8 +37,9 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
           if (!buffer) throw new Error("Gagal membaca data file biner.");
           
           // Konversi data biner
-          const layers = convertS57ToGeoJSONLayers(buffer, file.name);
-          onLayersLoaded(layers);
+          const bundle = buildS57ConversionBundle(buffer, file.name);
+          onLayersLoaded(bundle.processedLayers);
+          setConversionBundle(bundle);
           
           setLoadedFiles(prev => [...prev, file.name]);
         } catch (err: any) {
@@ -61,38 +64,58 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
   const handleReset = () => {
     onClearLayers();
     setLoadedFiles([]);
+    setConversionBundle(null);
     setError(null);
+  };
+
+  const handleDownloadZip = async () => {
+    if (!conversionBundle) return;
+    await triggerGeoJsonZipDownload(conversionBundle, conversionBundle.sourceFileName.replace(/\.000$/i, ''));
   };
 
   return (
     <div className="s57-uploader-panel">
-      <h3>S-57 Marine Chart Loader</h3>
-      <p className="description">Unggah file peta navigasi laut (.000) untuk merendernya sebagai layer GeoJSON.</p>
-      
-      <div className="upload-zone">
-        <input 
-          type="file" 
-          accept=".000" 
-          onChange={handleFileUpload} 
-          disabled={loading}
-          id="s57-file-input"
-        />
-        <label htmlFor="s57-file-input" className={`upload-button ${loading ? 'loading' : ''}`}>
-          {loading ? 'Memproses File...' : 'Pilih File S-57 (.000)'}
-        </label>
+      <section className="s57-panel-hero">
+        <span className="s57-panel-badge">Ready</span>
+        <h3>S-57 Marine Chart Loader</h3>
+        <p className="description">
+          Upload nautical data and keep your conversion workflow visible in one place.
+        </p>
+      </section>
+
+      <div className="s57-panel-body">
+        <section className="s57-panel-card">
+          <div className="upload-zone">
+            <input
+              type="file"
+              accept=".000"
+              onChange={handleFileUpload}
+              disabled={loading}
+              id="s57-file-input"
+            />
+            <label htmlFor="s57-file-input" className={`upload-button ${loading ? 'loading' : ''}`}>
+              {loading ? 'Memproses File...' : 'Pilih File S-57 (.000)'}
+            </label>
+          </div>
+
+          {error && <div className="error-message">⚠️ {error}</div>}
+        </section>
+
+        {loadedFiles.length > 0 && (
+          <section className="s57-panel-card s57-panel-card-muted">
+            <h4>Loaded files</h4>
+            <ul className="loaded-list">
+              {loadedFiles.map((f, i) => <li key={i}>📄 {f}</li>)}
+            </ul>
+            <div className="s57-panel-actions">
+              {conversionBundle && (
+                <button onClick={handleDownloadZip} className="download-button">Download ZIP</button>
+              )}
+              <button onClick={handleReset} className="reset-button">Clear layers</button>
+            </div>
+          </section>
+        )}
       </div>
-
-      {error && <div className="error-message">⚠️ {error}</div>}
-
-      {loadedFiles.length > 0 && (
-        <div className="loaded-section">
-          <h4>File yang Dimuat:</h4>
-          <ul>
-            {loadedFiles.map((f, i) => <li key={i}>📄 {f}</li>)}
-          </ul>
-          <button onClick={handleReset} className="reset-button">Bersihkan Semua Layer</button>
-        </div>
-      )}
     </div>
   );
 };

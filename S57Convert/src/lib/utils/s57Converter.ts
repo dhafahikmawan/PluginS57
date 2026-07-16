@@ -258,10 +258,19 @@ export interface S57LayerData {
   metadata?: Record<string, unknown>;
 }
 
+export interface S57ConversionBundle {
+  sourceFileName: string;
+  rawGeojsonByClass: Record<string, any>;
+  processedLayers: S57LayerData[];
+}
+
 /**
  * Mengonversi buffer file S-57 (.000) menjadi daftar layer GeoJSON yang terkelompok.
  */
-export function convertS57ToGeoJSONLayers(arrayBuffer: ArrayBuffer, fileName: string): S57LayerData[] {
+function convertS57ToGeoJSONLayersWithBundle(arrayBuffer: ArrayBuffer, fileName: string): {
+  layers: S57LayerData[];
+  bundle: S57ConversionBundle;
+} {
   // 1. Parsing file biner S-57
   const dataset = parseS57(arrayBuffer);
   
@@ -275,11 +284,17 @@ export function convertS57ToGeoJSONLayers(arrayBuffer: ArrayBuffer, fileName: st
   // 3. Kelompokkan fitur berdasarkan kode kelas objek S-57 (numeric OBJL) dan atribut styling
   const groupedFeatures: Record<string, any[]> = {};
   const groupAcronyms: Record<string, string> = {}; // groupKey -> original acronym
+  const rawGroupedFeatures: Record<string, any[]> = {};
   
   for (const feature of fullGeoJSON.features) {
     const rawCode: any = feature.properties?.OBJL || feature.properties?.OBJ_CLASS;
     const codeStr = rawCode != null ? String(rawCode) : "UNKNOWN";
     const acronym = getS57Acronym(codeStr); // maps numeric code to S-57 acronym; returns code as-is if not found
+
+    if (!rawGroupedFeatures[acronym]) {
+      rawGroupedFeatures[acronym] = [];
+    }
+    rawGroupedFeatures[acronym].push(structuredClone(feature));
 
     // Tentukan suffix khusus berdasarkan atribut untuk memisahkan style layer.
     // Gunakan ':' sebagai pemisah (bukan '_') agar kelas dengan underscore seperti M_NPUB tidak terpengaruh.
@@ -295,6 +310,7 @@ export function convertS57ToGeoJSONLayers(arrayBuffer: ArrayBuffer, fileName: st
     }
     
     if (acronym === 'DEPARE' || acronym === 'DRGARE') {
+      
       const drval1 = Number(props.DRVAL1) || 0;
       if (drval1 < 0) suffix = ':IT';
       else if (drval1 < 2.0) suffix = ':VS';
@@ -358,7 +374,7 @@ export function convertS57ToGeoJSONLayers(arrayBuffer: ArrayBuffer, fileName: st
     };
   });
 
-  const rawSoundingFeatures = groupedFeatures['SOUNDG'] ?? [];
+  const rawSoundingFeatures = rawGroupedFeatures['SOUNDG'] ?? [];
   const processedSoundingFeatures = rawSoundingFeatures.flatMap((feature) => buildProcessedSoundingFeatures(feature));
 
   if (processedSoundingFeatures.length > 0) {
@@ -382,7 +398,30 @@ export function convertS57ToGeoJSONLayers(arrayBuffer: ArrayBuffer, fileName: st
     });
   }
 
-  return layers;
+  const rawGeojsonByClass: Record<string, any> = {};
+  Object.entries(rawGroupedFeatures).forEach(([className, features]) => {
+    rawGeojsonByClass[className] = {
+      type: 'FeatureCollection',
+      features: features.map((feature) => structuredClone(feature)),
+    };
+  });
+
+  return {
+    layers,
+    bundle: {
+      sourceFileName: fileName,
+      rawGeojsonByClass,
+      processedLayers: layers,
+    },
+  };
+}
+
+export function convertS57ToGeoJSONLayers(arrayBuffer: ArrayBuffer, fileName: string): S57LayerData[] {
+  return convertS57ToGeoJSONLayersWithBundle(arrayBuffer, fileName).layers;
+}
+
+export function buildS57ConversionBundle(arrayBuffer: ArrayBuffer, fileName: string): S57ConversionBundle {
+  return convertS57ToGeoJSONLayersWithBundle(arrayBuffer, fileName).bundle;
 }
 
 

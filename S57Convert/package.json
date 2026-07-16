@@ -107,6 +107,7 @@
     "vitest": "^4.1.8"
   },
   "dependencies": {
-    "@s57-parser/s57": "^0.1.0"
+    "@s57-parser/s57": "^0.1.0",
+    "jszip": "^3.10.1"
   }
 }

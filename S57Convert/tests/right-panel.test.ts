@@ -50,7 +50,16 @@ describe("registerTemplateRightPanel", () => {
 
     const container = document.createElement("div");
     const cleanup = panel?.render(container);
-    expect(container.querySelector("h2")?.textContent).toBe("Plugin Workbench");
+    expect(container.querySelector("h2")?.textContent).toBe(
+      "S-57 Conversion Workspace",
+    );
+    expect(container.querySelector(".geolibre-panel-pill")?.textContent).toBe(
+      "Ready",
+    );
+    expect(container.querySelector(".geolibre-panel-body")?.children.length).toBeGreaterThan(1);
+    expect(container.querySelector(".geolibre-panel-card-title")?.textContent).toContain(
+      "Workflow",
+    );
 
     // The returned cleanup removes the plugin's own DOM.
     expect(cleanup).toBeTypeOf("function");

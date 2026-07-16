@@ -40,17 +40,65 @@ export function registerTemplateRightPanel<TControl extends GeoLibreControl>(
       const wrap = document.createElement("div");
       wrap.className = "geolibre-plugin-right-panel";
 
+      const hero = document.createElement("section");
+      hero.className = "geolibre-panel-hero";
+
+      const badge = document.createElement("span");
+      badge.className = "geolibre-panel-pill";
+      badge.textContent = "Ready";
+
       const heading = document.createElement("h2");
-      heading.textContent = "Plugin Workbench";
+      heading.textContent = "S-57 Conversion Workspace";
 
-      const body = document.createElement("p");
-      body.textContent =
-        "This panel is rendered by the plugin through app.registerRightPanel(). " +
-        "Replace this content with your own workbench, query review, or " +
-        "dashboard UI. Drive it with app.openRightPanel(), collapseRightPanel(), " +
-        "and closeRightPanel().";
+      const subtitle = document.createElement("p");
+      subtitle.className = "geolibre-panel-subtitle";
+      subtitle.textContent =
+        "Upload charts, review conversion settings, and keep your workflow visible in one place.";
 
-      wrap.append(heading, body);
+      const body = document.createElement("div");
+      body.className = "geolibre-panel-body";
+
+      const overviewCard = document.createElement("div");
+      overviewCard.className = "geolibre-panel-card";
+
+      const overviewTitle = document.createElement("h3");
+      overviewTitle.className = "geolibre-panel-card-title";
+      overviewTitle.textContent = "Workflow";
+
+      const overviewText = document.createElement("p");
+      overviewText.className = "geolibre-panel-card-text";
+      overviewText.textContent =
+        "Move from upload to review without losing context in the chart workspace.";
+
+      const list = document.createElement("ul");
+      list.className = "geolibre-panel-list";
+
+      [
+        "Upload S-57 data and inspect the result",
+        "Track styling and portrayal updates",
+        "Keep conversion tasks grouped for review",
+      ].forEach((itemText) => {
+        const item = document.createElement("li");
+        item.textContent = itemText;
+        list.appendChild(item);
+      });
+
+      const statusCard = document.createElement("div");
+      statusCard.className = "geolibre-panel-card geolibre-panel-card-muted";
+
+      const statusTitle = document.createElement("h3");
+      statusTitle.className = "geolibre-panel-card-title";
+      statusTitle.textContent = "Current focus";
+
+      const statusText = document.createElement("p");
+      statusText.className = "geolibre-panel-card-text";
+      statusText.textContent = "Monitor the active conversion state and keep the next review step in view.";
+
+      statusCard.append(statusTitle, statusText);
+      overviewCard.append(overviewTitle, overviewText, list);
+      body.append(overviewCard, statusCard);
+      hero.append(badge, heading, subtitle);
+      wrap.append(hero, body);
       container.appendChild(wrap);
 
       // Optional cleanup, run when the panel closes or is unregistered.

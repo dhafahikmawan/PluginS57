@@ -3,5 +3,6 @@
   "name": "S-57 Marine Chart Reader",
   "version": "1.0.0",
   "entry": "dist/index.js",
+  "style": "dist/style.css",
   "description": "Membaca file navigasi laut S-57 (.000), mengonversinya ke GeoJSON, dan memuatnya sebagai layer GeoLibre secara otomatis."
 }

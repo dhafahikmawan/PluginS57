@@ -330,23 +330,113 @@
 /* Demo right-sidebar panel body (see src/lib/geolibre/right-panel.ts). The host
    provides the dock chrome and theme; the plugin only styles its own content. */
 .geolibre-plugin-right-panel {
+  --panel-surface: color-mix(in srgb, var(--pc-bg) 92%, transparent);
+  --panel-surface-strong: color-mix(in srgb, var(--pc-bg) 98%, transparent);
+  --panel-border: color-mix(in srgb, var(--pc-border) 86%, transparent);
+  --panel-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+  --panel-muted: var(--pc-muted);
+  --panel-accent: var(--pc-accent);
+
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   padding: 12px;
   font-size: 13px;
   line-height: 1.5;
+  color: var(--pc-text);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.geolibre-plugin-right-panel .geolibre-panel-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--panel-accent) 16%, transparent), color-mix(in srgb, var(--panel-accent) 6%, transparent));
+  border: 1px solid var(--panel-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.geolibre-plugin-right-panel .geolibre-panel-pill {
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--panel-accent);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .geolibre-plugin-right-panel h2 {
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--pc-text);
+  letter-spacing: -0.01em;
 }
 
-.geolibre-plugin-right-panel p {
+.geolibre-plugin-right-panel .geolibre-panel-subtitle {
   margin: 0;
-  opacity: 0.85;
+  color: var(--panel-muted);
+  font-size: 12.5px;
+}
+
+.geolibre-plugin-right-panel .geolibre-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.geolibre-plugin-right-panel .geolibre-panel-card {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--panel-border);
+  background: var(--panel-surface-strong);
+  box-shadow: var(--panel-shadow);
+}
+
+.geolibre-plugin-right-panel .geolibre-panel-card-muted {
+  background: var(--panel-surface);
+}
+
+.geolibre-plugin-right-panel .geolibre-panel-card-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pc-text);
+}
+
+.geolibre-plugin-right-panel .geolibre-panel-card-text {
+  margin: 0 0 8px;
+  color: var(--panel-muted);
+}
+
+.geolibre-plugin-right-panel .geolibre-panel-list {
+  margin: 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--pc-label);
+}
+
+.geolibre-plugin-right-panel .geolibre-panel-list li {
+  line-height: 1.45;
+}
+
+.geolibre-plugin-right-panel .geolibre-panel-list li::marker {
+  color: var(--panel-accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  .geolibre-plugin-right-panel {
+    --panel-shadow: 0 16px 38px rgba(2, 6, 23, 0.4);
+  }
+}
 }
 
 /* Demo floating panel body (see src/lib/geolibre/floating-panel.ts). The host
