@@ -16,7 +16,16 @@ describe('createGeoJsonZip', () => {
           features: [{ type: 'Feature', properties: { DEPTH: 15 } }],
         },
       },
-      processedLayers: [],
+      processedLayers: [
+        {
+          classCode: 'SOUNDG',
+          layerName: 'SOUNDG--DEPARE',
+          geojson: {
+            type: 'FeatureCollection',
+            features: [{ type: 'Feature', properties: { DEPTH: 15, DRVAL1: 10, DRVAL2: 20 } }],
+          },
+        },
+      ],
     };
 
     const blob = await createGeoJsonZip(bundle);
@@ -26,10 +35,13 @@ describe('createGeoJsonZip', () => {
     const zip = await JSZip.loadAsync(blob);
     const lightsContent = await zip.file('raw/LIGHTS.geojson')?.async('string');
     const soundgContent = await zip.file('raw/SOUNDG.geojson')?.async('string');
-    const manifestContent = await zip.file('raw/manifest.json')?.async('string');
+    const processedContent = await zip.file('processed/SOUNDG--DEPARE.geojson')?.async('string');
+    const manifestContent = await zip.file('manifest.json')?.async('string');
 
     expect(lightsContent).toContain('"OBJNAM": "Light 1"');
     expect(soundgContent).toContain('"DEPTH": 15');
+    expect(processedContent).toContain('"DRVAL1": 10');
     expect(manifestContent).toContain('"sourceFileName": "sample.000"');
+    expect(manifestContent).toContain('"SOUNDG--DEPARE"');
   });
 });

@@ -13,13 +13,20 @@ export async function createGeoJsonZip(bundle: DownloadBundle): Promise<Blob> {
     zip.file(`raw/${className}.geojson`, JSON.stringify(geojson, null, 2));
   });
 
+  bundle.processedLayers.forEach((layer) => {
+    if (layer.geojson) {
+      zip.file(`processed/${layer.layerName}.geojson`, JSON.stringify(layer.geojson, null, 2));
+    }
+  });
+
   zip.file(
-    'raw/manifest.json',
+    'manifest.json',
     JSON.stringify(
       {
         sourceFileName: bundle.sourceFileName,
         generatedAt: new Date().toISOString(),
         classes: Object.keys(bundle.rawGeojsonByClass),
+        processedLayers: bundle.processedLayers.map(l => l.layerName),
       },
       null,
       2,

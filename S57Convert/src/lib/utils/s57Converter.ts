@@ -46,24 +46,24 @@ export function buildConversionBundleFromGeoJSON(
     rawGroupedFeatures[acronym].push(structuredClone(feature));
 
     // Tentukan suffix khusus berdasarkan atribut untuk memisahkan style layer.
-    // Gunakan ':' sebagai pemisah (bukan '_') agar kelas dengan underscore seperti M_NPUB tidak terpengaruh.
+    // Gunakan '--' sebagai pemisah (bukan '_') agar kelas dengan underscore seperti M_NPUB tidak terpengaruh.
     let suffix = '';
     const props = feature.properties || {};
 
     if (acronym === 'DEPARE' || acronym === 'DRGARE') {
       const drval1 = Number(props.DRVAL1) || 0;
-      if (drval1 < 0) suffix = ':IT';
-      else if (drval1 < 2.0) suffix = ':VS';
-      else if (drval1 < 30.0) suffix = ':MS';
-      else suffix = ':DW';
+      if (drval1 < 0) suffix = '--IT';
+      else if (drval1 < 2.0) suffix = '--VS';
+      else if (drval1 < 30.0) suffix = '--MS';
+      else suffix = '--DW';
     } else if (acronym === 'DEPCNT' || acronym === 'SLCONS') {
       const uncertain = String(props.QUAPOS) === '2' || String(props.CONDTN) === '2';
-      suffix = uncertain ? ':UNC' : ':CER';
+      suffix = uncertain ? '--UNC' : '--CER';
     } else if (acronym === 'LIGHTS') {
       const color = String(props.COLOUR || '');
-      if (color.includes('3')) suffix = ':RED';
-      else if (color.includes('4')) suffix = ':GRN';
-      else suffix = ':YLW';
+      if (color.includes('3')) suffix = '--RED';
+      else if (color.includes('4')) suffix = '--GRN';
+      else suffix = '--YLW';
     }
 
     const groupKey = `${acronym}${suffix}`;
