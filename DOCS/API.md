@@ -27,7 +27,7 @@ This document outlines the step-by-step implementation plan for enhancing the **
     - The API returns invalid JSON or invalid GeoJSON formatting.
     - The returned GeoJSON contains an empty feature collection (`features: []`).
 - **GeoJSON Processing Compatibility**:
-  - Once validated, the API-returned GeoJSON must flow through the same layer-splitting, feature-enriching, styling, and download-packaging logic as the built-in parser.
+  - Once validated, the API-returned GeoJSON must flow through the same layer-splitting, feature-enriching (if any), styling, and download-packaging logic as the built-in parser.
   - Use [/Samples/API/Result.geojson](file:///c:/Users/erwin/OneDrive/Documents/Learning/Plugin%20000/Samples/API/Result.geojson) as the target test structure.
 
 ---

@@ -34,7 +34,7 @@ describe('selectS57LayerStyle', () => {
 
   it('uses the higher of the purpose minimum and the layer-specific zoom threshold', () => {
     const contourStyle = selectS57LayerStyle('DEPCNT', {}, 2);
-    const soundingStyle = selectS57LayerStyle('SOUNDG_processed', {}, 2);
+    const soundingStyle = selectS57LayerStyle('SOUNDG', {}, 2);
     const hazardStyle = selectS57LayerStyle('LIGHTS', {}, 3);
 
     expect(contourStyle.minZoom).toBe(7);

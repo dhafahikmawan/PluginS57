@@ -1,254 +1,7 @@
 import { parseS57, toGeoJSON } from '@s57-parser/s57';
 import { getS57Acronym } from './s57ObjectClasses';
 
-function asString(value: unknown): string | undefined {
-  return typeof value === 'string' && value.length > 0 ? value : undefined;
-}
 
-function toColorCode(value: unknown): string | undefined {
-  const normalized = String(value ?? '').trim();
-  if (!normalized) return undefined;
-
-  const colorMap: Record<string, string> = {
-    '1': 'W',
-    '2': 'Y',
-    '3': 'R',
-    '4': 'G',
-    '5': 'W',
-    '6': 'W',
-  };
-
-  return colorMap[normalized] ?? normalized;
-}
-
-function parseBearing(value: unknown): number | undefined {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return undefined;
-  return parsed;
-}
-
-function parseNominalRange(value: unknown): number | undefined {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed) || parsed <= 0) return undefined;
-  return parsed;
-}
-
-function normalizeBearingDegrees(value: number): number {
-  let normalized = value % 360;
-  if (normalized < 0) normalized += 360;
-  return normalized;
-}
-
-type LightFeatureLike = {
-  type?: string;
-  geometry?: { type?: string; coordinates?: unknown } | null;
-  properties?: Record<string, unknown> | null;
-};
-
-type SoundingFeatureLike = {
-  type?: string;
-  geometry?: { type?: string; coordinates?: unknown } | null;
-  properties?: Record<string, unknown> | null;
-};
-
-function asNumber(value: unknown): number | undefined {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return value;
-  }
-
-  if (typeof value === 'string') {
-    const parsed = Number(value);
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
-  }
-
-  return undefined;
-}
-
-function parseSoundingDepth(feature: SoundingFeatureLike): number | undefined {
-  const props = feature.properties ?? {};
-  const candidates = [
-    props.DEPTH,
-    props.depth,
-    props.VALSOU,
-    props.VALDCO,
-    props.SOUVAL,
-    props.souval,
-    props.ATTL_133,
-    props.ATTL_135,
-    props.ATTL_1,
-  ];
-
-  for (const candidate of candidates) {
-    if (candidate === props.ATTL_133 || candidate === props.ATTL_135 || candidate === props.ATTL_1) {
-      const stringValue = typeof candidate === 'string' ? candidate : String(candidate ?? '');
-      const cleaned = stringValue.replace(/[^0-9.-]/g, '');
-      if (cleaned) {
-        const parsed = Number(cleaned);
-        if (Number.isFinite(parsed)) {
-          if (String(Math.abs(parsed)).length > 4) {
-            const digits = String(Math.abs(parsed));
-            return Number(digits.slice(0, 2));
-          }
-          return parsed;
-        }
-      }
-    }
-
-    const parsed = asNumber(candidate);
-    if (parsed !== undefined) {
-      return parsed;
-    }
-  }
-
-  const geometry = feature.geometry as { type?: string; coordinates?: unknown } | undefined;
-  const coordinates = geometry?.coordinates;
-  if (Array.isArray(coordinates) && coordinates.length >= 3) {
-    const depthFromCoordinates = asNumber(coordinates[2]);
-    if (depthFromCoordinates !== undefined) {
-      return depthFromCoordinates;
-    }
-  }
-
-  return undefined;
-}
-
-function formatSoundingDecimal(depth: number): string {
-  const decimalPart = depth - Math.trunc(depth);
-  if (decimalPart === 0) {
-    return '0';
-  }
-  return Number(decimalPart.toFixed(2)).toString().replace(/^0\./, '').replace(/0+$/, '');
-}
-
-export function buildProcessedSoundingFeatures(feature: SoundingFeatureLike): any[] {
-  const depth = parseSoundingDepth(feature);
-  if (depth === undefined) {
-    return [];
-  }
-
-  const props = feature.properties ?? {};
-  const processedProperties = {
-    ...props,
-    DEPTH: depth,
-    DEPTH_INT: Math.trunc(depth),
-    DEPTH_DEC: formatSoundingDecimal(depth),
-  };
-
-  const geometry = feature.geometry as { type?: string; coordinates?: unknown } | undefined;
-  const coordinates = geometry?.coordinates;
-
-  if (geometry?.type === 'Point' && Array.isArray(coordinates) && coordinates.length >= 2) {
-    const [lon, lat] = coordinates as [number, number];
-    return [{
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [lon, lat],
-      },
-      properties: processedProperties,
-    }];
-  }
-
-  return [];
-}
-
-export function buildLightSectorFeature(
-  feature: LightFeatureLike,
-  classCode: string = 'LIGHTS',
-): any | undefined {
-  const normalizedCode = String(classCode || '').toUpperCase();
-  if (normalizedCode !== 'LIGHTS' && normalizedCode !== 'LITFLT') {
-    return undefined;
-  }
-
-  const props = feature.properties ?? {};
-  const start = parseBearing(props.SECTR1);
-  const end = parseBearing(props.SECTR2);
-  const rangeNm = parseNominalRange(props.VALNMR);
-  const geometry = feature.geometry as { type?: string; coordinates?: [number, number] } | undefined;
-  const point = geometry?.type === 'Point' && Array.isArray(geometry.coordinates)
-    ? geometry.coordinates
-    : undefined;
-
-  if (start === undefined || end === undefined || rangeNm === undefined || !point || point.length < 2) {
-    return undefined;
-  }
-
-  const [lon, lat] = point as [number, number];
-  const startRadians = (normalizeBearingDegrees(start) * Math.PI) / 180;
-  const endRadians = (normalizeBearingDegrees(end) * Math.PI) / 180;
-  const radiusMeters = rangeNm * 1852;
-
-  const points = [
-    [lon, lat],
-    [lon + (radiusMeters * Math.cos(startRadians)) / 111320, lat + (radiusMeters * Math.sin(startRadians)) / 110540],
-    [lon + (radiusMeters * Math.cos(endRadians)) / 111320, lat + (radiusMeters * Math.sin(endRadians)) / 110540],
-  ];
-
-  const sectorFeature = {
-    type: 'Feature',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [[point, points[1], points[2], point]],
-    },
-    properties: {
-      ...props,
-      _sector_start: start,
-      _sector_end: end,
-      _sector_range_m: radiusMeters,
-      _sector_source_class: normalizedCode,
-    },
-  };
-
-  return sectorFeature;
-}
-
-export function deriveLightLabel(properties: Record<string, unknown> = {}, classCode: string = 'LIGHTS'): string {
-  const normalizedCode = String(classCode || '').toUpperCase();
-  const props = properties ?? {};
-  const lightChar = asString(props.LITCHR)?.trim();
-  const signalGroup = asString(props.SIGGRP);
-  const colorCode = toColorCode(props.COLOUR);
-  const signalPeriod = asString(props.SIGPER);
-  const nominalRange = asString(props.VALNMR);
-
-  const hasLightStructure = Boolean(lightChar || signalGroup || colorCode || signalPeriod || nominalRange);
-  const characteristic = lightChar ?? 'F';
-  const groupSuffix = signalGroup ? `(${signalGroup})` : '';
-  const colorSuffix = colorCode ? ` ${colorCode}` : '';
-  const periodSuffix = signalPeriod ? ` ${signalPeriod}` : '';
-  const rangeSuffix = nominalRange ? ` ${nominalRange}M` : '';
-
-  const labelParts = [
-    `${characteristic}${groupSuffix}`,
-    colorSuffix.trim(),
-    periodSuffix.trim(),
-    rangeSuffix.trim(),
-  ].filter(Boolean);
-
-  const derivedLabel = labelParts.join(' ').trim();
-
-  if (derivedLabel && hasLightStructure) {
-    return normalizedCode === 'LITFLT' ? `LtV ${derivedLabel}` : derivedLabel;
-  }
-
-  return asString(props.OBJNAM) ?? 'Unnamed light';
-}
-/*
-function enrichLightFeatures(features: Array<{ properties?: Record<string, unknown> }>, acronym: string): void {
-  if (acronym !== 'LIGHTS' && acronym !== 'LITFLT') {
-    return;
-  }
-
-  for (const feature of features) {
-    const props = feature.properties ?? {};
-    const label = deriveLightLabel(props, acronym);
-    props._light_label = label;
-  }
-}
-  */
 
 export interface S57LayerData {
   classCode: string; // e.g., ADMARE, AIRARE, etc.
@@ -265,27 +18,23 @@ export interface S57ConversionBundle {
 }
 
 /**
- * Mengonversi buffer file S-57 (.000) menjadi daftar layer GeoJSON yang terkelompok.
+ * Builds an S57ConversionBundle from a raw GeoJSON FeatureCollection.
+ * This is the shared grouping/enrichment logic used by both the local parser
+ * and the external API conversion path.
  */
-function convertS57ToGeoJSONLayersWithBundle(arrayBuffer: ArrayBuffer, fileName: string): {
-  layers: S57LayerData[];
-  bundle: S57ConversionBundle;
-} {
-  // 1. Parsing file biner S-57
-  const dataset = parseS57(arrayBuffer);
-  
-  // 2. Konversi dataset mentah ke GeoJSON menggunakan parser helper
-  const fullGeoJSON = toGeoJSON(dataset);
-  
+export function buildConversionBundleFromGeoJSON(
+  fullGeoJSON: any,
+  fileName: string
+): S57ConversionBundle {
   if (!fullGeoJSON || !fullGeoJSON.features) {
-    throw new Error("File S-57 tidak menghasilkan fitur geometri apa pun.");
+    throw new Error("Invalid GeoJSON: Missing features array.");
   }
-  
-  // 3. Kelompokkan fitur berdasarkan kode kelas objek S-57 (numeric OBJL) dan atribut styling
+
+  // 1. Kelompokkan fitur berdasarkan kode kelas objek S-57 (numeric OBJL) dan atribut styling
   const groupedFeatures: Record<string, any[]> = {};
   const groupAcronyms: Record<string, string> = {}; // groupKey -> original acronym
   const rawGroupedFeatures: Record<string, any[]> = {};
-  
+
   for (const feature of fullGeoJSON.features) {
     const rawCode: any = feature.properties?.OBJL || feature.properties?.OBJ_CLASS;
     const codeStr = rawCode != null ? String(rawCode) : "UNKNOWN";
@@ -301,16 +50,7 @@ function convertS57ToGeoJSONLayersWithBundle(arrayBuffer: ArrayBuffer, fileName:
     let suffix = '';
     const props = feature.properties || {};
 
-    if (acronym === 'LIGHTS' || acronym === 'LITFLT') {
-      props._light_label = deriveLightLabel(props, acronym);
-      const sectorFeature = buildLightSectorFeature(feature, acronym);
-      if (sectorFeature) {
-        props._light_sector = sectorFeature;
-      }
-    }
-    
     if (acronym === 'DEPARE' || acronym === 'DRGARE') {
-      
       const drval1 = Number(props.DRVAL1) || 0;
       if (drval1 < 0) suffix = ':IT';
       else if (drval1 < 2.0) suffix = ':VS';
@@ -334,25 +74,18 @@ function convertS57ToGeoJSONLayersWithBundle(arrayBuffer: ArrayBuffer, fileName:
     }
     groupedFeatures[groupKey].push(feature);
   }
-  
-  // 4. Transformasikan kelompok fitur menjadi struktur Layer GeoLibre
-  const layers: S57LayerData[] = Object.keys(groupedFeatures).map((groupKey) => {
-    const features = groupedFeatures[groupKey];
-    const sampleProperties = features[0]?.properties ?? {};
+
+  // 2. Transformasikan kelompok fitur menjadi struktur Layer GeoLibre
+  const layers: S57LayerData[] = Object.keys(groupedFeatures).flatMap((groupKey) => {
     const acronym = groupAcronyms[groupKey]; // Ambil nama class asli yang sudah disimpan
-
-    if (acronym === 'LIGHTS' || acronym === 'LITFLT') {
-      const sectorFeatures = features.flatMap((item) => {
-        const sectorFeature = buildLightSectorFeature(item, acronym);
-        return sectorFeature ? [sectorFeature] : [];
-      });
-
-      if (sectorFeatures.length > 0) {
-        features.push(...sectorFeatures);
-      }
+    if (acronym === 'SOUNDG') {
+      return [];
     }
 
-    return {
+    const features = groupedFeatures[groupKey];
+    const sampleProperties = features[0]?.properties ?? {};
+
+    return [{
       classCode: acronym,
       layerName: groupKey,
       fileName: fileName,
@@ -362,41 +95,15 @@ function convertS57ToGeoJSONLayersWithBundle(arrayBuffer: ArrayBuffer, fileName:
         sourcePath: fileName,
         styleHints: {
           objl: sampleProperties.OBJL ?? sampleProperties.OBJ_CLASS ?? acronym,
-          labelField: acronym === 'LIGHTS' || acronym === 'LITFLT'
-            ? (sampleProperties._light_label ? '_light_label' : 'OBJNAM')
-            : (sampleProperties.OBJNAM ?? 'OBJNAM')
+          labelField: sampleProperties.OBJNAM ?? 'OBJNAM'
         }
       },
       geojson: {
         type: "FeatureCollection",
         features
       }
-    };
+    }];
   });
-
-  const rawSoundingFeatures = rawGroupedFeatures['SOUNDG'] ?? [];
-  const processedSoundingFeatures = rawSoundingFeatures.flatMap((feature) => buildProcessedSoundingFeatures(feature));
-
-  if (processedSoundingFeatures.length > 0) {
-    layers.push({
-      classCode: 'SOUNDG_processed',
-      layerName: 'SOUNDG_processed',
-      fileName,
-      metadata: {
-        featureCount: processedSoundingFeatures.length,
-        sampleProperties: processedSoundingFeatures[0]?.properties ?? {},
-        sourcePath: fileName,
-        styleHints: {
-          objl: 'SOUNDG_processed',
-          labelField: 'DEPTH',
-        }
-      },
-      geojson: {
-        type: 'FeatureCollection',
-        features: processedSoundingFeatures,
-      }
-    });
-  }
 
   const rawGeojsonByClass: Record<string, any> = {};
   Object.entries(rawGroupedFeatures).forEach(([className, features]) => {
@@ -406,13 +113,161 @@ function convertS57ToGeoJSONLayersWithBundle(arrayBuffer: ArrayBuffer, fileName:
     };
   });
 
+  const soundgFeatures = rawGroupedFeatures['SOUNDG'] ?? [];
+  if (soundgFeatures.length > 0) {
+    const soundgProcessedFeatures = buildProcessedSoundings(soundgFeatures);
+
+    if (soundgProcessedFeatures.length > 0) {
+      const sampleProperties = soundgProcessedFeatures[0]?.properties ?? {};
+      layers.push({
+        classCode: 'SOUNDG_processed',
+        layerName: 'SOUNDG_processed',
+        fileName,
+        metadata: {
+          featureCount: soundgProcessedFeatures.length,
+          sampleProperties,
+          sourcePath: fileName,
+          styleHints: {
+            objl: 'SOUNDG_processed',
+            labelField: 'VALSOU',
+          },
+        },
+        geojson: {
+          type: 'FeatureCollection',
+          features: soundgProcessedFeatures,
+        },
+      });
+    }
+  }
+
   return {
-    layers,
-    bundle: {
-      sourceFileName: fileName,
-      rawGeojsonByClass,
-      processedLayers: layers,
-    },
+    sourceFileName: fileName,
+    rawGeojsonByClass,
+    processedLayers: layers,
+  };
+}
+
+function buildProcessedSoundings(features: any[]): any[] {
+  const processedFeatures: any[] = [];
+
+  for (const originalFeature of features) {
+    const geometry = originalFeature?.geometry;
+    const properties = structuredClone(originalFeature?.properties ?? {});
+
+    if (!geometry || !Array.isArray(geometry.coordinates)) {
+      continue;
+    }
+
+    if (geometry.type === 'Point') {
+      const coords = geometry.coordinates;
+      if (coords.length < 2) {
+        continue;
+      }
+
+      const depth = resolveSoundingDepth(coords, properties);
+      if (depth === undefined) {
+        continue;
+      }
+
+      const { depthInt, depthDec, depthValue } = formatSoundingDepth(depth);
+      processedFeatures.push({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [coords[0], coords[1]] },
+        properties: {
+          ...properties,
+          DEPTH: depthValue,
+          DEPTH_INT: depthInt,
+          DEPTH_DEC: depthDec,
+        },
+      });
+      continue;
+    }
+
+    if (geometry.type === 'MultiPoint') {
+      for (const coords of geometry.coordinates) {
+        if (!Array.isArray(coords) || coords.length < 2) {
+          continue;
+        }
+
+        const depth = resolveSoundingDepth(coords, properties);
+        if (depth === undefined) {
+          continue;
+        }
+
+        const { depthInt, depthDec, depthValue } = formatSoundingDepth(depth);
+        processedFeatures.push({
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [coords[0], coords[1]] },
+          properties: {
+            ...properties,
+            DEPTH: depthValue,
+            DEPTH_INT: depthInt,
+            DEPTH_DEC: depthDec,
+          },
+        });
+      }
+      continue;
+    }
+  }
+
+  return processedFeatures;
+}
+
+function resolveSoundingDepth(coords: any[], properties: Record<string, unknown>): number | undefined {
+  const rawDepth = coords.length > 2 ? coords[2] : undefined;
+  const depthCandidate = rawDepth ?? properties.DEPTH ?? properties.VALSOU;
+  return parseNumericDepth(depthCandidate);
+}
+
+function parseNumericDepth(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return undefined;
+}
+
+function formatSoundingDepth(depth: number) {
+  const depthValue = Number.isFinite(depth) ? Math.round(depth * 100) / 100 : depth;
+  const depthInt = Math.trunc(depthValue);
+  const decimalPart = Math.abs(depthValue - depthInt);
+  const depthDec = decimalPart === 0
+    ? '0'
+    : String(Number(decimalPart.toFixed(2))).replace(/^0\./, '');
+
+  return { depthValue, depthInt, depthDec };
+}
+
+/**
+ * Mengonversi buffer file S-57 (.000) menjadi daftar layer GeoJSON yang terkelompok.
+ * Parses the binary first, then delegates to buildConversionBundleFromGeoJSON.
+ */
+function convertS57ToGeoJSONLayersWithBundle(arrayBuffer: ArrayBuffer, fileName: string): {
+  layers: S57LayerData[];
+  bundle: S57ConversionBundle;
+} {
+  // 1. Parsing file biner S-57
+  const dataset = parseS57(arrayBuffer);
+
+  // 2. Konversi dataset mentah ke GeoJSON menggunakan parser helper
+  const fullGeoJSON = toGeoJSON(dataset);
+
+  if (!fullGeoJSON || !fullGeoJSON.features) {
+    throw new Error("File S-57 tidak menghasilkan fitur geometri apa pun.");
+  }
+
+  const bundle = buildConversionBundleFromGeoJSON(fullGeoJSON, fileName);
+
+  return {
+    layers: bundle.processedLayers,
+    bundle,
   };
 }
 
