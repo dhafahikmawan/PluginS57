@@ -1,0 +1,202 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9938108,
+          -4.3310594
+        ]
+      },
+      "properties": {
+        "RCID": 16,
+        "OBJL": 144,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "2",
+        "ATTL_133": "700001",
+        "ATTL_171": "4",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 33
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.5485161,
+          -5.8189079
+        ]
+      },
+      "properties": {
+        "RCID": 1095,
+        "OBJL": 144,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "2",
+        "ATTL_133": "700001",
+        "ATTL_171": "4",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 155
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9719546,
+          -5.9617546
+        ]
+      },
+      "properties": {
+        "RCID": 1371,
+        "OBJL": 144,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "2",
+        "ATTL_133": "700001",
+        "ATTL_171": "4",
+        "AGEN": 230,
+        "FIDN": 1632193702,
+        "FIDS": 12
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9092083,
+          -5.4012528
+        ]
+      },
+      "properties": {
+        "RCID": 1641,
+        "OBJL": 144,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "6",
+        "ATTL_133": "700001",
+        "ATTL_171": "7",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 186
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9850917,
+          -5.4937556
+        ]
+      },
+      "properties": {
+        "RCID": 1656,
+        "OBJL": 144,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "3",
+        "ATTL_133": "700001",
+        "ATTL_171": "3",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 171
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.3694401,
+          -6.646813
+        ]
+      },
+      "properties": {
+        "RCID": 1659,
+        "OBJL": 144,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "6",
+        "ATTL_133": "700001",
+        "ATTL_171": "7",
+        "AGEN": 230,
+        "FIDN": 1632193703,
+        "FIDS": 39
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9975699,
+          -5.9178178
+        ]
+      },
+      "properties": {
+        "RCID": 1810,
+        "OBJL": 144,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_133": "700001",
+        "ATTL_171": "7",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 166
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.7892222,
+          -6.4161388
+        ]
+      },
+      "properties": {
+        "RCID": 2068,
+        "OBJL": 144,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "3",
+        "ATTL_133": "700001",
+        "ATTL_171": "3",
+        "AGEN": 230,
+        "FIDN": 1632193707,
+        "FIDS": 128
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.8145333,
+          -5.9216667
+        ]
+      },
+      "properties": {
+        "RCID": 16301,
+        "OBJL": 144,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "2",
+        "ATTL_133": "700001",
+        "ATTL_171": "10",
+        "AGEN": 230,
+        "FIDN": 1642836846,
+        "FIDS": 2
+      }
+    }
+  ]
+}

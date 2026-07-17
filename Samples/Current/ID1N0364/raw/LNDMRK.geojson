@@ -1,0 +1,28 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.2718837,
+          -3.7954899
+        ]
+      },
+      "properties": {
+        "RCID": 368,
+        "OBJL": 74,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_35": "7",
+        "ATTL_83": "1",
+        "ATTL_94": "30",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 56
+      }
+    }
+  ]
+}

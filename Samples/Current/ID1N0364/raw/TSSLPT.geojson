@@ -1,0 +1,149 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              105.7743333,
+              -5.9506667
+            ],
+            [
+              105.7585,
+              -5.9396667
+            ],
+            [
+              105.7898333,
+              -5.9068333
+            ],
+            [
+              105.801,
+              -5.889
+            ],
+            [
+              105.8093327,
+              -5.8941674
+            ],
+            [
+              105.7983263,
+              -5.911882
+            ],
+            [
+              105.7743333,
+              -5.9506667
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "RCID": 532,
+        "OBJL": 148,
+        "PRIM": 3,
+        "GRUP": 2,
+        "ATTL_67": "1",
+        "ATTL_102": "TRAFFIC SEPARATION SCHEME IN THE SUNDA STRAIT IS IMO ADOPTED AND IT WILL BE COME INTO FORCE ON 1ST JULY 2020. VESSELS USING THE TRAFFIC LANES MUST COMPLY WITH RULE 10 OF THE COLREG 1972.",
+        "ATTL_117": "212",
+        "ATTL_133": "1500000",
+        "ATTL_149": "1",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 208
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              105.8315,
+              -5.8528333
+            ],
+            [
+              105.8153333,
+              -5.8428333
+            ],
+            [
+              105.8391667,
+              -5.805
+            ],
+            [
+              105.8551667,
+              -5.8148333
+            ],
+            [
+              105.8315,
+              -5.8528333
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "RCID": 703,
+        "OBJL": 148,
+        "PRIM": 3,
+        "GRUP": 2,
+        "ATTL_67": "1",
+        "ATTL_86": "20200701",
+        "ATTL_102": "TRAFFIC SEPARATION SCHEME IN THE SUNDA STRAIT IS IMO ADOPTED AND IT WILL BE COME INTO FORCE ON 1ST JULY 2020. VESSELS USING THE TRAFFIC LANES MUST COMPLY WITH RULE 10 OF THE COLREG 1972.",
+        "ATTL_117": "212",
+        "ATTL_133": "1500000",
+        "ATTL_149": "1",
+        "ATTL_158": "IDTSS170.TXT",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 132
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              105.8756667,
+              -5.8276667
+            ],
+            [
+              105.8521667,
+              -5.8656667
+            ],
+            [
+              105.836,
+              -5.8556667
+            ],
+            [
+              105.8596667,
+              -5.8176667
+            ],
+            [
+              105.8756667,
+              -5.8276667
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "RCID": 728,
+        "OBJL": 148,
+        "PRIM": 3,
+        "GRUP": 2,
+        "ATTL_67": "1",
+        "ATTL_86": "20200701",
+        "ATTL_102": "TRAFFIC SEPARATION SCHEME IN THE SUNDA STRAIT IS IMO ADOPTED AND IT WILL BE COME INTO FORCE ON 1ST JULY 2020. VESSELS USING THE TRAFFIC LANES MUST COMPLY WITH RULE 10 OF THE COLREG 1972.",
+        "ATTL_117": "32",
+        "ATTL_133": "1500000",
+        "ATTL_149": "1",
+        "ATTL_158": "IDTSS170.TXT",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 177
+      }
+    }
+  ]
+}

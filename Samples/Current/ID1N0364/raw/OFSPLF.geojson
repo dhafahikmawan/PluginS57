@@ -1,0 +1,47 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.5849486,
+          -5.5515795
+        ]
+      },
+      "properties": {
+        "RCID": 1136,
+        "OBJL": 87,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_43": "8",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1632193710,
+        "FIDS": 147
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9416667,
+          -5.4416667
+        ]
+      },
+      "properties": {
+        "RCID": 1632,
+        "OBJL": 87,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_43": "8",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1632193710,
+        "FIDS": 174
+      }
+    }
+  ]
+}

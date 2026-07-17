@@ -1,0 +1,63 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            105.8756667,
+            -5.8276667
+          ],
+          [
+            105.8521667,
+            -5.8656667
+          ]
+        ]
+      },
+      "properties": {
+        "RCID": 491,
+        "OBJL": 146,
+        "PRIM": 2,
+        "GRUP": 2,
+        "ATTL_67": "1",
+        "ATTL_133": "1500000",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 154
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            105.8181667,
+            -5.8995
+          ],
+          [
+            105.8071667,
+            -5.9171667
+          ],
+          [
+            105.7886667,
+            -5.9626667
+          ]
+        ]
+      },
+      "properties": {
+        "RCID": 1146,
+        "OBJL": 146,
+        "PRIM": 2,
+        "GRUP": 2,
+        "ATTL_67": "1",
+        "ATTL_133": "1500000",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 176
+      }
+    }
+  ]
+}

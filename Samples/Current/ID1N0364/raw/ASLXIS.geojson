@@ -1,0 +1,49 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.0015889,
+            -5.583819
+          ],
+          [
+            105.8340043,
+            -5.8544101
+          ],
+          [
+            105.8216865,
+            -5.8742991
+          ],
+          [
+            105.8093682,
+            -5.8941888
+          ],
+          [
+            105.5541667,
+            -6.3083333
+          ],
+          [
+            104.6230986,
+            -6.4204528
+          ]
+        ]
+      },
+      "properties": {
+        "RCID": 125,
+        "OBJL": 162,
+        "PRIM": 2,
+        "GRUP": 2,
+        "ATTL_102": "Archipelagic Sea Lane Axis Line",
+        "ATTL_111": "ID",
+        "ATTL_158": "IDD11B03.TXT",
+        "AGEN": 230,
+        "FIDN": 1632193707,
+        "FIDS": 15
+      }
+    }
+  ]
+}

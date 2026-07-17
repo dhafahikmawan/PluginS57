@@ -1,0 +1,55 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.3915096,
+          -6.1303808
+        ]
+      },
+      "properties": {
+        "RCID": 1606,
+        "OBJL": 19,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_4": "3",
+        "ATTL_66": "",
+        "ATTL_75": "3,1",
+        "ATTL_76": "2",
+        "ATTL_102": "Rep. 2019 (Tsunami Buoy)",
+        "ATTL_116": "Tsunami RWVS",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1632193710,
+        "FIDS": 141
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9092083,
+          -5.4012528
+        ]
+      },
+      "properties": {
+        "RCID": 1633,
+        "OBJL": 19,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_4": "1",
+        "ATTL_66": "39",
+        "ATTL_75": "6",
+        "ATTL_82": "3",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1632193710,
+        "FIDS": 175
+      }
+    }
+  ]
+}

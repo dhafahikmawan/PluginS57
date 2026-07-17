@@ -1,0 +1,503 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.752916,
+          -5.8685902
+        ]
+      },
+      "properties": {
+        "RCID": 240,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Bakaheuni",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 183
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.1737914,
+          -5.6168551
+        ]
+      },
+      "properties": {
+        "RCID": 369,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 89
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.7467777,
+          -4.9873895
+        ]
+      },
+      "properties": {
+        "RCID": 938,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Bandar",
+        "AGEN": 230,
+        "FIDN": 1632193704,
+        "FIDS": 207
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.653919,
+          -4.9478813
+        ]
+      },
+      "properties": {
+        "RCID": 940,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Waibatang",
+        "AGEN": 230,
+        "FIDN": 1632193704,
+        "FIDS": 208
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.5130227,
+          -4.8775718
+        ]
+      },
+      "properties": {
+        "RCID": 945,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Kolek",
+        "AGEN": 230,
+        "FIDN": 1632193704,
+        "FIDS": 209
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.5930058,
+          -5.7435085
+        ]
+      },
+      "properties": {
+        "RCID": 1018,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Kaliandak",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 157
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.1462242,
+          -5.7498567
+        ]
+      },
+      "properties": {
+        "RCID": 1111,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Bawang",
+        "AGEN": 230,
+        "FIDN": 1632193706,
+        "FIDS": 18
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.0253717,
+          -5.719391
+        ]
+      },
+      "properties": {
+        "RCID": 1128,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "AGEN": 230,
+        "FIDN": 1632193706,
+        "FIDS": 20
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.4054465,
+          -4.0554847
+        ]
+      },
+      "properties": {
+        "RCID": 1214,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Ngalam",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 81
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.6473941,
+          -5.7268071
+        ]
+      },
+      "properties": {
+        "RCID": 1226,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Karangberak",
+        "AGEN": 230,
+        "FIDN": 1632193706,
+        "FIDS": 37
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.129968,
+          -4.5834186
+        ]
+      },
+      "properties": {
+        "RCID": 1252,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Padangguci",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 69
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.9061177,
+          -4.4826305
+        ]
+      },
+      "properties": {
+        "RCID": 1269,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Mana",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 70
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.8176684,
+          -4.3797476
+        ]
+      },
+      "properties": {
+        "RCID": 1270,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Selali",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 71
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.6777168,
+          -4.2580361
+        ]
+      },
+      "properties": {
+        "RCID": 1438,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Pasartalo",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 79
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.5253172,
+          -4.1443545
+        ]
+      },
+      "properties": {
+        "RCID": 1462,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Seluma",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 80
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.0088027,
+          -5.2970921
+        ]
+      },
+      "properties": {
+        "RCID": 1588,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Pagerdalem",
+        "AGEN": 230,
+        "FIDN": 1632193702,
+        "FIDS": 103
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.2671804,
+          -3.7891039
+        ]
+      },
+      "properties": {
+        "RCID": 1602,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "BENGKULU",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 68
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.546855,
+          -5.5620663
+        ]
+      },
+      "properties": {
+        "RCID": 1650,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Betung",
+        "AGEN": 230,
+        "FIDN": 1632193704,
+        "FIDS": 28
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.0610286,
+          -5.3818243
+        ]
+      },
+      "properties": {
+        "RCID": 1747,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Marang",
+        "AGEN": 230,
+        "FIDN": 1632193702,
+        "FIDS": 104
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.3128798,
+          -3.8705579
+        ]
+      },
+      "properties": {
+        "RCID": 2105,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Kandang",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 82
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.2876324,
+          -4.7144825
+        ]
+      },
+      "properties": {
+        "RCID": 2256,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Batuhaji",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 94
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8261905,
+          -5.0543148
+        ]
+      },
+      "properties": {
+        "RCID": 2261,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Singaruga",
+        "AGEN": 230,
+        "FIDN": 1632193704,
+        "FIDS": 197
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.3317845,
+          -5.6071419
+        ]
+      },
+      "properties": {
+        "RCID": 2278,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Kotajawa",
+        "AGEN": 230,
+        "FIDN": 1632193702,
+        "FIDS": 114
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.4464358,
+          -5.745361
+        ]
+      },
+      "properties": {
+        "RCID": 2283,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Bandaragung",
+        "AGEN": 230,
+        "FIDN": 1632193702,
+        "FIDS": 115
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.3420377,
+          -4.7966795
+        ]
+      },
+      "properties": {
+        "RCID": 2284,
+        "OBJL": 13,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_116": "Bandar",
+        "AGEN": 230,
+        "FIDN": 1632193704,
+        "FIDS": 210
+      }
+    }
+  ]
+}

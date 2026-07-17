@@ -1,0 +1,137 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.5236111,
+          -7.0166667
+        ]
+      },
+      "properties": {
+        "RCID": 16306,
+        "OBJL": 33,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_16": "5",
+        "ATTL_116": "TD 147",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1642998866,
+        "FIDS": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.2622222,
+          -6.8547222
+        ]
+      },
+      "properties": {
+        "RCID": 16307,
+        "OBJL": 33,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_16": "5",
+        "ATTL_116": "TD 148A",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1642998917,
+        "FIDS": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.2388889,
+          -6.8394444
+        ]
+      },
+      "properties": {
+        "RCID": 16308,
+        "OBJL": 33,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_16": "5",
+        "ATTL_116": "TD 148",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1642998931,
+        "FIDS": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.245,
+          -5.5083333
+        ]
+      },
+      "properties": {
+        "RCID": 16309,
+        "OBJL": 33,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_16": "5",
+        "ATTL_116": "TD 154B",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1642999124,
+        "FIDS": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.2666667,
+          -5.5202778
+        ]
+      },
+      "properties": {
+        "RCID": 16310,
+        "OBJL": 33,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_16": "5",
+        "ATTL_116": "TD 154",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1642999134,
+        "FIDS": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.0844444,
+          -5.3597222
+        ]
+      },
+      "properties": {
+        "RCID": 16311,
+        "OBJL": 33,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_16": "5",
+        "ATTL_116": "TD 155",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1642999150,
+        "FIDS": 1
+      }
+    }
+  ]
+}

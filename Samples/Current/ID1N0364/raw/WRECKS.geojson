@@ -1,0 +1,236 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.3231821,
+          -5.491101
+        ]
+      },
+      "properties": {
+        "RCID": 19,
+        "OBJL": 159,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_71": "2",
+        "ATTL_133": "2100000",
+        "ATTL_187": "4",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 139
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.8506513,
+          -4.406848
+        ]
+      },
+      "properties": {
+        "RCID": 26,
+        "OBJL": 159,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_71": "5",
+        "ATTL_133": "2100000",
+        "ATTL_187": "2",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 29
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.9009205,
+          -3.4655965
+        ]
+      },
+      "properties": {
+        "RCID": 374,
+        "OBJL": 159,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_71": "2",
+        "ATTL_102": "Laporan 1995",
+        "ATTL_133": "2100000",
+        "ATTL_187": "3",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 107
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.2250469,
+          -5.5598325
+        ]
+      },
+      "properties": {
+        "RCID": 1057,
+        "OBJL": 159,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_71": "2",
+        "ATTL_125": "2",
+        "ATTL_133": "2100000",
+        "ATTL_187": "3",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 92
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.2504379,
+          -3.8968358
+        ]
+      },
+      "properties": {
+        "RCID": 1224,
+        "OBJL": 159,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_71": "4",
+        "ATTL_102": "Rep. 2018",
+        "ATTL_133": "2100000",
+        "ATTL_179": "",
+        "ATTL_187": "2",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 85
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.432386,
+          -6.3859281
+        ]
+      },
+      "properties": {
+        "RCID": 1249,
+        "OBJL": 159,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_71": "2",
+        "ATTL_102": "Reported 1997",
+        "ATTL_133": "2100000",
+        "ATTL_187": "3",
+        "AGEN": 230,
+        "FIDN": 1632193703,
+        "FIDS": 46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.2493811,
+          -3.776671
+        ]
+      },
+      "properties": {
+        "RCID": 1422,
+        "OBJL": 159,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_71": "2",
+        "ATTL_133": "2100000",
+        "ATTL_179": "",
+        "ATTL_187": "5",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 66
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.2697523,
+          -6.2053193
+        ]
+      },
+      "properties": {
+        "RCID": 1616,
+        "OBJL": 159,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_71": "1",
+        "ATTL_102": "Reported 2002",
+        "ATTL_133": "2100000",
+        "ATTL_179": "",
+        "ATTL_187": "3",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 31
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.5031285,
+          -6.0850548
+        ]
+      },
+      "properties": {
+        "RCID": 1762,
+        "OBJL": 159,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_71": "1",
+        "ATTL_102": "Reported 1977",
+        "ATTL_125": "2",
+        "ATTL_133": "2100000",
+        "ATTL_187": "3",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 245
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.7191016,
+          -6.0132075
+        ]
+      },
+      "properties": {
+        "RCID": 1832,
+        "OBJL": 159,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_71": "2",
+        "ATTL_125": "2",
+        "ATTL_133": "2100000",
+        "ATTL_187": "3",
+        "AGEN": 230,
+        "FIDN": 1632193703,
+        "FIDS": 93
+      }
+    }
+  ]
+}

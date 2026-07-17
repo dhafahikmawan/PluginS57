@@ -1,0 +1,100 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            105.8391667,
+            -5.805
+          ],
+          [
+            105.8153333,
+            -5.8428333
+          ]
+        ]
+      },
+      "properties": {
+        "RCID": 64,
+        "OBJL": 145,
+        "PRIM": 2,
+        "GRUP": 2,
+        "ATTL_67": "1",
+        "ATTL_133": "700001",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 153
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            105.801,
+            -5.889
+          ],
+          [
+            105.7898333,
+            -5.9068333
+          ],
+          [
+            105.7585,
+            -5.9396667
+          ]
+        ]
+      },
+      "properties": {
+        "RCID": 490,
+        "OBJL": 145,
+        "PRIM": 2,
+        "GRUP": 2,
+        "ATTL_67": "1",
+        "ATTL_86": "20200701",
+        "ATTL_102": "TRAFFIC SEPARATION SCHEME IN THE SUNDA STRAIT IS IMO ADOPTED AND IT WILL BE COME INTO FORCE ON 1ST JULY 2020. VESSELS USING THE TRAFFIC LANES MUST COMPLY WITH RULE 10 OF THE COLREG 1972.",
+        "ATTL_133": "700001",
+        "ATTL_149": "1",
+        "ATTL_158": "IDTSS170.TXT",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 177
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            105.7743333,
+            -5.9506667
+          ],
+          [
+            105.7983263,
+            -5.911882
+          ],
+          [
+            105.8093327,
+            -5.8941674
+          ]
+        ]
+      },
+      "properties": {
+        "RCID": 16296,
+        "OBJL": 145,
+        "PRIM": 2,
+        "GRUP": 2,
+        "ATTL_67": "1",
+        "ATTL_102": "TRAFFIC SEPARATION SCHEME IN THE SUNDA STRAIT IS IMO ADOPTED AND IT WILL BE COME INTO FORCE ON 1ST JULY 2020. VESSELS USING THE TRAFFIC LANES MUST COMPLY WITH RULE 10 OF THE COLREG 1972.",
+        "ATTL_133": "700001",
+        "ATTL_149": "1",
+        "AGEN": 230,
+        "FIDN": 1642836155,
+        "FIDS": 1
+      }
+    }
+  ]
+}

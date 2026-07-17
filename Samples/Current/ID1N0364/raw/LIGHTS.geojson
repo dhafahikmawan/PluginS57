@@ -1,0 +1,1436 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.7158706,
+          -5.9059667
+        ]
+      },
+      "properties": {
+        "RCID": 197,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "100",
+        "ATTL_102": "hasil verifikasi selat sunda 2019",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(3)",
+        "ATTL_142": "10",
+        "ATTL_178": "10",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 197
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.7852778,
+          -5.8852778
+        ]
+      },
+      "properties": {
+        "RCID": 233,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "54",
+        "ATTL_102": "hasil verifikasi selat sunda 2019",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(3)",
+        "ATTL_142": "8",
+        "ATTL_149": "11",
+        "ATTL_178": "18",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 188
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.80025,
+          -5.7946944
+        ]
+      },
+      "properties": {
+        "RCID": 246,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "13",
+        "ATTL_102": "hasil verifikasi selat sunda 2019",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "5",
+        "ATTL_149": "11",
+        "ATTL_178": "12",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 152
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.4714313,
+          -5.6571029
+        ]
+      },
+      "properties": {
+        "RCID": 378,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "23",
+        "ATTL_102": "BA LL K0923.5",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(2)",
+        "ATTL_142": "7",
+        "ATTL_178": "10",
+        "AGEN": 230,
+        "FIDN": 1632193707,
+        "FIDS": 227
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.2637916,
+          -3.874581
+        ]
+      },
+      "properties": {
+        "RCID": 390,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_102": "BPI No.31/302-2005 (has been relit)",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "10",
+        "ATTL_178": "6",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 54
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.8366667,
+          -5.6797222
+        ]
+      },
+      "properties": {
+        "RCID": 391,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "23",
+        "ATTL_102": "BA LL K0929.5",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "6",
+        "ATTL_178": "16",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 127
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          101.8944444,
+          -3.4172222
+        ]
+      },
+      "properties": {
+        "RCID": 405,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "21",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "5",
+        "ATTL_178": "14",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 110
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.85,
+          -5.1222222
+        ]
+      },
+      "properties": {
+        "RCID": 887,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "76",
+        "ATTL_102": "IDLL Nr.  : 2460 (K.0904)",
+        "ATTL_107": "3",
+        "ATTL_133": "700001",
+        "ATTL_136": "270",
+        "ATTL_137": "150",
+        "ATTL_141": "(1)",
+        "ATTL_142": "15",
+        "ATTL_149": "11",
+        "ATTL_178": "12",
+        "AGEN": 230,
+        "FIDN": 1632193703,
+        "FIDS": 8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.2128166,
+          -6.7490297
+        ]
+      },
+      "properties": {
+        "RCID": 961,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "50",
+        "ATTL_102": "BA LL K1050.2",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_136": "199",
+        "ATTL_137": "237.9",
+        "ATTL_141": "(3)",
+        "ATTL_142": "15",
+        "ATTL_178": "18",
+        "AGEN": 230,
+        "FIDN": 1632193702,
+        "FIDS": 61
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.2128166,
+          -6.7490297
+        ]
+      },
+      "properties": {
+        "RCID": 963,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "50",
+        "ATTL_102": "BA LL K1050.2",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_136": "6.1",
+        "ATTL_137": "138.5",
+        "ATTL_141": "(3)",
+        "ATTL_142": "15",
+        "ATTL_178": "18",
+        "AGEN": 230,
+        "FIDN": 1632193702,
+        "FIDS": 62
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.2504115,
+          -5.5979467
+        ]
+      },
+      "properties": {
+        "RCID": 1049,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "42",
+        "ATTL_102": "BA LL K0923.2",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "8",
+        "ATTL_178": "18.1",
+        "AGEN": 230,
+        "FIDN": 1632193704,
+        "FIDS": 10
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.394761,
+          -5.8213649
+        ]
+      },
+      "properties": {
+        "RCID": 1056,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "61.5",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(2)",
+        "ATTL_142": "10",
+        "ATTL_178": "21",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 144
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.5485161,
+          -5.8189079
+        ]
+      },
+      "properties": {
+        "RCID": 1059,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "30",
+        "ATTL_102": "BA LL K0925",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(2)",
+        "ATTL_142": "6",
+        "ATTL_178": "12",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 156
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.3005556,
+          -5.6377778
+        ]
+      },
+      "properties": {
+        "RCID": 1067,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "32",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "5",
+        "ATTL_178": "16",
+        "AGEN": 230,
+        "FIDN": 1632193706,
+        "FIDS": 54
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.5583333,
+          -5.925
+        ]
+      },
+      "properties": {
+        "RCID": 1080,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "63",
+        "ATTL_102": "BA LL K0914",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_136": "275.1",
+        "ATTL_137": "105",
+        "ATTL_141": "(2)",
+        "ATTL_142": "10",
+        "ATTL_178": "20",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 144
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.5333333,
+          -5.85
+        ]
+      },
+      "properties": {
+        "RCID": 1086,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "35",
+        "ATTL_102": "BA LL K0926",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_136": "95",
+        "ATTL_137": "324",
+        "ATTL_141": "(1)",
+        "ATTL_142": "5",
+        "ATTL_178": "11",
+        "AGEN": 230,
+        "FIDN": 1632193707,
+        "FIDS": 230
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.3455038,
+          -5.8253582
+        ]
+      },
+      "properties": {
+        "RCID": 1098,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_102": "BA LL K0926.7",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(2)",
+        "ATTL_142": "9",
+        "ATTL_178": "10",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 154
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.2942078,
+          -3.9203532
+        ]
+      },
+      "properties": {
+        "RCID": 1225,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "8",
+        "ATTL_107": "4",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "1",
+        "ATTL_178": "8",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 57
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.1005556,
+          -6.6127778
+        ]
+      },
+      "properties": {
+        "RCID": 1289,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "25",
+        "ATTL_102": "BA LL K1050.15 IDLL Nr.  : 2242",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "6",
+        "ATTL_149": "11",
+        "ATTL_178": "14",
+        "AGEN": 230,
+        "FIDN": 1632193702,
+        "FIDS": 75
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.4580107,
+          -6.1608928
+        ]
+      },
+      "properties": {
+        "RCID": 1300,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "13",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "4",
+        "ATTL_178": "12",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 235
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.8088141,
+          -6.4002012
+        ]
+      },
+      "properties": {
+        "RCID": 1307,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_107": "",
+        "ATTL_133": "700001",
+        "ATTL_136": "57",
+        "ATTL_137": "60",
+        "ATTL_141": "(1)",
+        "ATTL_142": "",
+        "ATTL_178": "12",
+        "AGEN": 230,
+        "FIDN": 1632193707,
+        "FIDS": 124
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.2663889,
+          -6.5277778
+        ]
+      },
+      "properties": {
+        "RCID": 1328,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "32",
+        "ATTL_102": "BA LL K1050.1",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "4",
+        "ATTL_178": "16",
+        "AGEN": 230,
+        "FIDN": 1632193702,
+        "FIDS": 87
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9316862,
+          -5.900474
+        ]
+      },
+      "properties": {
+        "RCID": 1342,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "100",
+        "ATTL_102": "hasil verifikasi selat sunda 2019",
+        "ATTL_107": "2",
+        "ATTL_108": "7",
+        "ATTL_133": "700001",
+        "ATTL_136": "45",
+        "ATTL_137": "66",
+        "ATTL_141": "(1)",
+        "ATTL_142": "3",
+        "ATTL_178": "15",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 169
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.8088141,
+          -6.4002012
+        ]
+      },
+      "properties": {
+        "RCID": 1343,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "4",
+        "ATTL_107": "",
+        "ATTL_133": "700001",
+        "ATTL_136": "55",
+        "ATTL_137": "57",
+        "ATTL_141": "(1)",
+        "ATTL_142": "",
+        "ATTL_178": "12",
+        "AGEN": 230,
+        "FIDN": 1632193707,
+        "FIDS": 127
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.8088141,
+          -6.4002012
+        ]
+      },
+      "properties": {
+        "RCID": 1344,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "3",
+        "ATTL_107": "",
+        "ATTL_133": "700001",
+        "ATTL_136": "60",
+        "ATTL_137": "62",
+        "ATTL_141": "(1)",
+        "ATTL_142": "",
+        "ATTL_178": "12",
+        "AGEN": 230,
+        "FIDN": 1632193707,
+        "FIDS": 125
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.7892222,
+          -6.4161388
+        ]
+      },
+      "properties": {
+        "RCID": 1345,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_107": "3",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "6",
+        "ATTL_178": "5",
+        "AGEN": 230,
+        "FIDN": 1632193707,
+        "FIDS": 129
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.8519172,
+          -5.9736434
+        ]
+      },
+      "properties": {
+        "RCID": 1351,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "108",
+        "ATTL_102": "hasil verikasi selat sunda 2019",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "7.5",
+        "ATTL_178": "16",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 146
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9261111,
+          -6.0091667
+        ]
+      },
+      "properties": {
+        "RCID": 1355,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "64",
+        "ATTL_102": "hasil verikasi selat sunda 2019",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "5",
+        "ATTL_178": "8",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 195
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.8826255,
+          -6.0941553
+        ]
+      },
+      "properties": {
+        "RCID": 1358,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "32",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "7.5",
+        "ATTL_178": "16",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 199
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.8857715,
+          -6.0710918
+        ]
+      },
+      "properties": {
+        "RCID": 1360,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "60",
+        "ATTL_102": "Obscured by land",
+        "ATTL_107": "2",
+        "ATTL_108": "7",
+        "ATTL_133": "700001",
+        "ATTL_136": "216",
+        "ATTL_137": "10",
+        "ATTL_141": "(2)",
+        "ATTL_142": "29",
+        "ATTL_178": "19",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 126
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.1833333,
+          -3.8416667
+        ]
+      },
+      "properties": {
+        "RCID": 1428,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "33",
+        "ATTL_107": "7",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "10",
+        "ATTL_178": "16",
+        "AGEN": 230,
+        "FIDN": 1632193701,
+        "FIDS": 58
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.2897222,
+          -5.35
+        ]
+      },
+      "properties": {
+        "RCID": 1449,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "40",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(4)",
+        "ATTL_142": "20",
+        "ATTL_178": "20",
+        "AGEN": 230,
+        "FIDN": 1632193704,
+        "FIDS": 174
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.898952,
+          -4.4808974
+        ]
+      },
+      "properties": {
+        "RCID": 1458,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "30",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(3)",
+        "ATTL_142": "15",
+        "ATTL_178": "12.6",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 81
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.9055556,
+          -5.2111111
+        ]
+      },
+      "properties": {
+        "RCID": 1562,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "42",
+        "ATTL_107": "3",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "5",
+        "ATTL_178": "17",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 72
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.8183333,
+          -5.3552778
+        ]
+      },
+      "properties": {
+        "RCID": 1613,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "14",
+        "ATTL_102": "BA LL K0929.6",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "3",
+        "ATTL_178": "11",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 161
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.3915096,
+          -6.1303808
+        ]
+      },
+      "properties": {
+        "RCID": 1618,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "6",
+        "ATTL_178": "4",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 239
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9850917,
+          -5.4937556
+        ]
+      },
+      "properties": {
+        "RCID": 1631,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "2",
+        "ATTL_178": "4",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 172
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9092083,
+          -5.4012528
+        ]
+      },
+      "properties": {
+        "RCID": 1634,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "6",
+        "ATTL_102": "IDLL Nr.  : 2408.2",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "5",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 187
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9416667,
+          -5.4416667
+        ]
+      },
+      "properties": {
+        "RCID": 1639,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_107": "",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "",
+        "ATTL_178": "12",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 185
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.5849486,
+          -5.5515795
+        ]
+      },
+      "properties": {
+        "RCID": 1667,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "",
+        "ATTL_107": "",
+        "ATTL_133": "700001",
+        "ATTL_141": "",
+        "ATTL_142": "",
+        "AGEN": 230,
+        "FIDN": 1632193704,
+        "FIDS": 43
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.3694401,
+          -6.646813
+        ]
+      },
+      "properties": {
+        "RCID": 1675,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "6",
+        "ATTL_95": "12",
+        "ATTL_102": "BA LL K1050.3",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "3",
+        "ATTL_178": "8",
+        "AGEN": 230,
+        "FIDN": 1632193703,
+        "FIDS": 44
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.9975699,
+          -5.9178178
+        ]
+      },
+      "properties": {
+        "RCID": 1795,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "6",
+        "ATTL_95": "9",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "3",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 165
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.2817787,
+          -5.4468974
+        ]
+      },
+      "properties": {
+        "RCID": 1818,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "44",
+        "ATTL_102": "DSI 2360",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "3",
+        "ATTL_178": "18",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 121
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.3380537,
+          -5.509309
+        ]
+      },
+      "properties": {
+        "RCID": 1834,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "15",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "5",
+        "ATTL_178": "12",
+        "AGEN": 230,
+        "FIDN": 1632193708,
+        "FIDS": 128
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.6670774,
+          -6.4732678
+        ]
+      },
+      "properties": {
+        "RCID": 2088,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "23",
+        "ATTL_102": "BA LL K1050.5",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "4",
+        "ATTL_178": "14",
+        "AGEN": 230,
+        "FIDN": 1632193707,
+        "FIDS": 130
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.5209646,
+          -7.0111618
+        ]
+      },
+      "properties": {
+        "RCID": 2137,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "45",
+        "ATTL_107": "",
+        "ATTL_133": "700001",
+        "ATTL_141": "(2)",
+        "ATTL_142": "10",
+        "ATTL_178": "20",
+        "AGEN": 230,
+        "FIDN": 1632193707,
+        "FIDS": 132
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.4405556,
+          -5.8958333
+        ]
+      },
+      "properties": {
+        "RCID": 2257,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "45",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "6",
+        "ATTL_178": "20",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 125
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.4069872,
+          -4.8498594
+        ]
+      },
+      "properties": {
+        "RCID": 2265,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "30",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(3)",
+        "ATTL_142": "15",
+        "ATTL_178": "12",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 107
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.3458791,
+          -4.8107405
+        ]
+      },
+      "properties": {
+        "RCID": 2281,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "18",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_141": "(1)",
+        "ATTL_142": "3",
+        "ATTL_178": "12",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 106
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.5583333,
+          -5.925
+        ]
+      },
+      "properties": {
+        "RCID": 2293,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "63",
+        "ATTL_102": "BA LL K0914",
+        "ATTL_107": "2",
+        "ATTL_133": "700001",
+        "ATTL_136": "108",
+        "ATTL_137": "138.3",
+        "ATTL_141": "(2)",
+        "ATTL_142": "10",
+        "ATTL_178": "20",
+        "AGEN": 230,
+        "FIDN": 1632193709,
+        "FIDS": 73
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.5583333,
+          -5.925
+        ]
+      },
+      "properties": {
+        "RCID": 2305,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_37": "",
+        "ATTL_75": "1",
+        "ATTL_95": "63",
+        "ATTL_102": "BA LL K0914",
+        "ATTL_107": "2",
+        "ATTL_108": "7",
+        "ATTL_133": "700001",
+        "ATTL_136": "105",
+        "ATTL_137": "108",
+        "ATTL_141": "(2)",
+        "ATTL_142": "10",
+        "ATTL_178": "20",
+        "AGEN": 230,
+        "FIDN": 1632193705,
+        "FIDS": 143
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.8145333,
+          -5.9216667
+        ]
+      },
+      "properties": {
+        "RCID": 16300,
+        "OBJL": 75,
+        "PRIM": 1,
+        "GRUP": 2,
+        "ATTL_75": "1",
+        "ATTL_95": "10",
+        "ATTL_107": "4",
+        "ATTL_133": "700001",
+        "ATTL_141": "(9)",
+        "ATTL_142": "15",
+        "ATTL_178": "10",
+        "AGEN": 230,
+        "FIDN": 1642836846,
+        "FIDS": 1
+      }
+    }
+  ]
+}
