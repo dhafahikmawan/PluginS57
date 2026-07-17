@@ -37,6 +37,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
 
   // API mode state
   const [apiEndpoint, setApiEndpoint] = useState<string>('');
+  const [apiToken, setApiToken] = useState<string>('');
   const [apiMethod, setApiMethod] = useState<string>('POST');
   const [apiParams, setApiParams] = useState<KeyValuePair[]>([]);
 
@@ -123,7 +124,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
 
     try {
       let url = apiEndpoint.trim();
-      const headers: Record<string, string> = {};
+      //const headers: Record<string, string> = {};
       let body: any = null;
 
       // Validate endpoint protocol
@@ -169,11 +170,13 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
         // CRITICAL: DO NOT set Content-Type header. Fetch will automatically set it
         // along with the correct multipart boundary.
       }
-
+      const apiHeaders = new Headers({
+        'Authorization' : 'Bearer '+apiToken,
+      })
       // Make the API request
       const response = await fetch(url, {
         method: apiMethod,
-        headers,
+        headers: apiHeaders,
         body
       });
       console.log("Response: ");
@@ -319,6 +322,21 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
                   <option value="PUT">PUT</option>
                   <option value="PATCH">PATCH</option>
                 </select>
+              </div>
+
+              {/* Token parameter */}
+              <div className='form-group'>
+                <label htmlFor="api-token">API Token</label>
+                <input 
+                  id="api-token"
+                  type="text"
+                  value={apiToken}
+                  onChange={(e) =>setApiToken(e.target.value)}
+                  placeholder="Your API Token Here"
+                  className="api-input-text"
+                  disabled={loading}
+
+                  />
               </div>
 
               {/* Key-Value parameters */}
