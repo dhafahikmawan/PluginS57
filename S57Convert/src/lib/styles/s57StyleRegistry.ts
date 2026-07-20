@@ -1,4 +1,5 @@
 import type { GeoLibreNativeLayerStyle } from '../geolibre/host-api';
+import { selectIconMapping } from '../utils/iconHelper';
 
 export type S57LayerFamily =
   | 'base'
@@ -171,6 +172,39 @@ export class StyleReapplier {
       paintOps.push(['circle-radius', style.circleRadius]);
     }
 
+    // Icon and symbol properties (layout properties, not paint)
+    if (style.iconImage) {
+      paintOps.push(['icon-image', style.iconImage]);
+    }
+
+    if (style.iconSize !== undefined) {
+      paintOps.push(['icon-size', style.iconSize]);
+    }
+
+    if (style.iconAllowOverlap !== undefined) {
+      paintOps.push(['icon-allow-overlap', style.iconAllowOverlap]);
+    }
+
+    if (style.iconIgnorePlacement !== undefined) {
+      paintOps.push(['icon-ignore-placement', style.iconIgnorePlacement]);
+    }
+
+    if (style.textField) {
+      paintOps.push(['text-field', style.textField]);
+    }
+
+    if (style.textSize !== undefined) {
+      paintOps.push(['text-size', style.textSize]);
+    }
+
+    if (style.textOffset !== undefined) {
+      paintOps.push(['text-offset', style.textOffset]);
+    }
+
+    if (style.textAnchor) {
+      paintOps.push(['text-anchor', style.textAnchor]);
+    }
+
     return paintOps;
   }
 
@@ -223,6 +257,10 @@ const COLORS = {
   TRFCD: '#c545c3',
   RADHI: '#d3a6e9',
   LITYW: '#f4da48',
+  // S-52 Navigation light colors (official standard)
+  NAV_RED: '#CD4759',
+  NAV_GREEN: '#00A04D',
+  NAV_YELLOW: '#FFCE00',
 };
 
 const LAND_CLASSES = new Set(['LNDARE', 'LAKARE', 'COALNE', 'CONVYR', 'BUAARE', 'BUISGL', 'DRYDOC', 'ROADWY']);
@@ -233,6 +271,7 @@ const HAZARD_CLASSES = new Set(['WRECKS', 'OBSTRN', 'UWTROC', 'CBLARE']);
 const NAVIGATION_CLASSES = new Set(['LIGHTS', 'BOYINB', 'BOYISD', 'BCNARE', 'BCNLAT', 'BOYLAT', 'BOYCAR', 'BOYSPP', 'BOYSAW', 'BCNCAR', 'BCNSPP', 'BCNISD', 'LITFLT']);
 const ROUTING_CLASSES = new Set(['SEAARE', 'TSSRON', 'TSELNE', 'TSSBND', 'TRFLNE']);
 const SOUNDING_CLASSES = new Set(['SOUNDG', 'SOUNDG_PROCESSED']);
+const LANDMARK_CLASSES = new Set(['LNDMRK']);
 const LABEL_CLASSES = new Set(['TEXT', 'M_ACCY', 'M_NPUB']);
 const BASE_CHART_CLASSES = new Set(['LNDARE', 'DEPARE', 'DRGARE', 'COALNE', 'FLODOC', 'PONTON', 'UNSARE', 'HULKES', 'LAKARE', 'BUAARE', 'RIVERS', 'CANALS', 'ROADWY', 'SLCONS', 'BRIDGE']);
 
@@ -341,6 +380,10 @@ function getLayerZoomRange(classCode: string, purposeCode?: string | number): { 
     return { minZoom: Math.max(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
   }
 
+  if (normalizedCode === 'LIGHT_SECTORS') {
+    return { minZoom: Math.max(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
+  }
+
   if (normalizedCode === 'LITFLT' || normalizedCode === 'MORFAC') {
     return { minZoom: Math.max(purposeRange.minZoom, 11), maxZoom: purposeRange.maxZoom };
   }
@@ -397,28 +440,46 @@ function buildRestrictedStyle(): GeoLibreNativeLayerStyle {
   };
 }
 
-function buildHazardStyle(): GeoLibreNativeLayerStyle {
+
+function buildHazardSymbolStyle(classCode: string, attributes: Record<string, unknown>): GeoLibreNativeLayerStyle {
+  const iconMapping = selectIconMapping(classCode, attributes);
+  
   return {
-    fillColor: COLORS.CHRED,
-    fillOpacity: 0.8,
-    strokeColor: COLORS.CHBLK,
-    strokeWidth: 1.0,
-    circleRadius: 4,
+    iconImage: iconMapping.spriteKey,
+    iconSize: iconMapping.size ?? 18,
+    iconAllowOverlap: iconMapping.allowOverlap ?? false,
+    iconIgnorePlacement: iconMapping.ignorePlacement ?? false,
   };
 }
 
-function buildNavigationStyle(attributes: Record<string, unknown>): GeoLibreNativeLayerStyle {
-  const colString = asString(attributes.COLOUR) ?? '';
-  let color = COLORS.CHYLW;
-  if (colString.includes('3')) color = COLORS.CHRED;
-  else if (colString.includes('4')) color = COLORS.CHGRN;
+
+
+function buildNavigationSymbolStyle(classCode: string, attributes: Record<string, unknown>): GeoLibreNativeLayerStyle {
+  const iconMapping = selectIconMapping(classCode, attributes);
   
   return {
+    iconImage: iconMapping.spriteKey,
+    iconSize: iconMapping.size ?? 20,
+    iconAllowOverlap: iconMapping.allowOverlap ?? true,
+    iconIgnorePlacement: iconMapping.ignorePlacement ?? false,
+  };
+}
+
+function buildLightSectorStyle(attributes: Record<string, unknown>): GeoLibreNativeLayerStyle {
+  // Colors per Colors.md §2.3:
+  //   COLOUR contains '3' → #FF0000 (red)
+  //   COLOUR contains '4' → #00FF00 (green)
+  //   fallback              → #F2E959 (white/yellow)
+  const colString = asString(attributes.COLOUR) ?? '';
+  let color = '#F2E959';
+  if (colString.includes('3')) color = '#FF0000';
+  else if (colString.includes('4')) color = '#00FF00';
+
+  return {
     fillColor: color,
-    fillOpacity: 0.9,
-    strokeColor: COLORS.CHBLK,
+    fillOpacity: 0.25,
+    strokeColor: color,
     strokeWidth: 1.0,
-    circleRadius: 5,
   };
 }
 
@@ -436,6 +497,21 @@ function buildSoundingStyle(): GeoLibreNativeLayerStyle {
     fillColor: COLORS.CHBLK,
     fillOpacity: 0.95,
     circleRadius: 2,
+  };
+}
+
+function buildLandmarkSymbolStyle(attributes: Record<string, unknown>): GeoLibreNativeLayerStyle {
+  const iconMapping = selectIconMapping('LNDMRK', attributes);
+  
+  return {
+    iconImage: iconMapping.spriteKey,
+    iconSize: iconMapping.size ?? 20,
+    iconAllowOverlap: true,
+    iconIgnorePlacement: false,
+    textField: asString(attributes.OBJNAM) ?? undefined,
+    textSize: 10,
+    textOffset: [0, 1.5],
+    textAnchor: 'top',
   };
 }
 
@@ -509,7 +585,17 @@ export function selectS57LayerStyle(
       priority: 60000,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
-      style: buildHazardStyle(),
+      style: buildHazardSymbolStyle(normalizedCode, normalizedAttributes),
+    };
+  }
+
+  if (normalizedCode === 'LIGHT_SECTORS') {
+    return {
+      family: 'navigation',
+      priority: 69000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildLightSectorStyle(normalizedAttributes),
     };
   }
 
@@ -523,7 +609,7 @@ export function selectS57LayerStyle(
       priority: 70000,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
-      style: buildNavigationStyle(normalizedAttributes),
+      style: buildNavigationSymbolStyle(normalizedCode, normalizedAttributes),
       labelField,
     };
   }
@@ -546,6 +632,17 @@ export function selectS57LayerStyle(
       maxZoom: zoomRange.maxZoom,
       style: buildSoundingStyle(),
       labelField: 'VALSOU',
+    };
+  }
+
+  if (LANDMARK_CLASSES.has(normalizedCode)) {
+    return {
+      family: 'navigation',
+      priority: 72000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildLandmarkSymbolStyle(normalizedAttributes),
+      labelField: asString(normalizedAttributes.OBJNAM) ?? undefined,
     };
   }
 
