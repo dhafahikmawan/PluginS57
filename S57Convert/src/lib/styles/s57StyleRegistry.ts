@@ -11,7 +11,9 @@ export type S57LayerFamily =
   | 'navigation'
   | 'routing'
   | 'sounding'
-  | 'label';
+  | 'label'
+  | 'tsslpt'
+  | 'tss_arrows';
 
 export interface S57StyleSelection {
   family: S57LayerFamily;
@@ -273,6 +275,8 @@ const ROUTING_CLASSES = new Set(['SEAARE', 'TSSRON', 'TSELNE', 'TSSBND', 'TRFLNE
 const SOUNDING_CLASSES = new Set(['SOUNDG', 'SOUNDG_PROCESSED']);
 const LANDMARK_CLASSES = new Set(['LNDMRK']);
 const LABEL_CLASSES = new Set(['TEXT', 'M_ACCY', 'M_NPUB']);
+const TSSLPT_CLASSES = new Set(['TSSLPT']);
+const TSS_ARROW_CLASSES = new Set(['TSS_ARROWS']);
 const BASE_CHART_CLASSES = new Set(['LNDARE', 'DEPARE', 'DRGARE', 'COALNE', 'FLODOC', 'PONTON', 'UNSARE', 'HULKES', 'LAKARE', 'BUAARE', 'RIVERS', 'CANALS', 'ROADWY', 'SLCONS', 'BRIDGE']);
 
 const PURPOSE_ZOOM_RANGES: Record<number, { minZoom: number; maxZoom: number }> = {
@@ -483,6 +487,31 @@ function buildLightSectorStyle(attributes: Record<string, unknown>): GeoLibreNat
   };
 }
 
+function buildTSSLPTStyle(attributes: Record<string, unknown>): GeoLibreNativeLayerStyle {
+  return {
+    fillColor: COLORS.TRFCD,
+    fillOpacity: 0.9,
+    strokeColor: COLORS.CHBLK,
+    strokeWidth: 1.0,
+    circleRadius: 4,
+    iconAllowOverlap: true,
+    iconIgnorePlacement: true,
+    textField: asString(attributes.OBJNAM) ?? 'TSSLPT',
+    textSize: 10,
+    textOffset: [0, 1.2],
+    textAnchor: 'top',
+  };
+}
+
+function buildTSSArrowStyle(_attributes: Record<string, unknown>): GeoLibreNativeLayerStyle {
+  return {
+    fillColor: COLORS.TRFCD,
+    fillOpacity: 0.7,
+    strokeColor: COLORS.CHBLK,
+    strokeWidth: 1.0,
+  };
+}
+
 function buildRoutingStyle(): GeoLibreNativeLayerStyle {
   return {
     strokeColor: COLORS.TRFCD,
@@ -611,6 +640,26 @@ export function selectS57LayerStyle(
       maxZoom: zoomRange.maxZoom,
       style: buildNavigationSymbolStyle(normalizedCode, normalizedAttributes),
       labelField,
+    };
+  }
+
+  if (TSSLPT_CLASSES.has(normalizedCode)) {
+    return {
+      family: 'tsslpt',
+      priority: 75000,
+      minZoom: 8,
+      maxZoom: zoomRange.maxZoom,
+      style: buildTSSLPTStyle(normalizedAttributes),
+    };
+  }
+
+  if (TSS_ARROW_CLASSES.has(normalizedCode)) {
+    return {
+      family: 'tss_arrows',
+      priority: 76000,
+      minZoom: 8,
+      maxZoom: zoomRange.maxZoom,
+      style: buildTSSArrowStyle(normalizedAttributes),
     };
   }
 

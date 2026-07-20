@@ -1,6 +1,7 @@
 import { parseS57, toGeoJSON } from '@s57-parser/s57';
 import { getS57Acronym } from './s57ObjectClasses';
 import { formatLightLabel, generateSectorsForFeature } from './lights';
+import { processTSSLPTBatch, type ProcessedTSSLPT } from './tsslptProcessor';
 
 
 
@@ -97,6 +98,12 @@ export function buildConversionBundleFromGeoJSON(
 
     const features = groupedFeatures[groupKey];
     const sampleProperties = features[0]?.properties ?? {};
+    const processedTSSLPTFeatures: ProcessedTSSLPT[] = acronym === 'TSSLPT'
+      ? processTSSLPTBatch(features as any[])
+      : [];
+    const layerFeatures = processedTSSLPTFeatures.length > 0
+      ? processedTSSLPTFeatures.map((item) => item.originalFeature)
+      : features;
 
     return [{
       classCode: acronym,
@@ -106,6 +113,7 @@ export function buildConversionBundleFromGeoJSON(
         featureCount: features.length,
         sampleProperties,
         sourcePath: fileName,
+        processedTSSLPT: processedTSSLPTFeatures,
         styleHints: {
           objl: sampleProperties.OBJL ?? sampleProperties.OBJ_CLASS ?? acronym,
           labelField: sampleProperties.OBJNAM ?? 'OBJNAM'
@@ -113,7 +121,7 @@ export function buildConversionBundleFromGeoJSON(
       },
       geojson: {
         type: "FeatureCollection",
-        features
+        features: layerFeatures
       }
     }];
   });

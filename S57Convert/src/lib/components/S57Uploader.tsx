@@ -261,6 +261,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
         {/* Conversion Mode Selection Dropdown */}
         <section className="s57-panel-card">
           <label htmlFor="s57-mode-select" className="input-label">Conversion Mode</label>
+          <div className="description">Upload S-57 (.000) File</div>
           <select
             id="s57-mode-select"
             value={mode}

@@ -3,6 +3,8 @@ import React from 'react';
 import type { GeoLibreAppAPI, GeoLibrePlugin } from './lib/geolibre/host-api';
 import { S57Uploader } from './lib/components/S57Uploader';
 import { S57LayerData } from './lib/utils/s57Converter';
+import { generateTSSArrows, type GeneratedArrow } from './lib/utils/tssArrowsGenerator';
+import type { ProcessedTSSLPT } from './lib/utils/tsslptProcessor';
 import { selectS57LayerStyle, StyleReapplier, StyleTracker, type S57StyleSelection } from './lib/styles/s57StyleRegistry';
 import './lib/styles/uploader.css';
 
@@ -15,6 +17,8 @@ let attachedMap: any = null;
 let styleRefreshHandler: (() => void) | null = null;
 let styleLoadHandler: (() => void) | null = null;
 let layerMutationHandler: (() => void) | null = null;
+const tsslptCache = new Map<string, ProcessedTSSLPT[]>();
+const tssArrowCache = new Map<string, GeneratedArrow[]>();
 
 
 
@@ -159,14 +163,20 @@ function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number) {
   if (!appAPI) return;
 
   const map = appAPI.getMap?.();
+  const sourceLayers = [...layers].filter((layer) => layer.layerName !== 'M_NPUB');
 
   // Sort by priority: base layers first, labels last
-  const orderedLayers = [...layers].sort((a, b) => {
+  const orderedLayers = [...sourceLayers].sort((a, b) => {
     const styleA = selectS57LayerStyle(a.classCode, (a.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
     const styleB = selectS57LayerStyle(b.classCode, (b.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
     return styleA.priority - styleB.priority;
   });
-  
+
+  const tsslptLayers = orderedLayers.filter((layer) => layer.classCode === 'TSSLPT');
+  const tsslptFeatures = tsslptLayers.flatMap((layer) => {
+    const processed = (layer.metadata?.processedTSSLPT as ProcessedTSSLPT[] | undefined) ?? [];
+    return processed;
+  });
 
   writeDebug("++++++++++++++++++++++++++++++++++++++++++");
   writeDebug("Layer rendering order: ")
@@ -174,10 +184,6 @@ function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number) {
     const sampleProperties = (layer.metadata?.sampleProperties as Record<string, unknown>) ?? {};
     const styleSelection = selectS57LayerStyle(layer.classCode, sampleProperties, purposeCode);
 
-    // Register in GeoLibre's Layers Panel
-    if(layer.layerName == "M_NPUB"){
-      continue;
-    }
     const hostedLayerId = appAPI.addGeoJsonLayer(
       layer.fileName + "--" + layer.layerName,
       layer.geojson as any,
@@ -191,6 +197,35 @@ function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number) {
       setTimeout(() => { void applyS57Style(map, layer.layerName, hostedLayerId, styleSelection); }, 0);
     }
   }
+
+  if (tsslptFeatures.length > 0) {
+    const sourceFile = tsslptLayers[0]?.fileName ?? 'unknown';
+    tsslptCache.set(sourceFile, tsslptFeatures);
+    const arrows = generateTSSArrows(tsslptFeatures, { arrowInterval: 5000, arrowType: 'vector' });
+    tssArrowCache.set(sourceFile, arrows);
+
+    const arrowGeojson = {
+      type: 'FeatureCollection',
+      features: arrows.map((arrow) => ({
+        type: 'Feature',
+        geometry: arrow.geometry,
+        properties: arrow.properties,
+      })),
+    };
+
+    const arrowLayerId = appAPI.addGeoJsonLayer(
+      `${sourceFile}--TSS_ARROWS`,
+      arrowGeojson as any,
+      sourceFile,
+    );
+    const arrowStyleSelection = selectS57LayerStyle('TSS_ARROWS', {}, purposeCode);
+    styleTracker.trackStyle(arrowLayerId, arrowStyleSelection, 'TSS_ARROWS', {});
+
+    if (map) {
+      setTimeout(() => { void applyS57Style(map, 'TSS_ARROWS', arrowLayerId, arrowStyleSelection); }, 0);
+    }
+  }
+
   writeDebug("++++++++++++++++++++++++++++++++++++++++++");
 }
 
