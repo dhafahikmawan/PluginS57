@@ -223,6 +223,10 @@ const COLORS = {
   TRFCD: '#c545c3',
   RADHI: '#d3a6e9',
   LITYW: '#f4da48',
+  // S-52 Navigation light colors (official standard)
+  NAV_RED: '#CD4759',
+  NAV_GREEN: '#00A04D',
+  NAV_YELLOW: '#FFCE00',
 };
 
 const LAND_CLASSES = new Set(['LNDARE', 'LAKARE', 'COALNE', 'CONVYR', 'BUAARE', 'BUISGL', 'DRYDOC', 'ROADWY']);
@@ -413,9 +417,9 @@ function buildHazardStyle(): GeoLibreNativeLayerStyle {
 
 function buildNavigationStyle(attributes: Record<string, unknown>): GeoLibreNativeLayerStyle {
   const colString = asString(attributes.COLOUR) ?? '';
-  let color = COLORS.CHYLW;
-  if (colString.includes('3')) color = COLORS.CHRED;
-  else if (colString.includes('4')) color = COLORS.CHGRN;
+  let color = COLORS.NAV_YELLOW;
+  if (colString.includes('3')) color = COLORS.NAV_RED;
+  else if (colString.includes('4')) color = COLORS.NAV_GREEN;
   
   return {
     fillColor: color,
