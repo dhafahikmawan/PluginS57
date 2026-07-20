@@ -385,7 +385,7 @@ function getLayerZoomRange(classCode: string, purposeCode?: string | number): { 
   }
 
   if (normalizedCode === 'LIGHT_SECTORS') {
-    return { minZoom: Math.max(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
+    return { minZoom: Math.min(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
   }
 
   if (normalizedCode === 'LITFLT' || normalizedCode === 'MORFAC') {

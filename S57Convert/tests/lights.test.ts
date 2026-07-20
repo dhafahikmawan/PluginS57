@@ -167,6 +167,27 @@ describe('generateSectorsForFeature', () => {
     expect(sectors[0].geometry.type).toBe('Polygon');
   });
 
+  it('defaults to 9 NM when SECTR1/SECTR2 are present but VALNMR is missing', () => {
+    const sectors = generateSectorsForFeature(makeLight({ SECTR1: 45, SECTR2: 135, VALNMR: undefined }));
+    expect(sectors).toHaveLength(1);
+    expect(sectors[0].geometry.type).toBe('Polygon');
+    expect(sectors[0].geometry.coordinates[0].length).toBeGreaterThan(4);
+  });
+
+  it('generates a sector fan in the opposite direction of S-57 SECTR bearings', () => {
+    const sectors = generateSectorsForFeature(makeLight({ SECTR1: 45, SECTR2: 135 }));
+    const ring = sectors[0].geometry.coordinates[0];
+    const center = ring[0] as [number, number];
+    const firstArc = ring[1] as [number, number];
+
+    const deltaLng = (firstArc[0] - center[0]) * Math.cos(center[1] * Math.PI / 180);
+    const deltaLat = firstArc[1] - center[1];
+    const bearing = (Math.atan2(deltaLng, deltaLat) * 180 / Math.PI + 360) % 360;
+
+    expect(bearing).toBeGreaterThan(220);
+    expect(bearing).toBeLessThan(230);
+  });
+
   it('returns an empty array when VALNMR is missing', () => {
     const feature = {
       type: 'Feature',
