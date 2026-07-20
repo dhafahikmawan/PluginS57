@@ -43,6 +43,15 @@ export interface GeoLibreNativeLayerStyle {
   fillOpacity?: number;
   circleRadius?: number;
   strokeDasharray?: string;
+  // Icon and symbol properties for point layers
+  iconImage?: string;
+  iconSize?: number;
+  iconAllowOverlap?: boolean;
+  iconIgnorePlacement?: boolean;
+  textField?: string;
+  textSize?: number;
+  textOffset?: [number, number];
+  textAnchor?: string;
 }
 
 /**
