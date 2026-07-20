@@ -34,10 +34,10 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
   const [purposeCode, setPurposeCode] = useState<number>(1);
 
   // Mode selection state
-  const [mode, setMode] = useState<ConversionMode>('local');
+  const [mode, setMode] = useState<ConversionMode>('api');
 
   // API mode state
-  const [apiEndpoint, setApiEndpoint] = useState<string>('');
+  const [apiEndpoint, setApiEndpoint] = useState<string>('http://localhost:3000/s57-geojson');
   const [apiToken, setApiToken] = useState<string>('');
   const [apiMethod, setApiMethod] = useState<string>('POST');
   const [apiParams, setApiParams] = useState<KeyValuePair[]>([]);
@@ -64,12 +64,51 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
         try {
           const buffer = e.target?.result as ArrayBuffer;
           if (!buffer) throw new Error("Gagal membaca data file biner.");
-          
-          // Konversi data biner
+
+          if (mode === 'api') {
+            try {
+              const apiResponse = await fetch(apiEndpoint.trim(), {
+                method: apiMethod,
+                headers: new Headers({
+                  Authorization: `Bearer ${apiToken}`,
+                }),
+                body: (() => {
+                  const formData = new FormData();
+                  formData.append('file', file);
+                  return formData;
+                })(),
+              });
+
+              if (!apiResponse.ok) {
+                throw new Error(`API returned HTTP Error ${apiResponse.status}: ${apiResponse.statusText}`);
+              }
+
+              let geojsonData: any;
+              try {
+                geojsonData = await apiResponse.json();
+              } catch {
+                throw new Error("API response is not a valid JSON document.");
+              }
+
+              if (!geojsonData || geojsonData.type !== 'FeatureCollection' || !Array.isArray(geojsonData.features)) {
+                throw new Error("API response format is invalid: Must be a valid GeoJSON FeatureCollection containing a 'features' array.");
+              }
+
+              const bundle = buildConversionBundleFromGeoJSON(geojsonData, file.name);
+              onLayersLoaded(bundle.processedLayers, purposeCode);
+              setConversionBundle(bundle);
+              setLoadedFiles(prev => [...prev, file.name]);
+              return;
+            } catch (apiError: any) {
+              const fallbackMessage = apiError?.message || "API conversion failed.";
+              setError(`API conversion failed, falling back to local S-57 parser. ${fallbackMessage}`);
+            }
+          }
+
+          // Fallback to the built-in parser when the API conversion fails or local mode is selected.
           const bundle = buildS57ConversionBundle(buffer, file.name);
           onLayersLoaded(bundle.processedLayers, purposeCode);
           setConversionBundle(bundle);
-          
           setLoadedFiles(prev => [...prev, file.name]);
         } catch (err: any) {
           setError(err.message || "Gagal mengurai file S-57.");
@@ -298,24 +337,29 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
           </select>
         </section>
 
-        {/* Conditionally Render Form based on Mode */}
-        {mode === 'local' ? (
-          <section className="s57-panel-card">
-            <div className="upload-zone">
-              <input
-                type="file"
-                accept=".000"
-                onChange={handleFileUpload}
-                disabled={loading}
-                id="s57-file-input"
-              />
-              <label htmlFor="s57-file-input" className={`upload-button ${loading ? 'loading' : ''}`}>
-                {loading ? 'Processing File...' : 'Upload S-57 (.000) File'}
-              </label>
-            </div>
-            {error && <div className="error-message">⚠️ {error}</div>}
-          </section>
-        ) : (
+        {/* Upload area shared by both modes */}
+        <section className="s57-panel-card">
+          <div className="upload-zone">
+            <input
+              type="file"
+              accept=".000"
+              onChange={handleFileUpload}
+              disabled={loading}
+              id="s57-file-input"
+            />
+            <label htmlFor="s57-file-input" className={`upload-button ${loading ? 'loading' : ''}`}>
+              {loading ? 'Processing File...' : mode === 'api' ? 'Upload S-57 (.000) File' : 'Upload S-57 (.000) File'}
+            </label>
+          </div>
+          <p className="description">
+            {mode === 'api'
+              ? 'Uploads are sent to the API endpoint first, then fall back to the built-in S-57 parser if the API request fails.'
+              : 'The built-in S-57 parser processes the file locally.'}
+          </p>
+          {error && <div className="error-message">⚠️ {error}</div>}
+        </section>
+
+        {mode === 'api' && (
           <section className="s57-panel-card">
             <div className="api-config-form">
               {/* Endpoint field */}
