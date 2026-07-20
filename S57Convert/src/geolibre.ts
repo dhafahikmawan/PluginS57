@@ -3,6 +3,8 @@ import React from 'react';
 import type { GeoLibreAppAPI, GeoLibrePlugin } from './lib/geolibre/host-api';
 import { S57Uploader } from './lib/components/S57Uploader';
 import { S57LayerData } from './lib/utils/s57Converter';
+import { generateTSSArrows, type GeneratedArrow } from './lib/utils/tssArrowsGenerator';
+import type { ProcessedTSSLPT } from './lib/utils/tsslptProcessor';
 import { selectS57LayerStyle, StyleReapplier, StyleTracker, type S57StyleSelection } from './lib/styles/s57StyleRegistry';
 import './lib/styles/uploader.css';
 
@@ -15,6 +17,8 @@ let attachedMap: any = null;
 let styleRefreshHandler: (() => void) | null = null;
 let styleLoadHandler: (() => void) | null = null;
 let layerMutationHandler: (() => void) | null = null;
+const tsslptCache = new Map<string, ProcessedTSSLPT[]>();
+const tssArrowCache = new Map<string, GeneratedArrow[]>();
 
 
 
@@ -155,43 +159,104 @@ async function applyS57Style(map: any, name: string, hostedLayerId: string, styl
  * Registers S-57 layers in GeoLibre's Layers Panel via addGeoJsonLayer,
  * then overrides their styling using getMap() for full MapLibre paint control.
  */
-function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number) {
+export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number) {
   if (!appAPI) return;
 
   const map = appAPI.getMap?.();
+  const sourceLayers = [...layers].filter((layer) => layer.layerName !== 'M_NPUB');
 
-  // Sort by priority: base layers first, labels last
-  const orderedLayers = [...layers].sort((a, b) => {
-    const styleA = selectS57LayerStyle(a.classCode, (a.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
-    const styleB = selectS57LayerStyle(b.classCode, (b.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
-    return styleA.priority - styleB.priority;
+  // Build stable ordering: sort by priority then by original index to preserve
+  // the sequence present in the chart index for features within the same band.
+  const indexed = sourceLayers.map((layer, idx) => ({ layer, idx }));
+  indexed.sort((a, b) => {
+    const styleA = selectS57LayerStyle(a.layer.classCode, (a.layer.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
+    const styleB = selectS57LayerStyle(b.layer.classCode, (b.layer.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
+    if (styleA.priority !== styleB.priority) return styleA.priority - styleB.priority;
+    return a.idx - b.idx;
   });
-  
 
-  writeDebug("++++++++++++++++++++++++++++++++++++++++++");
-  writeDebug("Layer rendering order: ")
-  for (const layer of orderedLayers) {
+  // Keep a quick lookup of any pre-generated derived layers (for example
+  // LIGHT_SECTORS produced by the converter) so they can be inserted
+  // immediately after their source layer.
+  const pendingDerived = new Map<string, any>();
+  for (const l of indexed.map((it) => it.layer)) {
+    if (l.classCode === 'LIGHT_SECTORS') {
+      // Key by source file so we can match to the originating LIGHTS group.
+      pendingDerived.set(`${l.fileName}::LIGHT_SECTORS`, l);
+    }
+  }
+
+  writeDebug('++++++++++++++++++++++++++++++++++++++++++');
+  writeDebug('Layer rendering order: ');
+
+  for (const item of indexed) {
+    const layer = item.layer;
+    // If this layer was consumed as a derived insertion earlier, skip it.
+    const consumedKey = `${layer.fileName}::${layer.layerName}`;
+    if ((layer.classCode === 'LIGHT_SECTORS' || layer.classCode === 'TSS_ARROWS') && pendingDerived.has(consumedKey)) {
+      // Will be added when its source layer was processed.
+      continue;
+    }
+
     const sampleProperties = (layer.metadata?.sampleProperties as Record<string, unknown>) ?? {};
     const styleSelection = selectS57LayerStyle(layer.classCode, sampleProperties, purposeCode);
 
-    // Register in GeoLibre's Layers Panel
-    if(layer.layerName == "M_NPUB"){
-      continue;
-    }
     const hostedLayerId = appAPI.addGeoJsonLayer(
-      layer.fileName + "--" + layer.layerName,
+      layer.fileName + '--' + layer.layerName,
       layer.geojson as any,
-      layer.fileName, // groups layers under the filename in the panel
+      layer.fileName,
     );
-    writeDebug(hostedLayerId + " : " + layer.layerName);
+    writeDebug(hostedLayerId + ' : ' + layer.layerName);
 
     styleTracker.trackStyle(hostedLayerId, styleSelection, layer.classCode, sampleProperties);
 
     if (map) {
       setTimeout(() => { void applyS57Style(map, layer.layerName, hostedLayerId, styleSelection); }, 0);
     }
+
+    // If this layer is a TSSLPT source, generate and insert its arrows immediately
+    // after the source so the visual stack matches expectations.
+    if (layer.classCode === 'TSSLPT') {
+      const processed = (layer.metadata?.processedTSSLPT as ProcessedTSSLPT[] | undefined) ?? [];
+      if (processed.length > 0) {
+        const sourceFile = layer.fileName ?? 'unknown';
+        tsslptCache.set(sourceFile, processed);
+        const arrows = generateTSSArrows(processed, { arrowInterval: 5000, arrowType: 'vector' });
+        tssArrowCache.set(sourceFile, arrows);
+
+        const arrowGeojson = {
+          type: 'FeatureCollection',
+          features: arrows.map((arrow) => ({ type: 'Feature', geometry: arrow.geometry, properties: arrow.properties })),
+        };
+
+        const arrowLayerId = appAPI.addGeoJsonLayer(`${sourceFile}--TSS_ARROWS`, arrowGeojson as any, sourceFile);
+        const arrowStyleSelection = selectS57LayerStyle('TSS_ARROWS', {}, purposeCode);
+        styleTracker.trackStyle(arrowLayerId, arrowStyleSelection, 'TSS_ARROWS', {});
+        if (map) {
+          setTimeout(() => { void applyS57Style(map, 'TSS_ARROWS', arrowLayerId, arrowStyleSelection); }, 0);
+        }
+      }
+    }
+
+    // If this layer is a LIGHTS group, and a pre-generated LIGHT_SECTORS layer
+    // exists for the same source file, insert it now and mark it consumed.
+    if (layer.classCode === 'LIGHTS') {
+      const key = `${layer.fileName}::LIGHT_SECTORS`;
+      const sectors = pendingDerived.get(key);
+      if (sectors) {
+        const hostedSectorId = appAPI.addGeoJsonLayer(`${sectors.fileName}--${sectors.layerName}`, sectors.geojson as any, sectors.fileName);
+        const sectorStyle = selectS57LayerStyle('LIGHT_SECTORS', (sectors.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
+        styleTracker.trackStyle(hostedSectorId, sectorStyle, 'LIGHT_SECTORS', {});
+        if (map) {
+          setTimeout(() => { void applyS57Style(map, 'LIGHT_SECTORS', hostedSectorId, sectorStyle); }, 0);
+        }
+        // mark as consumed so it won't be added later
+        pendingDerived.delete(key);
+      }
+    }
   }
-  writeDebug("++++++++++++++++++++++++++++++++++++++++++");
+
+  writeDebug('++++++++++++++++++++++++++++++++++++++++++');
 }
 
 // Default export untuk dibaca oleh bundling system GeoLibre
