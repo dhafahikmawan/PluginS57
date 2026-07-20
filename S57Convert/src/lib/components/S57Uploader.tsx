@@ -18,7 +18,7 @@ interface KeyValuePair {
 
 interface S57UploaderProps {
   // Callback untuk meregistrasikan layer baru ke GeoLibre Host
-  onLayersLoaded: (layers: S57LayerData[]) => void;
+  onLayersLoaded: (layers: S57LayerData[], purposeCode?: number) => void;
   // Callback untuk menghapus layer yang terdaftar sebelumnya
   onClearLayers: () => void;
 }
@@ -31,6 +31,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
   const [error, setError] = useState<string | null>(null);
   const [loadedFiles, setLoadedFiles] = useState<string[]>([]);
   const [conversionBundle, setConversionBundle] = useState<S57ConversionBundle | null>(null);
+  const [purposeCode, setPurposeCode] = useState<number>(1);
 
   // Mode selection state
   const [mode, setMode] = useState<ConversionMode>('local');
@@ -66,7 +67,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
           
           // Konversi data biner
           const bundle = buildS57ConversionBundle(buffer, file.name);
-          onLayersLoaded(bundle.processedLayers);
+          onLayersLoaded(bundle.processedLayers, purposeCode);
           setConversionBundle(bundle);
           
           setLoadedFiles(prev => [...prev, file.name]);
@@ -215,7 +216,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
       const bundle = buildConversionBundleFromGeoJSON(geojsonData, sourceFileName);
 
       // Register layers in GeoLibre panel & Maplibre instance
-      onLayersLoaded(bundle.processedLayers);
+      onLayersLoaded(bundle.processedLayers, purposeCode);
       setConversionBundle(bundle);
       setLoadedFiles(prev => [...prev, sourceFileName]);
 
@@ -270,6 +271,30 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
           >
             <option value="local">Local S-57 Parser (Offline)</option>
             <option value="api">Conversion API (Online)</option>
+          </select>
+        </section>
+
+        {/* ENC Purpose Selection Dropdown */}
+        <section className="s57-panel-card">
+          <label htmlFor="s57-purpose-select" className="input-label">ENC Usage Purpose</label>
+          <select
+            id="s57-purpose-select"
+            value={purposeCode}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              setPurposeCode(val);
+              if (conversionBundle) {
+                onLayersLoaded(conversionBundle.processedLayers, val);
+              }
+            }}
+            className="mode-select-dropdown"
+          >
+            <option value={1}>1 - Overview (Zoom 0-9)</option>
+            <option value={2}>2 - General (Zoom 7-10)</option>
+            <option value={3}>3 - Coastal (Zoom 9-12)</option>
+            <option value={4}>4 - Approach (Zoom 11-14)</option>
+            <option value={5}>5 - Harbour (Zoom 13-17)</option>
+            <option value={6}>6 - Berthing (Zoom 16-22)</option>
           </select>
         </section>
 

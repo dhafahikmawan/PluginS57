@@ -155,15 +155,15 @@ async function applyS57Style(map: any, name: string, hostedLayerId: string, styl
  * Registers S-57 layers in GeoLibre's Layers Panel via addGeoJsonLayer,
  * then overrides their styling using getMap() for full MapLibre paint control.
  */
-function handleLayersLoaded(layers: S57LayerData[]) {
+function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number) {
   if (!appAPI) return;
 
   const map = appAPI.getMap?.();
 
   // Sort by priority: base layers first, labels last
   const orderedLayers = [...layers].sort((a, b) => {
-    const styleA = selectS57LayerStyle(a.classCode, (a.metadata?.sampleProperties as Record<string, unknown>) ?? {});
-    const styleB = selectS57LayerStyle(b.classCode, (b.metadata?.sampleProperties as Record<string, unknown>) ?? {});
+    const styleA = selectS57LayerStyle(a.classCode, (a.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
+    const styleB = selectS57LayerStyle(b.classCode, (b.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
     return styleA.priority - styleB.priority;
   });
   
@@ -172,7 +172,7 @@ function handleLayersLoaded(layers: S57LayerData[]) {
   writeDebug("Layer rendering order: ")
   for (const layer of orderedLayers) {
     const sampleProperties = (layer.metadata?.sampleProperties as Record<string, unknown>) ?? {};
-    const styleSelection = selectS57LayerStyle(layer.classCode, sampleProperties);
+    const styleSelection = selectS57LayerStyle(layer.classCode, sampleProperties, purposeCode);
 
     // Register in GeoLibre's Layers Panel
     const hostedLayerId = appAPI.addGeoJsonLayer(
