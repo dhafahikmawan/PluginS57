@@ -341,6 +341,10 @@ function getLayerZoomRange(classCode: string, purposeCode?: string | number): { 
     return { minZoom: Math.max(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
   }
 
+  if (normalizedCode === 'LIGHT_SECTORS') {
+    return { minZoom: Math.max(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
+  }
+
   if (normalizedCode === 'LITFLT' || normalizedCode === 'MORFAC') {
     return { minZoom: Math.max(purposeRange.minZoom, 11), maxZoom: purposeRange.maxZoom };
   }
@@ -419,6 +423,24 @@ function buildNavigationStyle(attributes: Record<string, unknown>): GeoLibreNati
     strokeColor: COLORS.CHBLK,
     strokeWidth: 1.0,
     circleRadius: 5,
+  };
+}
+
+function buildLightSectorStyle(attributes: Record<string, unknown>): GeoLibreNativeLayerStyle {
+  // Colors per Colors.md §2.3:
+  //   COLOUR contains '3' → #FF0000 (red)
+  //   COLOUR contains '4' → #00FF00 (green)
+  //   fallback              → #F2E959 (white/yellow)
+  const colString = asString(attributes.COLOUR) ?? '';
+  let color = '#F2E959';
+  if (colString.includes('3')) color = '#FF0000';
+  else if (colString.includes('4')) color = '#00FF00';
+
+  return {
+    fillColor: color,
+    fillOpacity: 0.25,
+    strokeColor: color,
+    strokeWidth: 1.0,
   };
 }
 
@@ -510,6 +532,16 @@ export function selectS57LayerStyle(
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       style: buildHazardStyle(),
+    };
+  }
+
+  if (normalizedCode === 'LIGHT_SECTORS') {
+    return {
+      family: 'navigation',
+      priority: 69000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildLightSectorStyle(normalizedAttributes),
     };
   }
 
