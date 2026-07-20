@@ -175,8 +175,11 @@ function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number) {
     const styleSelection = selectS57LayerStyle(layer.classCode, sampleProperties, purposeCode);
 
     // Register in GeoLibre's Layers Panel
+    if(layer.layerName == "M_NPUB"){
+      continue;
+    }
     const hostedLayerId = appAPI.addGeoJsonLayer(
-      layer.layerName,
+      layer.fileName + "--" + layer.layerName,
       layer.geojson as any,
       layer.fileName, // groups layers under the filename in the panel
     );

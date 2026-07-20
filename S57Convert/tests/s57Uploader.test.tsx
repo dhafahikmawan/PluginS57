@@ -10,7 +10,7 @@ describe("S57Uploader", () => {
     );
 
     expect(container.querySelector(".s57-panel-badge")?.textContent).toBe("Ready");
-    expect(container.querySelector(".s57-panel-card")?.textContent).toContain("Pilih File S-57 (.000)");
+    expect(container.querySelector(".s57-panel-card")?.textContent).toContain("Upload S-57 (.000) File");
     expect(container.textContent).toContain("S-57 Marine Chart Loader");
   });
 });

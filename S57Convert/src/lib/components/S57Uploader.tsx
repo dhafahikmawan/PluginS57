@@ -249,7 +249,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
   return (
     <div className="s57-uploader-panel">
       <section className="s57-panel-hero">
-        {/*<span className="s57-panel-badge">Ready</span>*/}
+        <span className="s57-panel-badge">Ready</span>
         <h3>S-57 Marine Chart Loader</h3>
         <p className="description">
           Choose to process files locally or convert online via an external API.
