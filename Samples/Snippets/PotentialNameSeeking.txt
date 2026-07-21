@@ -20,7 +20,7 @@ for l in geolibre.layers:
 for l in geolibre.layers: 
     if 'LIGHT' in l.name: 
         print(l.id, l.name)
-const targetId = '3846bd64-803f-406a-a90d-55f553c882b7';\n
+const targetId = '3846bd64-803f-406a-a90d-55f553c882b7';
 const layers = map.getStyle().layers.filter(l => l.id.includes(targetId));
 const result = [];
 for (const l of layers) {
