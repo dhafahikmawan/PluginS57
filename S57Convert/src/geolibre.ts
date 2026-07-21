@@ -225,13 +225,15 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number,
   });
 
   // Keep a quick lookup of any pre-generated derived layers (for example
-  // LIGHT_SECTORS produced by the converter) so they can be inserted
+  // LIGHT_SECTORS--RED/GRN/YLW produced by the converter) so they can be inserted
   // immediately after their source layer.
-  const pendingDerived = new Map<string, any>();
+  const pendingDerived = new Map<string, S57LayerData[]>();
   for (const l of indexed.map((it) => it.layer)) {
     if (l.classCode === 'LIGHT_SECTORS') {
       // Key by source file so we can match to the originating LIGHTS group.
-      pendingDerived.set(`${l.fileName}::LIGHT_SECTORS`, l);
+      const key = `${l.fileName}::LIGHT_SECTORS`;
+      if (!pendingDerived.has(key)) pendingDerived.set(key, []);
+      pendingDerived.get(key)!.push(l);
     }
   }
 
@@ -241,7 +243,7 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number,
   for (const item of indexed) {
     const layer = item.layer;
     // If this layer was consumed as a derived insertion earlier, skip it.
-    const consumedKey = `${layer.fileName}::${layer.layerName}`;
+    const consumedKey = `${layer.fileName}::${layer.classCode === 'LIGHT_SECTORS' ? 'LIGHT_SECTORS' : layer.layerName}`;
     if ((layer.classCode === 'LIGHT_SECTORS' || layer.classCode === 'TSS_ARROWS') && pendingDerived.has(consumedKey)) {
       // Will be added when its source layer was processed.
       continue;
@@ -291,21 +293,23 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number,
       }
     }
 
-    // If this layer is a LIGHTS group, and a pre-generated LIGHT_SECTORS layer
-    // exists for the same source file, insert it now and mark it consumed.
+    // If this layer is a LIGHTS group, and pre-generated LIGHT_SECTORS color layers
+    // exist for the same source file, insert them now and mark as consumed.
     if (layer.classCode === 'LIGHTS') {
       const key = `${layer.fileName}::LIGHT_SECTORS`;
-      const sectors = pendingDerived.get(key);
-      if (sectors) {
-        const hostedSectorId = appAPI.addGeoJsonLayer(`${sectors.fileName}--${sectors.layerName}`, sectors.geojson as any, sectors.fileName);
-        const sectorStyle = selectS57LayerStyle('LIGHT_SECTORS', (sectors.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
-        styleTracker.trackStyle(hostedSectorId, sectorStyle, 'LIGHT_SECTORS', {});
-        everyloadedlayers.push(hostedSectorId);
-        layerIds.push(hostedSectorId);
-        if (map) {
-          setTimeout(() => { void applyS57Style(map, 'LIGHT_SECTORS', hostedSectorId, sectorStyle); }, 0);
+      const sectorLayers = pendingDerived.get(key);
+      if (sectorLayers && sectorLayers.length > 0) {
+        for (const sectors of sectorLayers) {
+          const hostedSectorId = appAPI.addGeoJsonLayer(`${sectors.fileName}--${sectors.layerName}`, sectors.geojson as any, sectors.fileName);
+          const sectorStyle = selectS57LayerStyle(sectors.layerName, (sectors.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
+          styleTracker.trackStyle(hostedSectorId, sectorStyle, sectors.classCode, {});
+          everyloadedlayers.push(hostedSectorId);
+          layerIds.push(hostedSectorId);
+          if (map) {
+            setTimeout(() => { void applyS57Style(map, sectors.layerName, hostedSectorId, sectorStyle); }, 0);
+          }
         }
-        // mark as consumed so it won't be added later
+        // mark as consumed so color variants won't be added again
         pendingDerived.delete(key);
       }
     }

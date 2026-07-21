@@ -388,7 +388,7 @@ function getLayerZoomRange(classCode: string, purposeCode?: string | number): { 
     return { minZoom: Math.max(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
   }
 
-  if (normalizedCode === 'LIGHT_SECTORS') {
+  if (normalizedCode === 'LIGHT_SECTORS' || normalizedCode.startsWith('LIGHT_SECTORS--')) {
     return { minZoom: Math.min(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
   }
 
@@ -473,15 +473,17 @@ function buildNavigationSymbolStyle(classCode: string, attributes: Record<string
   };
 }
 
-function buildLightSectorStyle(attributes: Record<string, unknown>): GeoLibreNativeLayerStyle {
+function buildLightSectorStyle(attributes: Record<string, unknown>, layerNameOrClass?: string): GeoLibreNativeLayerStyle {
   // Colors per Colors.md §2.3:
-  //   COLOUR contains '3' → #FF0000 (red)
-  //   COLOUR contains '4' → #00FF00 (green)
-  //   fallback              → #F2E959 (white/yellow)
+  //   COLOUR contains '3' or layer name contains '--RED' → #FF0000 (red)
+  //   COLOUR contains '4' or layer name contains '--GRN' → #00FF00 (green)
+  //   fallback                                           → #F2E959 (white/yellow)
   const colString = asString(attributes.COLOUR) ?? '';
+  const nameUpper = String(layerNameOrClass || '').toUpperCase();
+
   let color = '#F2E959';
-  if (colString.includes('3')) color = '#FF0000';
-  else if (colString.includes('4')) color = '#00FF00';
+  if (colString.includes('3') || nameUpper.includes('--RED')) color = '#FF0000';
+  else if (colString.includes('4') || nameUpper.includes('--GRN')) color = '#00FF00';
 
   return {
     fillColor: color,
@@ -622,13 +624,13 @@ export function selectS57LayerStyle(
     };
   }
 
-  if (normalizedCode === 'LIGHT_SECTORS') {
+  if (normalizedCode === 'LIGHT_SECTORS' || normalizedCode.startsWith('LIGHT_SECTORS--')) {
     return {
       family: 'navigation',
       priority: 69000,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
-      style: buildLightSectorStyle(normalizedAttributes),
+      style: buildLightSectorStyle(normalizedAttributes, normalizedCode),
     };
   }
 
