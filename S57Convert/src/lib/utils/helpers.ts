@@ -14,7 +14,14 @@
  * ```
  */
 export function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
+  const lowerBound = Math.min(min, max);
+  const upperBound = Math.max(min, max);
+
+  if (!Number.isFinite(value)) {
+    return lowerBound;
+  }
+
+  return Math.min(Math.max(value, lowerBound), upperBound);
 }
 
 /**
@@ -32,7 +39,14 @@ export function clamp(value: number, min: number, max: number): number {
  * ```
  */
 export function formatNumericValue(value: number, step: number): string {
-  if (step === 0) return value.toString();
+  if (!Number.isFinite(value)) {
+    return '0';
+  }
+
+  if (step === 0) {
+    return value.toString();
+  }
+
   const decimals = Math.max(0, -Math.floor(Math.log10(step)));
   return value.toFixed(decimals);
 }
@@ -50,7 +64,7 @@ export function formatNumericValue(value: number, step: number): string {
  * ```
  */
 export function generateId(prefix?: string): string {
-  const id = Math.random().toString(36).substring(2, 9);
+  const id = Math.random().toString(36).slice(2, 9);
   return prefix ? `${prefix}-${id}` : id;
 }
 
@@ -74,9 +88,10 @@ export function debounce<T extends (...args: unknown[]) => void>(
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
   return (...args: Parameters<T>) => {
-    if (timeoutId) {
+    if (timeoutId !== null) {
       clearTimeout(timeoutId);
     }
+
     timeoutId = setTimeout(() => {
       fn(...args);
       timeoutId = null;

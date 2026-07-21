@@ -161,10 +161,9 @@ describe('generateSectorsForFeature', () => {
     expect(sectors[0].properties.COLOUR).toBe('3');
   });
 
-  it('generates a full 360° sector when SECTR1/SECTR2 are absent but VALNMR is present', () => {
+  it('does not generate a sector when SECTR1/SECTR2 are absent', () => {
     const sectors = generateSectorsForFeature(makeLight());
-    expect(sectors).toHaveLength(1);
-    expect(sectors[0].geometry.type).toBe('Polygon');
+    expect(sectors).toHaveLength(0);
   });
 
   it('defaults to 9 NM when SECTR1/SECTR2 are present but VALNMR is missing', () => {

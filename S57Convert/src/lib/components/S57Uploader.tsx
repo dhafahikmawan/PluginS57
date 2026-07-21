@@ -285,9 +285,12 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
             onChange={(e) => {
               const val = Number(e.target.value);
               setPurposeCode(val);
+              /*
               if (conversionBundle) {
                 onLayersLoaded(conversionBundle.processedLayers, val);
               }
+              */
+              
             }}
             className="mode-select-dropdown"
           >

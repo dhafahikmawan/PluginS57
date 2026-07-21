@@ -1,0 +1,4 @@
+ogrinfo -ro -q -config S57_CSV=<S57-CSV-path> <input path>
+
+
+ogr2ogr -skipfailures -f GeoJSON -config S57_CSV=<S57-CSV-path> <Output path> <input path> <layer name>

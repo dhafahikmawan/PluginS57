@@ -17,10 +17,9 @@ let attachedMap: any = null;
 let styleRefreshHandler: (() => void) | null = null;
 let styleLoadHandler: (() => void) | null = null;
 let layerMutationHandler: (() => void) | null = null;
+let everyloadedlayers : Array<string> = [];
 const tsslptCache = new Map<string, ProcessedTSSLPT[]>();
 const tssArrowCache = new Map<string, GeneratedArrow[]>();
-
-
 
 
 function writeDebug(message : any){
@@ -119,6 +118,18 @@ export const s57ReaderPlugin: GeoLibrePlugin = {
   },
 
   deactivate(app: GeoLibreAppAPI) {
+    console.log("Every layer IDs:");
+    console.log(everyloadedlayers);
+    everyloadedlayers.forEach((layer_id)=>{
+      try {
+        const unregister = app?.unregisterExternalNativeLayer;
+        if (typeof unregister === "function") {
+          unregister(layer_id);
+        }
+      } catch (e) {
+        console.error("Error while removing GeoJSON layer", e);
+      }
+    })
     if (app.unregisterRightPanel) {
       app.unregisterRightPanel("s57-uploader-panel");
     }
@@ -207,6 +218,7 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number)
       layer.fileName,
     );
     writeDebug(hostedLayerId + ' : ' + layer.layerName);
+    everyloadedlayers.push(hostedLayerId);
 
     styleTracker.trackStyle(hostedLayerId, styleSelection, layer.classCode, sampleProperties);
 
@@ -230,6 +242,7 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number)
         };
 
         const arrowLayerId = appAPI.addGeoJsonLayer(`${sourceFile}--TSS_ARROWS`, arrowGeojson as any, sourceFile);
+        everyloadedlayers.push(arrowLayerId);
         const arrowStyleSelection = selectS57LayerStyle('TSS_ARROWS', {}, purposeCode);
         styleTracker.trackStyle(arrowLayerId, arrowStyleSelection, 'TSS_ARROWS', {});
         if (map) {
@@ -247,6 +260,7 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number)
         const hostedSectorId = appAPI.addGeoJsonLayer(`${sectors.fileName}--${sectors.layerName}`, sectors.geojson as any, sectors.fileName);
         const sectorStyle = selectS57LayerStyle('LIGHT_SECTORS', (sectors.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
         styleTracker.trackStyle(hostedSectorId, sectorStyle, 'LIGHT_SECTORS', {});
+        everyloadedlayers.push(hostedSectorId);
         if (map) {
           setTimeout(() => { void applyS57Style(map, 'LIGHT_SECTORS', hostedSectorId, sectorStyle); }, 0);
         }
