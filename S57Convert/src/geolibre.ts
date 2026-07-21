@@ -20,6 +20,8 @@ let layerMutationHandler: (() => void) | null = null;
 const everyloadedlayers : Array<string> = [];
 const tsslptCache = new Map<string, ProcessedTSSLPT[]>();
 const tssArrowCache = new Map<string, GeneratedArrow[]>();
+let nextFileId = 1;
+const fileLayerMap = new Map<number, { fileName: string; layerIds: string[] }>();
 
 
 function writeDebug(message : any){
@@ -103,7 +105,8 @@ export const s57ReaderPlugin: GeoLibrePlugin = {
           root.render(
             React.createElement(S57Uploader, {
               onLayersLoaded: handleLayersLoaded,
-              onClearLayers: () => {}
+              onDeleteFile: handleDeleteFileLayer,
+              onClearLayers: handleClearLayers,
             })
           );
           return () => { root.unmount(); };
@@ -120,16 +123,7 @@ export const s57ReaderPlugin: GeoLibrePlugin = {
   deactivate(app: GeoLibreAppAPI) {
     console.log("Every layer IDs:");
     console.log(everyloadedlayers);
-    everyloadedlayers.forEach((layer_id)=>{
-      try {
-        const unregister = app?.unregisterExternalNativeLayer;
-        if (typeof unregister === "function") {
-          unregister(layer_id);
-        }
-      } catch (e) {
-        console.error("Error while removing GeoJSON layer", e);
-      }
-    })
+    handleClearLayers();
     if (app.unregisterRightPanel) {
       app.unregisterRightPanel("s57-uploader-panel");
     }
@@ -166,15 +160,59 @@ async function applyS57Style(map: any, name: string, hostedLayerId: string, styl
     writeDebug("*************************************************");
   }
 }
+function removeTrackedLayer(layerId: string) {
+  const index = everyloadedlayers.indexOf(layerId);
+  if (index >= 0) {
+    everyloadedlayers.splice(index, 1);
+  }
+  styleTracker.removeStyle(layerId);
+}
+
+export function handleClearLayers() {
+  const fileIds = Array.from(fileLayerMap.keys());
+  fileIds.forEach((fileId) => {
+    handleDeleteFileLayer(fileId);
+  });
+  everyloadedlayers.length = 0;
+  styleTracker.resetAll();
+  fileLayerMap.clear();
+}
+
+export function handleDeleteFileLayer(fileId: number) {
+  const entry = fileLayerMap.get(fileId);
+  if (!entry) {
+    return;
+  }
+
+  entry.layerIds.forEach((layerId) => {
+    try {
+      appAPI?.unregisterExternalNativeLayer?.(layerId);
+    } catch (error) {
+      console.error('Error while removing GeoJSON layer', error);
+    }
+    removeTrackedLayer(layerId);
+  });
+
+  fileLayerMap.delete(fileId);
+}
+
 /**
  * Registers S-57 layers in GeoLibre's Layers Panel via addGeoJsonLayer,
  * then overrides their styling using getMap() for full MapLibre paint control.
  */
-export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number) {
-  if (!appAPI) return;
+export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number, fileName?: string) {
+  if (!appAPI) return undefined;
 
   const map = appAPI.getMap?.();
   const sourceLayers = [...layers].filter((layer) => layer.layerName !== 'M_NPUB');
+
+  if (sourceLayers.length === 0) {
+    return undefined;
+  }
+
+  const resolvedFileName = fileName ?? sourceLayers[0]?.fileName ?? `uploaded-${nextFileId}`;
+  const fileId = nextFileId++;
+  const layerIds: string[] = [];
 
   // Build stable ordering: sort by priority then by original index to preserve
   // the sequence present in the chart index for features within the same band.
@@ -219,6 +257,7 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number)
     );
     writeDebug(hostedLayerId + ' : ' + layer.layerName);
     everyloadedlayers.push(hostedLayerId);
+    layerIds.push(hostedLayerId);
 
     styleTracker.trackStyle(hostedLayerId, styleSelection, layer.classCode, sampleProperties);
 
@@ -243,6 +282,7 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number)
 
         const arrowLayerId = appAPI.addGeoJsonLayer(`${sourceFile}--TSS_ARROWS`, arrowGeojson as any, sourceFile);
         everyloadedlayers.push(arrowLayerId);
+        layerIds.push(arrowLayerId);
         const arrowStyleSelection = selectS57LayerStyle('TSS_ARROWS', {}, purposeCode);
         styleTracker.trackStyle(arrowLayerId, arrowStyleSelection, 'TSS_ARROWS', {});
         if (map) {
@@ -261,6 +301,7 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number)
         const sectorStyle = selectS57LayerStyle('LIGHT_SECTORS', (sectors.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
         styleTracker.trackStyle(hostedSectorId, sectorStyle, 'LIGHT_SECTORS', {});
         everyloadedlayers.push(hostedSectorId);
+        layerIds.push(hostedSectorId);
         if (map) {
           setTimeout(() => { void applyS57Style(map, 'LIGHT_SECTORS', hostedSectorId, sectorStyle); }, 0);
         }
@@ -270,7 +311,10 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number)
     }
   }
 
+  fileLayerMap.set(fileId, { fileName: resolvedFileName, layerIds });
+
   writeDebug('++++++++++++++++++++++++++++++++++++++++++');
+  return { id: fileId, name: resolvedFileName };
 }
 
 // Default export untuk dibaca oleh bundling system GeoLibre
