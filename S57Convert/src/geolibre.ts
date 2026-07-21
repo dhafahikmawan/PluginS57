@@ -17,7 +17,7 @@ let attachedMap: any = null;
 let styleRefreshHandler: (() => void) | null = null;
 let styleLoadHandler: (() => void) | null = null;
 let layerMutationHandler: (() => void) | null = null;
-let everyloadedlayers : Array<string> = [];
+const everyloadedlayers : Array<string> = [];
 const tsslptCache = new Map<string, ProcessedTSSLPT[]>();
 const tssArrowCache = new Map<string, GeneratedArrow[]>();
 
