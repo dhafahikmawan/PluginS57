@@ -128,12 +128,41 @@
   font-size: 0.8rem;
 }
 
-.s57-uploader-panel .loaded-list li {
-  padding: 4px 0;
+.s57-uploader-panel .loaded-file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  color: var(--pc-label, #475569);
+}
+
+.s57-uploader-panel .file-name {
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--pc-label, #475569);
+}
+
+.s57-uploader-panel .delete-file-button {
+  border: none;
+  background: transparent;
+  color: #dc2626;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.s57-uploader-panel .delete-file-button:hover {
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+  transform: scale(1.05);
+}
+
+.s57-uploader-panel .delete-file-button:active {
+  transform: scale(0.95);
 }
 
 .s57-uploader-panel .s57-panel-actions {

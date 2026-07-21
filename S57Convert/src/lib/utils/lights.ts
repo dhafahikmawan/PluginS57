@@ -252,9 +252,9 @@ export function generateSectorCoordinates(
  *  - All-around lights (SECTR1/SECTR2 absent but VALNMR present) → full 360° circle polygon
  *  - No range → returns empty array
  */
-export function generateSectorsForFeature(feature: any): any[] {
-  const geometry = feature?.geometry;
-  const props: Record<string, any> = feature?.properties ?? {};
+export function generateSectorsForFeature(feature: Record<string, unknown> | null | undefined): Array<Record<string, unknown>> {
+  const geometry = (feature as { geometry?: { type?: string; coordinates?: unknown } } | null | undefined)?.geometry;
+  const props: Record<string, unknown> = (feature as { properties?: Record<string, unknown> } | null | undefined)?.properties ?? {};
 
   // Must be a point geometry
   if (!geometry || geometry.type !== 'Point') {
@@ -266,35 +266,29 @@ export function generateSectorsForFeature(feature: any): any[] {
     return [];
   }
 
-  const center: [number, number] = [coords[0], coords[1]];
+  const center: [number, number] = [Number(coords[0]), Number(coords[1])];
 
   const rawValnmr = parseFloatProp(props.VALNMR);
   const sectr1 = parseFloatProp(props.SECTR1);
   const sectr2 = parseFloatProp(props.SECTR2);
   const hasSectorBounds = sectr1 !== undefined && sectr2 !== undefined;
 
+  if (!hasSectorBounds) {
+    return [];
+  }
+
   // Use 9 NM as a fallback when sector bounds are defined but range is missing.
-  const rangeNm = hasSectorBounds
-    ? rawValnmr && rawValnmr > 0 ? rawValnmr : 9
-    : rawValnmr;
+  const rangeNm = rawValnmr && rawValnmr > 0 ? rawValnmr : 9;
 
-  if (rangeNm === undefined || rangeNm <= 0) {
+  if (rangeNm <= 0) {
     return [];
   }
 
-  let ring: Array<[number, number]>;
-
-  if (hasSectorBounds) {
-    // S-57 sector bearings are reported from seaward towards the light,
-    // so the visible sector fan is the opposite direction.
-    const sectorStart = (sectr1 + 180) % 360;
-    const sectorEnd = (sectr2 + 180) % 360;
-    ring = generateSectorCoordinates(center, rangeNm, sectorStart, sectorEnd);
-  } else {
-    // All-around light → 360° polygon
-    return [];
-    //ring = generateSectorCoordinates(center, rangeNm, 0, 360);
-  }
+  // S-57 sector bearings are reported from seaward towards the light,
+  // so the visible sector fan is the opposite direction.
+  const sectorStart = (sectr1 + 180) % 360;
+  const sectorEnd = (sectr2 + 180) % 360;
+  const ring = generateSectorCoordinates(center, rangeNm, sectorStart, sectorEnd);
 
   if (ring.length < 4) {
     return [];

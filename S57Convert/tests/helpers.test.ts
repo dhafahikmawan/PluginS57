@@ -32,6 +32,12 @@ describe('clamp', () => {
     expect(clamp(0, -10, -1)).toBe(-1);
     expect(clamp(-15, -10, -1)).toBe(-10);
   });
+
+  it('normalizes reversed bounds before clamping', () => {
+    expect(clamp(5, 10, 0)).toBe(5);
+    expect(clamp(15, 10, 0)).toBe(10);
+    expect(clamp(-5, 10, 0)).toBe(0);
+  });
 });
 
 describe('formatNumericValue', () => {
@@ -48,6 +54,11 @@ describe('formatNumericValue', () => {
 
   it('handles step of 0', () => {
     expect(formatNumericValue(5, 0)).toBe('5');
+  });
+
+  it('returns a safe string for non-finite values', () => {
+    expect(formatNumericValue(Number.NaN, 0.1)).toBe('0');
+    expect(formatNumericValue(Number.POSITIVE_INFINITY, 0.1)).toBe('0');
   });
 
   it('rounds to appropriate decimal places', () => {

@@ -64,6 +64,10 @@ export class StyleTracker {
     return [...this.trackedStyles.keys()];
   }
 
+  removeStyle(layerId: string) {
+    this.trackedStyles.delete(layerId);
+  }
+
   resetAll() {
     this.trackedStyles.clear();
   }

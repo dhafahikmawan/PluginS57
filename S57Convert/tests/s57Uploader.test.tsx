@@ -6,7 +6,7 @@ import { S57Uploader } from "../src/lib/components/S57Uploader";
 describe("S57Uploader", () => {
   it("renders the refined status and hero content", () => {
     const { container } = render(
-      <S57Uploader onLayersLoaded={() => undefined} onClearLayers={() => undefined} />,
+      <S57Uploader onLayersLoaded={() => undefined} onDeleteFile={() => undefined} onClearLayers={() => undefined} />,
     );
 
     expect(container.querySelector(".s57-panel-badge")?.textContent).toBe("Ready");

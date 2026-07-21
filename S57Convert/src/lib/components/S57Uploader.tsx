@@ -16,20 +16,26 @@ interface KeyValuePair {
 
 // ── Props ────────────────────────────────────────────────────────────────────
 
+interface LoadedFileItem {
+  id: number;
+  name: string;
+}
+
 interface S57UploaderProps {
   // Callback untuk meregistrasikan layer baru ke GeoLibre Host
-  onLayersLoaded: (layers: S57LayerData[], purposeCode?: number) => void;
+  onLayersLoaded: (layers: S57LayerData[], purposeCode?: number, fileName?: string) => LoadedFileItem | undefined;
   // Callback untuk menghapus layer yang terdaftar sebelumnya
+  onDeleteFile: (fileId: number) => void;
   onClearLayers: () => void;
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClearLayers }) => {
+export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDeleteFile, onClearLayers }) => {
   // Shared state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loadedFiles, setLoadedFiles] = useState<string[]>([]);
+  const [loadedFiles, setLoadedFiles] = useState<LoadedFileItem[]>([]);
   const [conversionBundle, setConversionBundle] = useState<S57ConversionBundle | null>(null);
   const [purposeCode, setPurposeCode] = useState<number>(1);
 
@@ -68,10 +74,12 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
           // Konversi data biner
 
           const bundle = buildS57ConversionBundle(buffer, file.name);
-          onLayersLoaded(bundle.processedLayers, purposeCode);
+          const loadedFile = onLayersLoaded(bundle.processedLayers, purposeCode, file.name);
           setConversionBundle(bundle);
           
-          setLoadedFiles(prev => [...prev, file.name]);
+          if (loadedFile) {
+            setLoadedFiles(prev => [...prev, loadedFile]);
+          }
         } catch (err: any) {
           setError(err.message || "Gagal mengurai file S-57.");
         } finally {
@@ -217,9 +225,11 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
       const bundle = buildConversionBundleFromGeoJSON(geojsonData, sourceFileName);
 
       // Register layers in GeoLibre panel & Maplibre instance
-      onLayersLoaded(bundle.processedLayers, purposeCode);
+      const loadedFile = onLayersLoaded(bundle.processedLayers, purposeCode, sourceFileName);
       setConversionBundle(bundle);
-      setLoadedFiles(prev => [...prev, sourceFileName]);
+      if (loadedFile) {
+        setLoadedFiles(prev => [...prev, loadedFile]);
+      }
 
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred during API conversion.");
@@ -236,6 +246,11 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
     setLoadedFiles([]);
     setConversionBundle(null);
     setError(null);
+  };
+
+  const handleDeleteFile = (fileId: number) => {
+    onDeleteFile(fileId);
+    setLoadedFiles(prev => prev.filter(file => file.id !== fileId));
   };
 
   // ── Download handler ─────────────────────────────────────────────────────
@@ -285,9 +300,12 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
             onChange={(e) => {
               const val = Number(e.target.value);
               setPurposeCode(val);
+              /*
               if (conversionBundle) {
                 onLayersLoaded(conversionBundle.processedLayers, val);
               }
+              */
+              
             }}
             className="mode-select-dropdown"
           >
@@ -462,7 +480,19 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onClea
           <section className="s57-panel-card s57-panel-card-muted">
             <h4>Loaded layers</h4>
             <ul className="loaded-list">
-              {loadedFiles.map((f, i) => <li key={i}>📄 {f}</li>)}
+              {loadedFiles.map((file) => (
+                <li key={file.id} className="loaded-file-item">
+                  <span className="file-name">📄 {file.name}</span>
+                  <button
+                    type="button"
+                    className="delete-file-button"
+                    onClick={() => handleDeleteFile(file.id)}
+                    title={`Delete ${file.name}`}
+                  >
+                    🗑️
+                  </button>
+                </li>
+              ))}
             </ul>
             <div className="s57-panel-actions">
               {conversionBundle && (
