@@ -76,7 +76,7 @@ export function PluginControlReact({
         options.collapsed !== currentState.collapsed
       ) {
         if (options.collapsed) {
-          controlRef.current.collapse();
+          controlRef.current.collapse(map);
         } else {
           controlRef.current.expand();
         }

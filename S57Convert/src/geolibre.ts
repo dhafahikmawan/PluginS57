@@ -1,12 +1,15 @@
 import { createRoot } from 'react-dom/client';
 import React from 'react';
-import type { GeoLibreAppAPI, GeoLibrePlugin } from './lib/geolibre/host-api';
+import type { GeoLibreAppAPI, GeoLibrePlugin, GeoLibreMapControlPosition } from './lib/geolibre/host-api';
+import { PluginControl } from './lib/core/PluginControl';
+import { PluginState } from './lib/core/types';
 import { S57Uploader } from './lib/components/S57Uploader';
 import { S57LayerData } from './lib/utils/s57Converter';
 import { generateTSSArrows, type GeneratedArrow } from './lib/utils/tssArrowsGenerator';
 import type { ProcessedTSSLPT } from './lib/utils/tsslptProcessor';
 import { selectS57LayerStyle, StyleReapplier, StyleTracker, type S57StyleSelection } from './lib/styles/s57StyleRegistry';
 import './lib/styles/uploader.css';
+//import { PluginControlOptions } from './react';
 
 const PLUGIN_ID = 'geolibre-s57-reader';
 
@@ -19,12 +22,55 @@ let attachedMap: any = null;
 let styleRefreshHandler: (() => void) | null = null;
 let styleLoadHandler: (() => void) | null = null;
 let layerMutationHandler: (() => void) | null = null;
+let control: PluginControl | null = null;
+let position: GeoLibreMapControlPosition = "top-right";
+let pendingState: Partial<PluginState> | null = null;
 
 const everyloadedlayers : Array<string> = [];
 const tsslptCache = new Map<string, ProcessedTSSLPT[]>();
 const tssArrowCache = new Map<string, GeneratedArrow[]>();
 let nextFileId = 1;
 const fileLayerMap = new Map<number, { fileName: string; layerIds: string[] }>();
+
+
+
+function createControl(app: GeoLibreAppAPI): PluginControl{
+  const nextControl = new PluginControl({
+    collapsed : pendingState?.collapsed ?? true,
+    panelWidth: pendingState?.panelWidth ?? 300,
+    registerNativeLayer: (layer) => app.registerExternalNativeLayer?.(layer),
+
+  });
+  if(pendingState){
+    nextControl.setState(pendingState);
+  }
+
+  return nextControl;
+}
+
+function isPluginState(value: unknown): value is Partial<PluginState>{
+  if(!value || typeof value !== "object" || Array.isArray(value)){
+    return false;
+  }
+  const candidate = value as Record<string, unknown>;
+  if("collapsed" in candidate && typeof candidate.collapsed !== "boolean"){
+    return false;
+  }
+  if("panelWidth" in candidate && typeof candidate.panelWidth !== "number"){
+    return false;
+  }
+  if(
+    "data" in candidate &&
+    (typeof candidate.data !== "object" ||   
+      candidate.data === null ||
+      Array.isArray(candidate.data))
+  ){
+    return false;
+  }
+  return true;
+
+}
+
 
 // ---------------------------------------------------------------------------
 // Sprite asset helpers
@@ -213,6 +259,12 @@ export const s57ReaderPlugin: GeoLibrePlugin = {
 
   activate(app: GeoLibreAppAPI) {
     appAPI = app;
+    control = control ?? createControl(appAPI);
+    const added = app.addMapControl(control, position);
+    if(!added){
+      control = null;
+      return false;
+    }
     const map = app.getMap?.();
 
     if (map) {
@@ -254,8 +306,35 @@ export const s57ReaderPlugin: GeoLibrePlugin = {
     }
     detachStylePersistenceListeners();
     styleTracker.resetAll();
+    if(!control) return;
+    pendingState = control.getState();
+    app.removeMapControl(control);
+    control = null;
     appAPI = null;
     return true;
+  },
+  getMapControlPosition() {
+    return position;
+  },
+  setMapControlPosition(app, nextPosition){
+    position = nextPosition;
+    if(!control) return;
+
+    app.removeMapControl(control);
+    const added = app.addMapControl(control, position);
+    if(!added){
+      pendingState = control.getState();
+      control = null;
+      return false;
+    }
+  },
+  getProjectState(){
+    return control?.getState() ?? pendingState ?? undefined;
+  },
+  applyProjectState(_app, state){
+    if(!isPluginState(state)) return false;
+    pendingState = state;
+    control?.setState(state);
   }
 };
 
