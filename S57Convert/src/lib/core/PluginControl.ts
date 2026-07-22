@@ -1,4 +1,4 @@
-import type { IControl, Map as MapLibreMap } from 'maplibre-gl';
+import type { IControl, Map as MapLibreMap, MapMouseEvent } from 'maplibre-gl';
 import type {
   PluginControlOptions,
   PluginState,
@@ -65,6 +65,7 @@ export class PluginControl implements IControl, DeepLinkConsumer {
   // Ids of native layers this control has registered with the host, so they can
   // be unregistered when the control is removed.
   private _registeredNativeLayerIds: string[] = [];
+  private _featuresClickHandler?: (event: MapMouseEvent) => void;
 
   // Panel positioning handlers
   private _resizeHandler: (() => void) | null = null;
@@ -209,10 +210,16 @@ export class PluginControl implements IControl, DeepLinkConsumer {
       this.toggle();
     }
     console.log("Collapsing...");
-    console.log(map);
+    //console.log(map);
     if(!map) return;
-    const clickHandler = (event :maplibregl.MapMouseEvent) => this._selectFeatures(event, map);
-    map.off("click", clickHandler);
+    if(!this._featuresClickHandler) return;
+    //const clickHandler = (event :maplibregl.MapMouseEvent) => this._selectFeatures(event, map);
+    map.off("click", this._featuresClickHandler);
+    this._selectActive = false;
+    if (this._getFeaturesButton) {
+      this._getFeaturesButton.style.background = "var(--pc-accent)";
+      this._getFeaturesButton.textContent = "Start Selecting Features";
+    }
   }
 
   /**
@@ -474,7 +481,7 @@ export class PluginControl implements IControl, DeepLinkConsumer {
    */
   private _setupEventListeners(map : MapLibreMap): void {
     // Click outside to close (check both container and panel since they're now separate)
-    
+    /*
     this._clickOutsideHandler = (e: MouseEvent) => {
       const target = e.target as Node;
       if (
@@ -487,8 +494,8 @@ export class PluginControl implements IControl, DeepLinkConsumer {
       }
     };
     document.addEventListener('click', this._clickOutsideHandler);
-    
-
+    */
+    console.log(map);
     // Update panel position on window resize
     this._resizeHandler = () => {
       if (!this._state.collapsed) {
@@ -579,7 +586,7 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     }
   }
 
-  private _selectFeatures(event : maplibregl.MapMouseEvent, map : MapLibreMap){
+  private _selectFeatures(event : MapMouseEvent, map : MapLibreMap){
     console.log(map);
     if(!map){
       console.log("No Map");
@@ -610,20 +617,23 @@ export class PluginControl implements IControl, DeepLinkConsumer {
       console.log("Map not initialized");
       return;
     }
-    const clickHandler = (event :maplibregl.MapMouseEvent) => this._selectFeatures(event, map);
+    if(!this._featuresClickHandler){
+      this._featuresClickHandler = (event: MapMouseEvent) => this._selectFeatures(event,map);
+    }
+    //const clickHandler = (event :maplibregl.MapMouseEvent) => this._selectFeatures(event, map);
     this._selectActive = !this._selectActive;
     if(!this._getFeaturesButton) return;
     if(this._selectActive){
       console.log("Activating Selection.....");
       this._getFeaturesButton.style.background = "red";
       this._getFeaturesButton.textContent = "Stop Selecting Features";
-      map.on("click", clickHandler);
+      map.on("click", this._featuresClickHandler);
     }
     else{
       console.log("Deactivating Selection.....");
       this._getFeaturesButton.style.background = "var(--pc-accent)";
       this._getFeaturesButton.textContent = "Start Selecting Features";
-      map.off("click", clickHandler)
+      map.off("click", this._featuresClickHandler)
     }
     
     

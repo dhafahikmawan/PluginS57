@@ -298,8 +298,9 @@ export const s57ReaderPlugin: GeoLibrePlugin = {
   },
 
   deactivate(app: GeoLibreAppAPI) {
-    console.log("Every layer IDs:");
-    console.log(everyloadedlayers);
+    //console.log("Every layer IDs:");
+    //console.log(everyloadedlayers);
+    const map = app.getMap?.();
     handleClearLayers();
     if (app.unregisterRightPanel) {
       app.unregisterRightPanel("s57-uploader-panel");
@@ -308,6 +309,7 @@ export const s57ReaderPlugin: GeoLibrePlugin = {
     styleTracker.resetAll();
     if(!control) return;
     pendingState = control.getState();
+    if(map) control.collapse(map);
     app.removeMapControl(control);
     control = null;
     appAPI = null;
