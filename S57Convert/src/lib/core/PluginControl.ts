@@ -1,4 +1,4 @@
-import type { IControl, Map as MapLibreMap } from 'maplibre-gl';
+import type { IControl, Map as MapLibreMap, MapMouseEvent } from 'maplibre-gl';
 import type {
   PluginControlOptions,
   PluginState,
@@ -7,6 +7,9 @@ import type {
 } from './types';
 import type { DeepLinkConsumer } from '../utils/deep-link';
 import type { GeoLibreNativeLayerRegistration } from '../geolibre/host-api';
+import { getS57Acronym } from '../utils/s57ObjectClasses';
+
+
 
 /**
  * Default options for the PluginControl.
@@ -15,10 +18,13 @@ import type { GeoLibreNativeLayerRegistration } from '../geolibre/host-api';
  * standalone MapLibre control. The GeoLibre wrapper (`src/geolibre.ts`) binds
  * them to the real host APIs when the plugin runs inside GeoLibre.
  */
+
+
+
 const DEFAULT_OPTIONS: Required<PluginControlOptions> = {
   collapsed: true,
   position: 'top-right',
-  title: 'Plugin Control',
+  title: 'S-57 Marine Chart Reader Feature Selector',
   panelWidth: 300,
   className: '',
   pickFiles: () => Promise.resolve(null),
@@ -50,13 +56,16 @@ export class PluginControl implements IControl, DeepLinkConsumer {
   private _container?: HTMLElement;
   private _panel?: HTMLElement;
   private _status?: HTMLElement;
+  private _getFeaturesButton?: HTMLElement;
   private _options: Required<PluginControlOptions>;
   private _state: PluginState;
   private _eventHandlers: EventHandlersMap = new globalThis.Map();
+  private _selectActive : boolean;
 
   // Ids of native layers this control has registered with the host, so they can
   // be unregistered when the control is removed.
   private _registeredNativeLayerIds: string[] = [];
+  private _featuresClickHandler?: (event: MapMouseEvent) => void;
 
   // Panel positioning handlers
   private _resizeHandler: (() => void) | null = null;
@@ -75,6 +84,7 @@ export class PluginControl implements IControl, DeepLinkConsumer {
       panelWidth: this._options.panelWidth,
       data: {},
     };
+    this._selectActive = false;
   }
 
   /**
@@ -88,13 +98,13 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     this._map = map;
     this._mapContainer = map.getContainer();
     this._container = this._createContainer();
-    this._panel = this._createPanel();
+    this._panel = this._createPanel(map);
 
     // Append panel to map container for independent positioning (avoids overlap with other controls)
     this._mapContainer.appendChild(this._panel);
 
     // Setup event listeners for panel positioning and click-outside
-    this._setupEventListeners();
+    this._setupEventListeners(map);
 
     // Set initial panel state
     if (!this._state.collapsed) {
@@ -195,9 +205,20 @@ export class PluginControl implements IControl, DeepLinkConsumer {
   /**
    * Collapses the control panel.
    */
-  collapse(): void {
+  collapse(map : MapLibreMap): void {
     if (!this._state.collapsed) {
       this.toggle();
+    }
+    console.log("Collapsing...");
+    //console.log(map);
+    if(!map) return;
+    if(!this._featuresClickHandler) return;
+    //const clickHandler = (event :maplibregl.MapMouseEvent) => this._selectFeatures(event, map);
+    map.off("click", this._featuresClickHandler);
+    this._selectActive = false;
+    if (this._getFeaturesButton) {
+      this._getFeaturesButton.style.background = "var(--pc-accent)";
+      this._getFeaturesButton.textContent = "Start Selecting Features";
     }
   }
 
@@ -391,7 +412,7 @@ export class PluginControl implements IControl, DeepLinkConsumer {
    *
    * @returns The panel element
    */
-  private _createPanel(): HTMLElement {
+  private _createPanel(map : MapLibreMap): HTMLElement {
     const panel = document.createElement('div');
     panel.className = 'plugin-control-panel';
     panel.style.width = `${this._options.panelWidth}px`;
@@ -409,7 +430,7 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     closeBtn.type = 'button';
     closeBtn.setAttribute('aria-label', 'Close panel');
     closeBtn.innerHTML = '&times;';
-    closeBtn.addEventListener('click', () => this.collapse());
+    closeBtn.addEventListener('click', () => this.collapse(map));
 
     header.appendChild(title);
     header.appendChild(closeBtn);
@@ -420,7 +441,7 @@ export class PluginControl implements IControl, DeepLinkConsumer {
 
     const placeholder = document.createElement('p');
     placeholder.className = 'plugin-control-placeholder';
-    placeholder.textContent = 'Add your custom plugin content here.';
+    placeholder.textContent = 'This will display the properties of the features clicked on the map';
 
     // Demonstrate the GeoLibre host callbacks end to end. These buttons drive
     // `openFiles()` and `loadFromUrl()`, which call the host-provided pickers
@@ -428,15 +449,17 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     const actions = document.createElement('div');
     actions.className = 'plugin-control-actions';
 
-    const openFolderBtn = document.createElement('button');
-    openFolderBtn.type = 'button';
-    openFolderBtn.className = 'plugin-control-action';
-    openFolderBtn.textContent = 'Open folder…';
-    openFolderBtn.addEventListener('click', () => {
-      void this.openFiles();
+    const getFeaturesBtn = document.createElement('button');
+    getFeaturesBtn.type = 'button';
+    getFeaturesBtn.className = 'plugin-control-action';
+    getFeaturesBtn.textContent = 'Start Selecting Features';
+    getFeaturesBtn.addEventListener('click', () => {
+      void this._getFeatures(this._map);
     });
 
-    actions.appendChild(openFolderBtn);
+    this._getFeaturesButton = getFeaturesBtn;
+
+    actions.appendChild(getFeaturesBtn);
 
     const status = document.createElement('div');
     status.className = 'plugin-control-status';
@@ -456,8 +479,9 @@ export class PluginControl implements IControl, DeepLinkConsumer {
   /**
    * Setup event listeners for panel positioning and click-outside behavior.
    */
-  private _setupEventListeners(): void {
+  private _setupEventListeners(map : MapLibreMap): void {
     // Click outside to close (check both container and panel since they're now separate)
+    /*
     this._clickOutsideHandler = (e: MouseEvent) => {
       const target = e.target as Node;
       if (
@@ -466,11 +490,12 @@ export class PluginControl implements IControl, DeepLinkConsumer {
         !this._container.contains(target) &&
         !this._panel.contains(target)
       ) {
-        this.collapse();
+        this.collapse(map);
       }
     };
     document.addEventListener('click', this._clickOutsideHandler);
-
+    */
+    console.log(map);
     // Update panel position on window resize
     this._resizeHandler = () => {
       if (!this._state.collapsed) {
@@ -559,5 +584,79 @@ export class PluginControl implements IControl, DeepLinkConsumer {
         this._panel.style.right = `${buttonRight}px`;
         break;
     }
+  }
+
+  private _selectFeatures(event : MapMouseEvent, map : MapLibreMap){
+    console.log(map);
+    if(!map){
+      console.log("No Map");
+      return;
+    }
+    try{
+        const featureProperties : Array<object> = [];
+        const features = map.queryRenderedFeatures(event.point);
+        if(!features || features.length === 0) return;
+        
+        console.log("Features: ")
+        features.forEach((feature) => {
+          const rawCode: any = feature.properties?.OBJL || feature.properties?.OBJ_CLASS;
+          const codeStr = rawCode != null ? String(rawCode) : "UNKNOWN"; 
+          feature.properties.ACRONYM = getS57Acronym(codeStr);
+          if(feature.properties.OBJL) featureProperties.push(feature.properties);
+        });
+        console.log(featureProperties);
+      }catch(err){
+        console.log("Error: " + err);
+      }
+  }
+  flushSelectionEvent(){
+
+  }
+  async _getFeatures(map? : MapLibreMap){
+    if(!map){
+      console.log("Map not initialized");
+      return;
+    }
+    if(!this._featuresClickHandler){
+      this._featuresClickHandler = (event: MapMouseEvent) => this._selectFeatures(event,map);
+    }
+    //const clickHandler = (event :maplibregl.MapMouseEvent) => this._selectFeatures(event, map);
+    this._selectActive = !this._selectActive;
+    if(!this._getFeaturesButton) return;
+    if(this._selectActive){
+      console.log("Activating Selection.....");
+      this._getFeaturesButton.style.background = "red";
+      this._getFeaturesButton.textContent = "Stop Selecting Features";
+      map.on("click", this._featuresClickHandler);
+    }
+    else{
+      console.log("Deactivating Selection.....");
+      this._getFeaturesButton.style.background = "var(--pc-accent)";
+      this._getFeaturesButton.textContent = "Start Selecting Features";
+      map.off("click", this._featuresClickHandler)
+    }
+    
+    
+    /*
+    map.once("click", (event) => {
+      try{
+        const featureProperties : Array<object> = [];
+        const features = map.queryRenderedFeatures(event.point);
+        if(!features || features.length === 0) return;
+        
+        console.log("Features: ")
+        features.forEach((feature) => {
+          const rawCode: any = feature.properties?.OBJL || feature.properties?.OBJ_CLASS;
+          const codeStr = rawCode != null ? String(rawCode) : "UNKNOWN"; 
+          feature.properties.acronym = getS57Acronym(codeStr);
+          if(feature.properties.OBJL) featureProperties.push(feature.properties);
+        });
+        console.log(featureProperties);
+      }catch(err){
+        console.log("Error: " + err);
+      }
+    });
+    */
+    
   }
 }
