@@ -54,4 +54,36 @@ describe('group by file handling', () => {
     expect(mockApp.unregisterExternalNativeLayer).toHaveBeenCalledWith('layer-chart-one.000--NAVMARE');
     expect(mockApp.unregisterExternalNativeLayer).not.toHaveBeenCalledWith('layer-chart-two.000--LIGHTS');
   });
+
+  it('removes all LIGHT_SECTORS color variant layers when the owning file is deleted', () => {
+    // Simulate a file that produced red, green, and yellow sector layers + a LIGHTS layer
+    const redSectorLayer = createLayer('chart-one.000', 'LIGHT_SECTORS--RED', 'LIGHT_SECTORS');
+    const grnSectorLayer = createLayer('chart-one.000', 'LIGHT_SECTORS--GRN', 'LIGHT_SECTORS');
+    const ylwSectorLayer = createLayer('chart-one.000', 'LIGHT_SECTORS--YLW', 'LIGHT_SECTORS');
+    const lightsLayer    = createLayer('chart-one.000', 'LIGHTS--RED',         'LIGHTS');
+
+    // The LIGHTS layer must come after the sector layers in the list so the
+    // pending-derived logic can consume them when LIGHTS is processed.
+    const file = handleLayersLoaded([redSectorLayer, grnSectorLayer, ylwSectorLayer, lightsLayer], 1);
+
+    expect(file).not.toBeUndefined();
+    if (!file) return;
+
+    // Four addGeoJsonLayer calls expected: 3 sector variants consumed by LIGHTS + 1 LIGHTS itself
+    expect(mockApp.addGeoJsonLayer).toHaveBeenCalledTimes(4);
+
+    handleDeleteFileLayer(file.id);
+
+    // All four layers should be unregistered
+    expect(mockApp.unregisterExternalNativeLayer).toHaveBeenCalledTimes(4);
+    expect(mockApp.unregisterExternalNativeLayer).toHaveBeenCalledWith(
+      expect.stringContaining('LIGHT_SECTORS--RED')
+    );
+    expect(mockApp.unregisterExternalNativeLayer).toHaveBeenCalledWith(
+      expect.stringContaining('LIGHT_SECTORS--GRN')
+    );
+    expect(mockApp.unregisterExternalNativeLayer).toHaveBeenCalledWith(
+      expect.stringContaining('LIGHT_SECTORS--YLW')
+    );
+  });
 });

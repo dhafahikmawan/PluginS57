@@ -37,8 +37,13 @@ export function buildConversionBundleFromGeoJSON(
   const groupAcronyms: Record<string, string> = {}; // groupKey -> original acronym
   const rawGroupedFeatures: Record<string, any[]> = {};
 
-  // Accumulate generated light sector polygons across all LIGHTS/LITFLT features.
-  const sectorFeatures: any[] = [];
+  // Accumulate generated light sector polygons across all LIGHTS/LITFLT features,
+  // grouped by color suffix so each color gets its own processed layer.
+  const sectorFeaturesByColor: Record<string, any[]> = {
+    '--RED': [],
+    '--GRN': [],
+    '--YLW': [],
+  };
 
   for (const feature of fullGeoJSON.features) {
     const rawCode: any = feature.properties?.OBJL || feature.properties?.OBJ_CLASS;
@@ -68,9 +73,15 @@ export function buildConversionBundleFromGeoJSON(
       // Enrich feature with derived light label
       feature.properties._light_label = formatLightLabel(props);
 
-      // Generate sector polygon(s) for this light feature
+      // Generate sector polygon(s) for this light feature and bucket by color.
       const generated = generateSectorsForFeature(feature);
-      sectorFeatures.push(...generated);
+      for (const secFeature of generated) {
+        const secColor = String((secFeature.properties as any)?.COLOUR || '');
+        let secSuffix = '--YLW';
+        if (secColor.includes('3')) secSuffix = '--RED';
+        else if (secColor.includes('4')) secSuffix = '--GRN';
+        sectorFeaturesByColor[secSuffix].push(secFeature);
+      }
 
       if (acronym === 'LIGHTS') {
         const color = String(props.COLOUR || '');
@@ -161,15 +172,17 @@ export function buildConversionBundleFromGeoJSON(
     }
   }
 
-  // Append the LIGHT_SECTORS layer if any sector polygons were generated.
-  if (sectorFeatures.length > 0) {
+  // Append color-split LIGHT_SECTORS layers for any non-empty color groups.
+  Object.entries(sectorFeaturesByColor).forEach(([secSuffix, features]) => {
+    if (features.length === 0) return;
+    const layerName = `LIGHT_SECTORS${secSuffix}`;
     layers.push({
       classCode: 'LIGHT_SECTORS',
-      layerName: 'LIGHT_SECTORS',
+      layerName,
       fileName,
       metadata: {
-        featureCount: sectorFeatures.length,
-        sampleProperties: sectorFeatures[0]?.properties ?? {},
+        featureCount: features.length,
+        sampleProperties: features[0]?.properties ?? {},
         sourcePath: fileName,
         styleHints: {
           objl: 'LIGHT_SECTORS',
@@ -178,10 +191,10 @@ export function buildConversionBundleFromGeoJSON(
       },
       geojson: {
         type: 'FeatureCollection',
-        features: sectorFeatures,
+        features,
       },
     });
-  }
+  });
 
   return {
     sourceFileName: fileName,

@@ -252,9 +252,139 @@ describe('LIGHT_SECTORS style selection', () => {
     expect(style.style.strokeColor).toBe('#F2E959');
   });
 
-  it('uses minZoom 9 (aligned with LIGHTS) regardless of purpose', () => {
-    // Purpose 1 → base minZoom 0, but LIGHT_SECTORS clamps to 9
-    const style = selectS57LayerStyle('LIGHT_SECTORS', {}, 1);
-    expect(style.minZoom).toBe(9);
+  it('uses minZoom capped at 9 for high-purpose charts, but 0 for overview (purpose 1)', () => {
+    // Purpose 1 → base minZoom 0, Math.min(0, 9) = 0 → sectors visible from zoom 0 in overview
+    const overviewStyle = selectS57LayerStyle('LIGHT_SECTORS', {}, 1);
+    expect(overviewStyle.minZoom).toBe(0);
+    // Purpose 5 → base minZoom 13, Math.min(13, 9) = 9 → sectors visible from zoom 9
+    const detailStyle = selectS57LayerStyle('LIGHT_SECTORS', {}, 5);
+    expect(detailStyle.minZoom).toBe(9);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 4. Color-split LIGHT_SECTORS layer generation from buildConversionBundleFromGeoJSON
+// ---------------------------------------------------------------------------
+
+import { buildConversionBundleFromGeoJSON } from '../src/lib/utils/s57Converter';
+import { getS57Acronym } from '../src/lib/utils/s57ObjectClasses';
+
+const LIGHTS_OBJL = Object.entries(
+  // find numeric OBJL that maps to 'LIGHTS'
+  Object.fromEntries(
+    Array.from({ length: 500 }, (_, i) => [String(i), getS57Acronym(String(i))])
+      .filter(([, v]) => v === 'LIGHTS')
+  )
+)[0]?.[0] ?? '75'; // 75 is the standard S-57 OBJL for LIGHTS
+
+function makeLightFeature(colour: string, sectr1: number, sectr2: number, valnmr = 5) {
+  return {
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: [106.8, -6.2] },
+    properties: { OBJL: Number(LIGHTS_OBJL), COLOUR: colour, SECTR1: sectr1, SECTR2: sectr2, VALNMR: valnmr },
+  };
+}
+
+describe('buildConversionBundleFromGeoJSON – LIGHT_SECTORS color splitting', () => {
+  it('produces LIGHT_SECTORS--RED layer for a red light (COLOUR contains 3)', () => {
+    const geoJson = { type: 'FeatureCollection', features: [makeLightFeature('3', 45, 135)] };
+    const bundle = buildConversionBundleFromGeoJSON(geoJson as any, 'test.000');
+    const redLayer = bundle.processedLayers.find((l) => l.layerName === 'LIGHT_SECTORS--RED');
+    expect(redLayer).toBeDefined();
+    expect(redLayer!.classCode).toBe('LIGHT_SECTORS');
+    expect(redLayer!.geojson.features.length).toBeGreaterThan(0);
+  });
+
+  it('produces LIGHT_SECTORS--GRN layer for a green light (COLOUR contains 4)', () => {
+    const geoJson = { type: 'FeatureCollection', features: [makeLightFeature('4', 45, 135)] };
+    const bundle = buildConversionBundleFromGeoJSON(geoJson as any, 'test.000');
+    const grnLayer = bundle.processedLayers.find((l) => l.layerName === 'LIGHT_SECTORS--GRN');
+    expect(grnLayer).toBeDefined();
+    expect(grnLayer!.geojson.features.length).toBeGreaterThan(0);
+  });
+
+  it('produces LIGHT_SECTORS--YLW layer for an unrecognised colour (fallback)', () => {
+    const geoJson = { type: 'FeatureCollection', features: [makeLightFeature('1', 45, 135)] };
+    const bundle = buildConversionBundleFromGeoJSON(geoJson as any, 'test.000');
+    const ylwLayer = bundle.processedLayers.find((l) => l.layerName === 'LIGHT_SECTORS--YLW');
+    expect(ylwLayer).toBeDefined();
+    expect(ylwLayer!.geojson.features.length).toBeGreaterThan(0);
+  });
+
+  it('produces separate color layers from a mixed-colour chart', () => {
+    const geoJson = {
+      type: 'FeatureCollection',
+      features: [
+        makeLightFeature('3', 45, 135),   // red
+        makeLightFeature('4', 135, 225),  // green
+        makeLightFeature('1', 225, 315),  // yellow fallback
+      ],
+    };
+    const bundle = buildConversionBundleFromGeoJSON(geoJson as any, 'test.000');
+    const layerNames = bundle.processedLayers.map((l) => l.layerName);
+    expect(layerNames).toContain('LIGHT_SECTORS--RED');
+    expect(layerNames).toContain('LIGHT_SECTORS--GRN');
+    expect(layerNames).toContain('LIGHT_SECTORS--YLW');
+    // No bare LIGHT_SECTORS layer should be emitted
+    expect(layerNames).not.toContain('LIGHT_SECTORS');
+  });
+
+  it('does not emit a LIGHT_SECTORS layer when there are no sectors', () => {
+    // Light with no SECTR1/SECTR2 → no sectors generated
+    const geoJson = {
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [106.8, -6.2] },
+        properties: { OBJL: Number(LIGHTS_OBJL), COLOUR: '3', VALNMR: 5 },
+      }],
+    };
+    const bundle = buildConversionBundleFromGeoJSON(geoJson as any, 'test.000');
+    const sectorLayers = bundle.processedLayers.filter((l) => l.classCode === 'LIGHT_SECTORS');
+    expect(sectorLayers).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 5. Color-suffixed LIGHT_SECTORS style resolution
+// ---------------------------------------------------------------------------
+
+describe('LIGHT_SECTORS--* color-suffixed style selection', () => {
+  it('LIGHT_SECTORS--RED resolves to #FF0000 with priority 69000', () => {
+    const style = selectS57LayerStyle('LIGHT_SECTORS--RED', {});
+    expect(style.family).toBe('navigation');
+    expect(style.priority).toBe(69000);
+    expect(style.style.fillColor).toBe('#FF0000');
+    expect(style.style.strokeColor).toBe('#FF0000');
+    expect(style.style.fillOpacity).toBe(0.25);
+  });
+
+  it('LIGHT_SECTORS--GRN resolves to #00FF00 with priority 69000', () => {
+    const style = selectS57LayerStyle('LIGHT_SECTORS--GRN', {});
+    expect(style.priority).toBe(69000);
+    expect(style.style.fillColor).toBe('#00FF00');
+    expect(style.style.strokeColor).toBe('#00FF00');
+  });
+
+  it('LIGHT_SECTORS--YLW resolves to #F2E959 with priority 69000', () => {
+    const style = selectS57LayerStyle('LIGHT_SECTORS--YLW', {});
+    expect(style.priority).toBe(69000);
+    expect(style.style.fillColor).toBe('#F2E959');
+    expect(style.style.strokeColor).toBe('#F2E959');
+  });
+
+  it('color-suffixed layers use Math.min(purposeMinZoom, 9) for minZoom', () => {
+    // Purpose 1 → base minZoom 0, Math.min(0, 9) = 0 (visible in overview)
+    expect(selectS57LayerStyle('LIGHT_SECTORS--RED', {}, 1).minZoom).toBe(0);
+    expect(selectS57LayerStyle('LIGHT_SECTORS--GRN', {}, 1).minZoom).toBe(0);
+    expect(selectS57LayerStyle('LIGHT_SECTORS--YLW', {}, 1).minZoom).toBe(0);
+    // Purpose 5 → base minZoom 13, Math.min(13, 9) = 9
+    expect(selectS57LayerStyle('LIGHT_SECTORS--RED', {}, 5).minZoom).toBe(9);
+  });
+
+  it('layer name suffix takes precedence over COLOUR attribute for red', () => {
+    // Even if attributes say green (COLOUR 4), the layer name suffix wins
+    const style = selectS57LayerStyle('LIGHT_SECTORS--RED', { COLOUR: '4' });
+    expect(style.style.fillColor).toBe('#FF0000');
   });
 });

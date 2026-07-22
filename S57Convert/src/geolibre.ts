@@ -8,6 +8,8 @@ import type { ProcessedTSSLPT } from './lib/utils/tsslptProcessor';
 import { selectS57LayerStyle, StyleReapplier, StyleTracker, type S57StyleSelection } from './lib/styles/s57StyleRegistry';
 import './lib/styles/uploader.css';
 
+const PLUGIN_ID = 'geolibre-s57-reader';
+
 let appAPI: GeoLibreAppAPI | null = null;
 let styleTracker = new StyleTracker();
 let styleReapplier = new StyleReapplier(styleTracker);
@@ -17,11 +19,126 @@ let attachedMap: any = null;
 let styleRefreshHandler: (() => void) | null = null;
 let styleLoadHandler: (() => void) | null = null;
 let layerMutationHandler: (() => void) | null = null;
+
 const everyloadedlayers : Array<string> = [];
 const tsslptCache = new Map<string, ProcessedTSSLPT[]>();
 const tssArrowCache = new Map<string, GeneratedArrow[]>();
 let nextFileId = 1;
 const fileLayerMap = new Map<number, { fileName: string; layerIds: string[] }>();
+
+// ---------------------------------------------------------------------------
+// Sprite asset helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Resolve the base URL for the plugin's bundled sprite assets.
+ * Order of attempts:
+ *   1. app.resolvePluginAssetUrl() — host-provided canonical path.
+ *   2. Relative path inferred from the plugin bundle's own script URL.
+ *   3. null (graceful degradation — no icons).
+ */
+function resolveSpriteBaseUrl(app: GeoLibreAppAPI): string | null {
+  // Attempt 1 — host API
+  if (typeof app.resolvePluginAssetUrl === 'function') {
+    const url = app.resolvePluginAssetUrl(PLUGIN_ID, 'icons/sprite.json');
+    if (url) {
+      const base = url.replace(/\/sprite\.json$/, '');
+      writeDebug(`[sprite] Resolved via host API: ${base}`);
+      return base;
+    }
+    writeDebug('[sprite] resolvePluginAssetUrl returned null — trying fallback.');
+  } else {
+    writeDebug('[sprite] Host does not expose resolvePluginAssetUrl — trying fallback.');
+  }
+
+  // Attempt 2 — derive from the current script URL (works when plugin is served
+  // from a URL, not a local file:// path).
+  try {
+    // import.meta.url is the URL of this compiled bundle (dist/index.js).
+    const scriptUrl = new URL(import.meta.url);
+    const base = scriptUrl.href.replace(/\/index\.js$/, '/icons');
+    if (!base.startsWith('file://')) {
+      writeDebug(`[sprite] Resolved via script URL fallback: ${base}`);
+      return base;
+    }
+    writeDebug('[sprite] Script URL is a file:// path — cannot serve sprites over HTTP.');
+  } catch {
+    writeDebug('[sprite] Could not determine script URL.');
+  }
+
+  writeDebug('[sprite] No sprite base URL could be resolved. Icons will be absent.');
+  return null;
+}
+
+/**
+ * Load sprite.json + sprite.png from baseUrl, then register every icon in the
+ * sprite sheet with the MapLibre map via map.addImage().
+ * Safe to call multiple times — skips images already registered.
+ */
+async function registerSpriteWithMap(map: any, baseUrl: string): Promise<void> {
+  const jsonUrl = `${baseUrl}/sprite.json`;
+  const pngUrl  = `${baseUrl}/sprite.png`;
+
+  let manifest: Record<string, { x: number; y: number; width: number; height: number; pixelRatio?: number }>;
+  let image: ImageBitmap;
+
+  try {
+    const jsonRes = await fetch(jsonUrl);
+    if (!jsonRes.ok) {
+      writeDebug(`[sprite] Failed to fetch sprite.json (${jsonRes.status}): ${jsonUrl}`);
+      return;
+    }
+    manifest = await jsonRes.json();
+    writeDebug(`[sprite] Loaded sprite manifest — ${Object.keys(manifest).length} icons from ${jsonUrl}`);
+  } catch (err) {
+    writeDebug(`[sprite] Error fetching sprite.json: ${err}`);
+    return;
+  }
+
+  try {
+    const pngRes = await fetch(pngUrl);
+    if (!pngRes.ok) {
+      writeDebug(`[sprite] Failed to fetch sprite.png (${pngRes.status}): ${pngUrl}`);
+      return;
+    }
+    const blob = await pngRes.blob();
+    image = await createImageBitmap(blob);
+    writeDebug(`[sprite] Loaded sprite image (${image.width}×${image.height}px) from ${pngUrl}`);
+  } catch (err) {
+    writeDebug(`[sprite] Error fetching/decoding sprite.png: ${err}`);
+    return;
+  }
+
+  let registered = 0;
+  let skipped = 0;
+
+  for (const [key, entry] of Object.entries(manifest)) {
+    if (typeof map.hasImage === 'function' && map.hasImage(key)) {
+      skipped++;
+      continue;
+    }
+    try {
+      // Crop the icon's sub-image from the sprite sheet.
+      const sub = await createImageBitmap(image, entry.x, entry.y, entry.width, entry.height);
+      map.addImage(key, sub, { pixelRatio: entry.pixelRatio ?? 1 });
+      registered++;
+    } catch (err) {
+      writeDebug(`[sprite] Could not register icon "${key}": ${err}`);
+    }
+  }
+
+  writeDebug(`[sprite] Registration complete — registered: ${registered}, skipped (already present): ${skipped}`);
+}
+
+/**
+ * Resolve sprite URL and register icons with the map.
+ * Called on activation and after every style reload.
+ */
+function ensureSpriteRegistered(app: GeoLibreAppAPI, map: any) {
+  const baseUrl = resolveSpriteBaseUrl(app);
+  if (!baseUrl) return;
+  void registerSpriteWithMap(map, baseUrl);
+}
 
 
 function writeDebug(message : any){
@@ -52,7 +169,13 @@ function attachStylePersistenceListeners(map: any) {
   detachStylePersistenceListeners();
 
   styleRefreshHandler = () => queueStyleReapply(map);
-  styleLoadHandler = () => setTimeout(() => queueStyleReapply(map), 250);
+  styleLoadHandler = () => {
+    setTimeout(() => queueStyleReapply(map), 250);
+    // Re-register sprites after a style swap — MapLibre clears images on style reload.
+    if (appAPI) {
+      ensureSpriteRegistered(appAPI, map);
+    }
+  };
   layerMutationHandler = () => queueStyleReapply(map);
 
   map.on('data', styleRefreshHandler);
@@ -94,6 +217,8 @@ export const s57ReaderPlugin: GeoLibrePlugin = {
 
     if (map) {
       attachStylePersistenceListeners(map);
+      // Register sprite icons before any symbol layer is drawn.
+      ensureSpriteRegistered(app, map);
     }
 
     if (app.registerRightPanel) {
@@ -225,13 +350,15 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number,
   });
 
   // Keep a quick lookup of any pre-generated derived layers (for example
-  // LIGHT_SECTORS produced by the converter) so they can be inserted
+  // LIGHT_SECTORS--RED/GRN/YLW produced by the converter) so they can be inserted
   // immediately after their source layer.
-  const pendingDerived = new Map<string, any>();
+  const pendingDerived = new Map<string, S57LayerData[]>();
   for (const l of indexed.map((it) => it.layer)) {
     if (l.classCode === 'LIGHT_SECTORS') {
       // Key by source file so we can match to the originating LIGHTS group.
-      pendingDerived.set(`${l.fileName}::LIGHT_SECTORS`, l);
+      const key = `${l.fileName}::LIGHT_SECTORS`;
+      if (!pendingDerived.has(key)) pendingDerived.set(key, []);
+      pendingDerived.get(key)!.push(l);
     }
   }
 
@@ -241,7 +368,7 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number,
   for (const item of indexed) {
     const layer = item.layer;
     // If this layer was consumed as a derived insertion earlier, skip it.
-    const consumedKey = `${layer.fileName}::${layer.layerName}`;
+    const consumedKey = `${layer.fileName}::${layer.classCode === 'LIGHT_SECTORS' ? 'LIGHT_SECTORS' : layer.layerName}`;
     if ((layer.classCode === 'LIGHT_SECTORS' || layer.classCode === 'TSS_ARROWS') && pendingDerived.has(consumedKey)) {
       // Will be added when its source layer was processed.
       continue;
@@ -291,21 +418,23 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number,
       }
     }
 
-    // If this layer is a LIGHTS group, and a pre-generated LIGHT_SECTORS layer
-    // exists for the same source file, insert it now and mark it consumed.
+    // If this layer is a LIGHTS group, and pre-generated LIGHT_SECTORS color layers
+    // exist for the same source file, insert them now and mark as consumed.
     if (layer.classCode === 'LIGHTS') {
       const key = `${layer.fileName}::LIGHT_SECTORS`;
-      const sectors = pendingDerived.get(key);
-      if (sectors) {
-        const hostedSectorId = appAPI.addGeoJsonLayer(`${sectors.fileName}--${sectors.layerName}`, sectors.geojson as any, sectors.fileName);
-        const sectorStyle = selectS57LayerStyle('LIGHT_SECTORS', (sectors.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
-        styleTracker.trackStyle(hostedSectorId, sectorStyle, 'LIGHT_SECTORS', {});
-        everyloadedlayers.push(hostedSectorId);
-        layerIds.push(hostedSectorId);
-        if (map) {
-          setTimeout(() => { void applyS57Style(map, 'LIGHT_SECTORS', hostedSectorId, sectorStyle); }, 0);
+      const sectorLayers = pendingDerived.get(key);
+      if (sectorLayers && sectorLayers.length > 0) {
+        for (const sectors of sectorLayers) {
+          const hostedSectorId = appAPI.addGeoJsonLayer(`${sectors.fileName}--${sectors.layerName}`, sectors.geojson as any, sectors.fileName);
+          const sectorStyle = selectS57LayerStyle(sectors.layerName, (sectors.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
+          styleTracker.trackStyle(hostedSectorId, sectorStyle, sectors.classCode, {});
+          everyloadedlayers.push(hostedSectorId);
+          layerIds.push(hostedSectorId);
+          if (map) {
+            setTimeout(() => { void applyS57Style(map, sectors.layerName, hostedSectorId, sectorStyle); }, 0);
+          }
         }
-        // mark as consumed so it won't be added later
+        // mark as consumed so color variants won't be added again
         pendingDerived.delete(key);
       }
     }
