@@ -430,7 +430,7 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     this._featureCollection.forEach((feature)=>{
       const option = document.createElement("option");
       option.style.backgroundColor = "black";
-      option.text = feature.ACRONYM + "RCID - " + feature.RCID;
+      option.text = feature.ACRONYM + ": RCID - " + feature.RCID;
       option.value = feature.OBJL;
       if(this._featuresDisplaySelect){
         this._featuresDisplaySelect.appendChild(option);
