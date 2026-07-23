@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import JSZip from 'jszip';
-import { createGeoJsonZip } from '../src/lib/utils/downloadZip';
+import { createGeoJsonZip, createNestedGeoJsonZip } from '../src/lib/utils/downloadZip';
 
 describe('createGeoJsonZip', () => {
   it('creates a zip archive with raw GeoJSON files and a manifest', async () => {
@@ -43,5 +43,36 @@ describe('createGeoJsonZip', () => {
     expect(processedContent).toContain('"DRVAL1": 10');
     expect(manifestContent).toContain('"sourceFileName": "sample.000"');
     expect(manifestContent).toContain('"SOUNDG--DEPARE"');
+  });
+});
+
+describe('createNestedGeoJsonZip', () => {
+  it('creates an outer zip containing nested zip files for multiple bundles', async () => {
+    const bundleA = {
+      sourceFileName: 'sampleA.000',
+      rawGeojsonByClass: {
+        LIGHTS: { type: 'FeatureCollection', features: [] },
+      },
+      processedLayers: [],
+    };
+    const bundleB = {
+      sourceFileName: 'sampleB.000',
+      rawGeojsonByClass: {
+        SOUNDG: { type: 'FeatureCollection', features: [] },
+      },
+      processedLayers: [],
+    };
+
+    const blob = await createNestedGeoJsonZip([bundleA, bundleB], 'all-converted-files');
+    const outerZip = await JSZip.loadAsync(blob);
+
+    const innerA = await outerZip.file('sampleA.zip')?.async('blob');
+    const innerB = await outerZip.file('sampleB.zip')?.async('blob');
+    const manifestContent = await outerZip.file('manifest.json')?.async('string');
+
+    expect(innerA).toBeInstanceOf(Blob);
+    expect(innerB).toBeInstanceOf(Blob);
+    expect(manifestContent).toContain('"sourceFileName": "sampleA.000"');
+    expect(manifestContent).toContain('"sourceFileName": "sampleB.000"');
   });
 });

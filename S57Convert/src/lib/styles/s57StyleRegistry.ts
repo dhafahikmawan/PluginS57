@@ -2,6 +2,8 @@ import type { GeoLibreNativeLayerStyle } from '../geolibre/host-api';
 import { selectIconMapping } from '../utils/iconHelper';
 import { ensureResarePatternsAdded } from '../utils/patternGenerator';
 
+//Style flag: StyleApplicationMode 'all' | 'zoom-only' | 'none'
+
 export type S57LayerFamily =
   | 'base'
   | 'land'
@@ -29,6 +31,8 @@ export interface S57StyleSelection {
   style: ExtendedLayerStyle;
   labelField?: string;
 }
+
+export type StyleApplicationMode = 'all' | 'zoom-only' | 'none';
 
 interface TrackedS57Style {
   layerId: string;
@@ -108,6 +112,7 @@ export class StyleReapplier {
     attributes: Record<string, unknown> = {},
     targetName?: string,
     isLayerHidden?: (trackedLayerId: string) => boolean,
+    mode: StyleApplicationMode = 'all',
   ): Promise<boolean> {
     const trackedStyle = styleSelection
       ? { layerId, styleSelection, classCode: classCode ?? '', attributes }
@@ -117,7 +122,12 @@ export class StyleReapplier {
       return false;
     }
 
-    ensureResarePatternsAdded(map);
+    const applyZoomRange = mode !== 'none';
+    const applyPaintOps = mode === 'all';
+
+    if (applyPaintOps) {
+      ensureResarePatternsAdded(map);
+    }
 
     const candidateLayerIds = this.getCandidateLayerIds(map, layerId, targetName);
     if (candidateLayerIds.length === 0) {
@@ -131,7 +141,7 @@ export class StyleReapplier {
       const minZoom = trackedStyle.styleSelection.minZoom;
       const maxZoom = trackedStyle.styleSelection.maxZoom;
 
-      if (minZoom !== undefined) {
+      if (applyZoomRange && minZoom !== undefined) {
         try {
           if (maxZoom !== undefined) {
             map.setLayerZoomRange?.(candidateLayerId, minZoom, maxZoom);
@@ -144,24 +154,26 @@ export class StyleReapplier {
         }
       }
 
-      paintOps.forEach(([property, value]) => {
-        try {
-          if (LAYOUT_PROPERTIES.has(property)) {
-            const currentValue = map.getLayoutProperty?.(candidateLayerId, property);
-            if (currentValue !== value) {
-              map.setLayoutProperty?.(candidateLayerId, property, value);
+      if (applyPaintOps) {
+        paintOps.forEach(([property, value]) => {
+          try {
+            if (LAYOUT_PROPERTIES.has(property)) {
+              const currentValue = map.getLayoutProperty?.(candidateLayerId, property);
+              if (currentValue !== value) {
+                map.setLayoutProperty?.(candidateLayerId, property, value);
+              }
+            } else {
+              const currentValue = map.getPaintProperty?.(candidateLayerId, property);
+              if (currentValue !== value) {
+                map.setPaintProperty?.(candidateLayerId, property, value);
+              }
             }
-          } else {
-            const currentValue = map.getPaintProperty?.(candidateLayerId, property);
-            if (currentValue !== value) {
-              map.setPaintProperty?.(candidateLayerId, property, value);
-            }
+            applied = true;
+          } catch {
+            // Ignore transient MapLibre setter failures and retry later.
           }
-          applied = true;
-        } catch {
-          // Ignore transient MapLibre setter failures and retry later.
-        }
-      });
+        });
+      }
     });
 
     // After style reapplication, re-enforce visibility: none for layers belonging
@@ -187,14 +199,16 @@ export class StyleReapplier {
       getPaintProperty?: (layerId: string, property: string) => unknown;
       setLayoutProperty?: (layerId: string, property: string, value: unknown) => void;
       getLayoutProperty?: (layerId: string, property: string) => unknown;
+      setLayerZoomRange?: (layerId: string, minZoom: number, maxZoom?: number) => void;
     },
     isLayerHidden?: (trackedLayerId: string) => boolean,
+    mode: StyleApplicationMode = 'all',
   ): Promise<number> {
     const trackedLayers = this.tracker.getAllTrackedLayers();
     let appliedCount = 0;
 
     for (const trackedLayerId of trackedLayers) {
-      const applied = await this.reapplyStyle(map, trackedLayerId, null, undefined, {}, undefined, isLayerHidden);
+      const applied = await this.reapplyStyle(map, trackedLayerId, null, undefined, {}, undefined, isLayerHidden, mode);
       if (applied) {
         appliedCount += 1;
       }

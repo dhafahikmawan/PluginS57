@@ -7,7 +7,7 @@ import { S57Uploader } from './lib/components/S57Uploader';
 import { S57LayerData } from './lib/utils/s57Converter';
 import { generateTSSArrows, type GeneratedArrow } from './lib/utils/tssArrowsGenerator';
 import type { ProcessedTSSLPT } from './lib/utils/tsslptProcessor';
-import { selectS57LayerStyle, StyleReapplier, StyleTracker, type S57StyleSelection } from './lib/styles/s57StyleRegistry';
+import { selectS57LayerStyle, StyleReapplier, StyleTracker, type S57StyleSelection, type StyleApplicationMode } from './lib/styles/s57StyleRegistry';
 import './lib/styles/uploader.css';
 import { SPRITE_PNG_BASE64 } from './lib/assets/spritePng';
 import { spriteManifest } from './lib/assets/spriteManifest';
@@ -16,6 +16,12 @@ let appAPI: GeoLibreAppAPI | null = null;
 let styleTracker = new StyleTracker();
 let styleReapplier = new StyleReapplier(styleTracker);
 let enableDebug = true;
+
+// Developer-only flag for debugging style application behavior.
+// Set to 'all' to apply full paint + zoom styling, 'zoom-only' to apply only layer zoom ranges,
+// or 'none' to skip plugin-driven styling entirely.
+let styleApplicationMode: StyleApplicationMode = 'all';
+
 let pendingReapplyTimer: ReturnType<typeof setTimeout> | null = null;
 let attachedMap: any = null;
 let styleRefreshHandler: (() => void) | null = null;
@@ -158,7 +164,7 @@ function queueStyleReapply(map: any) {
 
   pendingReapplyTimer = setTimeout(() => {
     pendingReapplyTimer = null;
-    void styleReapplier.reapplyAllStyles(map, isAnyFileLayerHidden);
+    void styleReapplier.reapplyAllStyles(map, isAnyFileLayerHidden, styleApplicationMode);
   }, 125);
 }
 
@@ -311,7 +317,7 @@ async function applyS57Style(map: any, name: string, hostedLayerId: string, styl
     return;
   }
 
-  const applied = await styleReapplier.reapplyStyle(map, hostedLayerId, styleSelection, undefined, {}, name);
+  const applied = await styleReapplier.reapplyStyle(map, hostedLayerId, styleSelection, undefined, {}, name, undefined, styleApplicationMode);
 
   if (!applied && attempt < 4) {
     setTimeout(() => { void applyS57Style(map, name, hostedLayerId, styleSelection, attempt + 1); }, 250 * (attempt + 1));

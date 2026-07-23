@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { buildS57ConversionBundle, buildConversionBundleFromGeoJSON, S57ConversionBundle, S57LayerData } from '../utils/s57Converter';
-import { triggerGeoJsonZipDownload } from '../utils/downloadZip';
+import { triggerGeoJsonZipDownload, triggerGeoJsonZipDownloadForBundles } from '../utils/downloadZip';
 
 // ── ENC Purpose Labels ───────────────────────────────────────────────────────
 
@@ -51,6 +51,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
   const [loadedFiles, setLoadedFiles] = useState<LoadedFileItem[]>([]);
   const [hiddenFileIds, setHiddenFileIds] = useState<Set<number>>(new Set());
   const [conversionBundle, setConversionBundle] = useState<S57ConversionBundle | null>(null);
+  const [conversionBundles, setConversionBundles] = useState<Array<{ id: number; bundle: S57ConversionBundle }>>([]);
   const [purposeCode, setPurposeCode] = useState<number>(1);
 
   // Mode selection state
@@ -93,6 +94,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
           
           if (loadedFile) {
             setLoadedFiles(prev => [...prev, { ...loadedFile, purposeCode }]);
+            setConversionBundles(prev => [...prev, { id: loadedFile.id, bundle }]);
           }
         } catch (err: any) {
           setError(err.message || "Gagal mengurai file S-57.");
@@ -243,6 +245,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
       setConversionBundle(bundle);
       if (loadedFile) {
         setLoadedFiles(prev => [...prev, { ...loadedFile, purposeCode }]);
+        setConversionBundles(prev => [...prev, { id: loadedFile.id, bundle }]);
       }
 
     } catch (err: any) {
@@ -260,12 +263,14 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
     setLoadedFiles([]);
     setHiddenFileIds(new Set());
     setConversionBundle(null);
+    setConversionBundles([]);
     setError(null);
   };
 
   const handleDeleteFile = (fileId: number) => {
     onDeleteFile(fileId);
     setLoadedFiles(prev => prev.filter(file => file.id !== fileId));
+    setConversionBundles(prev => prev.filter((entry) => entry.id !== fileId));
     setHiddenFileIds(prev => {
       const next = new Set(prev);
       next.delete(fileId);
@@ -290,8 +295,18 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
   // ── Download handler ─────────────────────────────────────────────────────
 
   const handleDownloadZip = async () => {
-    if (!conversionBundle) return;
-    await triggerGeoJsonZipDownload(conversionBundle, conversionBundle.sourceFileName.replace(/\.000$/i, ''));
+    if (conversionBundles.length === 0) return;
+
+    if (conversionBundles.length === 1) {
+      const bundle = conversionBundles[0].bundle;
+      await triggerGeoJsonZipDownload(bundle, bundle.sourceFileName.replace(/\.000$/i, ''));
+      return;
+    }
+
+    await triggerGeoJsonZipDownloadForBundles(
+      conversionBundles.map((entry) => entry.bundle),
+      'all-converted-files',
+    );
   };
 
   // ── Render ───────────────────────────────────────────────────────────────

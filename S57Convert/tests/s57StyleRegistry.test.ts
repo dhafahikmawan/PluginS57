@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { selectS57LayerStyle, StyleReapplier, StyleTracker } from '../src/lib/styles/s57StyleRegistry';
+import { selectS57LayerStyle, StyleReapplier, StyleTracker, type StyleApplicationMode } from '../src/lib/styles/s57StyleRegistry';
 
 describe('selectS57LayerStyle', () => {
   it('assigns a depth family and a safe depth fill for depth areas', () => {
@@ -102,5 +102,53 @@ describe('selectS57LayerStyle', () => {
 
     expect(appliedPaint.some(([layerId, property]) => layerId === 'hosted-layer' && property === 'fill-color')).toBe(true);
     expect(appliedPaint.some(([layerId, property]) => layerId === 'hosted-layer' && property === 'line-color')).toBe(true);
+  });
+
+  it('applies only zoom ranges in zoom-only mode and skips paint properties', async () => {
+    const reapply = new StyleReapplier();
+    const style = selectS57LayerStyle('DEPARE', { DRVAL1: 1 });
+    const zoomCalls: Array<[string, number, number | undefined]> = [];
+    const paintCalls: Array<[string, string, unknown]> = [];
+
+    const map = {
+      getStyle: () => ({ layers: [{ id: 'hosted-layer' }] }),
+      setLayerZoomRange: (layerId: string, minZoom: number, maxZoom?: number) => {
+        zoomCalls.push([layerId, minZoom, maxZoom]);
+      },
+      setPaintProperty: (layerId: string, property: string, value: unknown) => {
+        paintCalls.push([layerId, property, value]);
+      },
+      getPaintProperty: () => undefined,
+    };
+
+    const applied = await reapply.reapplyStyle(map as any, 'hosted-layer', style, 'DEPARE', {}, undefined, undefined, 'zoom-only');
+
+    expect(applied).toBe(true);
+    expect(zoomCalls).toHaveLength(1);
+    expect(paintCalls).toHaveLength(0);
+  });
+
+  it('skips both zoom and paint in none mode', async () => {
+    const reapply = new StyleReapplier();
+    const style = selectS57LayerStyle('DEPARE', { DRVAL1: 1 });
+    const zoomCalls: Array<[string, number, number | undefined]> = [];
+    const paintCalls: Array<[string, string, unknown]> = [];
+
+    const map = {
+      getStyle: () => ({ layers: [{ id: 'hosted-layer' }] }),
+      setLayerZoomRange: (layerId: string, minZoom: number, maxZoom?: number) => {
+        zoomCalls.push([layerId, minZoom, maxZoom]);
+      },
+      setPaintProperty: (layerId: string, property: string, value: unknown) => {
+        paintCalls.push([layerId, property, value]);
+      },
+      getPaintProperty: () => undefined,
+    };
+
+    const applied = await reapply.reapplyStyle(map as any, 'hosted-layer', style, 'DEPARE', {}, undefined, undefined, 'none');
+
+    expect(applied).toBe(false);
+    expect(zoomCalls).toHaveLength(0);
+    expect(paintCalls).toHaveLength(0);
   });
 });
