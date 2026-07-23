@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "CTRPNT",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 5467, "PRIM": 1, "GRUP": 2, "OBJL": 33, "RVER": 1, "AGEN": 230, "FIDN": 944070, "FIDS": 1, "LNAM": "00E6000E67C60001", "CATCTR": 5, "OBJNAM": "TD 148A", "SCAMIN": 259999 }, "geometry": { "type": "Point", "coordinates": [ 105.2622222, -6.8547222 ] } },
+{ "type": "Feature", "properties": { "RCID": 5468, "PRIM": 1, "GRUP": 2, "OBJL": 33, "RVER": 1, "AGEN": 230, "FIDN": 944072, "FIDS": 1, "LNAM": "00E6000E67C80001", "CATCTR": 5, "OBJNAM": "TD 151", "SCAMIN": 259999 }, "geometry": { "type": "Point", "coordinates": [ 104.4405556, -5.8958333 ] } },
+{ "type": "Feature", "properties": { "RCID": 5469, "PRIM": 1, "GRUP": 2, "OBJL": 33, "RVER": 1, "AGEN": 230, "FIDN": 944071, "FIDS": 1, "LNAM": "00E6000E67C70001", "CATCTR": 5, "OBJNAM": "TD 148", "SCAMIN": 259999 }, "geometry": { "type": "Point", "coordinates": [ 105.2388889, -6.8394444 ] } }
+]
+}

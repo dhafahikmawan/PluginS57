@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "OFSPLF",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 101, "PRIM": 1, "GRUP": 2, "OBJL": 87, "RVER": 1, "AGEN": 230, "FIDN": 587182, "FIDS": 1, "LNAM": "00E60008F5AE0001", "CATOFP": [ "8" ], "SCAMIN": 699999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.9416666, -5.4416667 ] } },
+{ "type": "Feature", "properties": { "RCID": 1765, "PRIM": 1, "GRUP": 2, "OBJL": 87, "RVER": 1, "AGEN": 230, "FIDN": 672929, "FIDS": 1, "LNAM": "00E6000A44A10001", "LNAM_REFS": [ "00E6000A44DC0001" ], "FFPT_RIND": [ 2 ], "CATOFP": [ "8" ], "SCAMIN": 699999, "SORDAT": "20170401", "SORIND": "ID,ID,graph,peta 71 edisi xiv cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 104.616177, -5.5721744 ] } },
+{ "type": "Feature", "properties": { "RCID": 1994, "PRIM": 1, "GRUP": 2, "OBJL": 87, "RVER": 1, "AGEN": 230, "FIDN": 672903, "FIDS": 1, "LNAM": "00E6000A44870001", "LNAM_REFS": [ "00E600071FB00001" ], "FFPT_RIND": [ 2 ], "CATOFP": [ "8" ], "OBJNAM": "Teluk Semangka Oil Terminal", "SCAMIN": 699999, "SORDAT": "20170401", "SORIND": "ID,ID,graph,peta 71 edisi xiv cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 104.6213294, -5.5380088 ] } },
+{ "type": "Feature", "properties": { "RCID": 2024, "PRIM": 1, "GRUP": 2, "OBJL": 87, "RVER": 1, "AGEN": 230, "FIDN": 672927, "FIDS": 1, "LNAM": "00E6000A449F0001", "LNAM_REFS": [ "00E600071FAF0001" ], "FFPT_RIND": [ 2 ], "CATOFP": [ "8" ], "SCAMIN": 699999, "SORDAT": "20170401", "SORIND": "ID,ID,graph,peta 71 edisi xiv cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 104.5849486, -5.5515795 ] } }
+]
+}

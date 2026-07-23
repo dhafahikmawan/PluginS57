@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "BCNISD",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 1660, "PRIM": 1, "GRUP": 2, "OBJL": 6, "RVER": 1, "AGEN": 230, "FIDN": 472424, "FIDS": 1, "LNAM": "00E6000735680001", "LNAM_REFS": [ "00E60007355D0001" ], "FFPT_RIND": [ 2 ], "BCNSHP": 1, "COLOUR": [ "2", "3", "2" ], "COLPAT": [ "1" ], "VERLEN": 15.0, "SCAMIN": 699999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.5486531, -5.8194341 ] } }
+]
+}

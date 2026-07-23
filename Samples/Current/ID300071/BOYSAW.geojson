@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "BOYSAW",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 196, "PRIM": 1, "GRUP": 2, "OBJL": 18, "RVER": 1, "AGEN": 230, "FIDN": 472371, "FIDS": 1, "LNAM": "00E6000735330001", "LNAM_REFS": [ "00E60007351A0001", "00E6000735300001" ], "FFPT_RIND": [ 2, 2 ], "BOYSHP": 4, "COLOUR": [ "3", "1" ], "COLPAT": [ "2" ], "CONRAD": 3, "SCAMIN": 499999 }, "geometry": { "type": "Point", "coordinates": [ 105.9850917, -5.4937556 ] } },
+{ "type": "Feature", "properties": { "RCID": 647, "PRIM": 1, "GRUP": 2, "OBJL": 18, "RVER": 1, "AGEN": 230, "FIDN": 472448, "FIDS": 1, "LNAM": "00E6000735800001", "LNAM_REFS": [ "00E6000735820001", "00E6000735810001" ], "FFPT_RIND": [ 2, 2 ], "BOYSHP": 4, "COLOUR": [ "3", "1" ], "COLPAT": [ "2" ], "CONRAD": 3, "SCAMIN": 499999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.7892222, -6.4161388 ] } },
+{ "type": "Feature", "properties": { "RCID": 5357, "PRIM": 1, "GRUP": 2, "OBJL": 18, "RVER": 1, "AGEN": 230, "FIDN": 712896, "FIDS": 1, "LNAM": "00E6000AE0C00001", "LNAM_REFS": [ "00E6000AE0BF0001", "00E6000AE0BE0001" ], "FFPT_RIND": [ 2, 2 ], "BOYSHP": 5, "COLOUR": [ "3", "1" ], "COLPAT": [ "2" ], "CONRAD": 3, "INFORM": "IDLL Nr.   : 2334", "SCAMIN": 499999, "SORDAT": "20170701", "SORIND": "ID,ID,graph,peta 94r2 edisi iv cetakan iii bpi no. 22-2017" }, "geometry": { "type": "Point", "coordinates": [ 105.2997274, -5.4703949 ] } }
+]
+}

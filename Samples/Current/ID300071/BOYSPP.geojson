@@ -1,0 +1,12 @@
+{
+"type": "FeatureCollection",
+"name": "BOYSPP",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 683, "PRIM": 1, "GRUP": 2, "OBJL": 19, "RVER": 1, "AGEN": 230, "FIDN": 788909, "FIDS": 1, "LNAM": "00E6000C09AD0001", "LNAM_REFS": [ "00E6000C09AC0001" ], "FFPT_RIND": [ 2 ], "BOYSHP": 3, "CATSPM": [ ], "COLOUR": [ "3", "1" ], "COLPAT": [ "2" ], "OBJNAM": "Tsunami RWVS", "INFORM": "Rep. 2019 (Tsunami Buoy)", "SCAMIN": 499999, "SORDAT": "20190624", "SORIND": "ID,ID,publn,20/282-2019" }, "geometry": { "type": "Point", "coordinates": [ 105.3916667, -6.1305556 ] } },
+{ "type": "Feature", "properties": { "RCID": 769, "PRIM": 1, "GRUP": 2, "OBJL": 19, "RVER": 1, "AGEN": 230, "FIDN": 472369, "FIDS": 1, "LNAM": "00E6000735310001", "LNAM_REFS": [ "00E6000735170001", "00E6000735320001" ], "FFPT_RIND": [ 2, 2 ], "BOYSHP": 1, "CATSPM": [ "39" ], "COLOUR": [ "6" ], "CONRAD": 3, "SCAMIN": 499999 }, "geometry": { "type": "Point", "coordinates": [ 105.9297445, -5.4395083 ] } },
+{ "type": "Feature", "properties": { "RCID": 1051, "PRIM": 1, "GRUP": 2, "OBJL": 19, "RVER": 1, "AGEN": 230, "FIDN": 472376, "FIDS": 1, "LNAM": "00E6000735380001", "LNAM_REFS": [ "00E6000735390001", "00E60007353A0001" ], "FFPT_RIND": [ 2, 2 ], "BOYSHP": 1, "CATSPM": [ "39" ], "COLOUR": [ "6" ], "CONRAD": 3, "SCAMIN": 499999 }, "geometry": { "type": "Point", "coordinates": [ 105.9477056, -5.4256194 ] } },
+{ "type": "Feature", "properties": { "RCID": 1711, "PRIM": 1, "GRUP": 2, "OBJL": 19, "RVER": 1, "AGEN": 230, "FIDN": 472373, "FIDS": 1, "LNAM": "00E6000735350001", "LNAM_REFS": [ "00E6000735360001", "00E6000735370001" ], "FFPT_RIND": [ 2, 2 ], "BOYSHP": 1, "CATSPM": [ "39" ], "COLOUR": [ "6" ], "CONRAD": 3, "SCAMIN": 499999 }, "geometry": { "type": "Point", "coordinates": [ 105.9613611, -5.4438167 ] } },
+{ "type": "Feature", "properties": { "RCID": 2031, "PRIM": 1, "GRUP": 2, "OBJL": 19, "RVER": 1, "AGEN": 230, "FIDN": 472372, "FIDS": 1, "LNAM": "00E6000735340001", "LNAM_REFS": [ "00E60007353F0001", "00E6000735280001" ], "FFPT_RIND": [ 2, 2 ], "BOYSHP": 1, "CATSPM": [ "39" ], "COLOUR": [ "6" ], "CONRAD": 3, "SCAMIN": 499999 }, "geometry": { "type": "Point", "coordinates": [ 105.9434056, -5.4575084 ] } }
+]
+}

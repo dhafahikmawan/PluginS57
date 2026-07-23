@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "WATTUR",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 159, "PRIM": 1, "GRUP": 2, "OBJL": 156, "RVER": 1, "AGEN": 230, "FIDN": 586841, "FIDS": 1, "LNAM": "00E60008F4590001", "CATWAT": 4, "SCAMIN": 499999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.8462896, -5.9342285 ] } },
+{ "type": "Feature", "properties": { "RCID": 188, "PRIM": 1, "GRUP": 2, "OBJL": 156, "RVER": 1, "AGEN": 230, "FIDN": 586842, "FIDS": 1, "LNAM": "00E60008F45A0001", "CATWAT": 4, "SCAMIN": 499999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.8464003, -5.9227911 ] } },
+{ "type": "Feature", "properties": { "RCID": 594, "PRIM": 1, "GRUP": 2, "OBJL": 156, "RVER": 1, "AGEN": 230, "FIDN": 586970, "FIDS": 1, "LNAM": "00E60008F4DA0001", "CATWAT": 4, "SCAMIN": 499999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.8369737, -5.9263445 ] } },
+{ "type": "Feature", "properties": { "RCID": 2290, "PRIM": 1, "GRUP": 2, "OBJL": 156, "RVER": 1, "AGEN": 230, "FIDN": 586971, "FIDS": 1, "LNAM": "00E60008F4DB0001", "CATWAT": 4, "SCAMIN": 499999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.8439605, -5.9291206 ] } }
+]
+}
