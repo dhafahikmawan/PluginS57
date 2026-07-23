@@ -42,12 +42,20 @@ describe('selectS57LayerStyle', () => {
     expect(hazardStyle.minZoom).toBe(9);
   });
 
-  it('uses dashed outlines for restricted areas', () => {
+  it('uses dashed outlines with RESARE pattern fills for restricted areas', () => {
     const style = selectS57LayerStyle('RESARE', { RESTRN: '1' });
 
     expect(style.family).toBe('restricted');
-    expect(style.style.strokeDasharray).toBe('6,4');
-    expect(style.style.fillColor).toBe('#c545c3');
+    expect(style.style.strokeDasharray).toBe('4,4');
+    expect(style.style.fillPattern).toBe('NOANCHR_pattern');
+    expect(style.style.textColor).toBe('#c545c3');
+  });
+
+  it('selects the correct pattern for entry prohibited restricted areas', () => {
+    const style = selectS57LayerStyle('RESARE', { RESTRN: '14' });
+
+    expect(style.family).toBe('restricted');
+    expect(style.style.fillPattern).toBe('ENTPRO_pattern');
   });
 
   it('does not attempt zoom-range updates for non-existent layers', async () => {

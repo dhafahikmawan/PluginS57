@@ -1,5 +1,6 @@
 import type { GeoLibreNativeLayerStyle } from '../geolibre/host-api';
 import { selectIconMapping } from '../utils/iconHelper';
+import { ensureResarePatternsAdded } from '../utils/patternGenerator';
 
 export type S57LayerFamily =
   | 'base'
@@ -15,12 +16,17 @@ export type S57LayerFamily =
   | 'tsslpt'
   | 'tss_arrows';
 
+export type ExtendedLayerStyle = GeoLibreNativeLayerStyle & {
+  fillPattern?: string;
+  textColor?: string;
+};
+
 export interface S57StyleSelection {
   family: S57LayerFamily;
   priority: number;
   minZoom: number;
   maxZoom?: number;
-  style: GeoLibreNativeLayerStyle;
+  style: ExtendedLayerStyle;
   labelField?: string;
 }
 
@@ -111,6 +117,8 @@ export class StyleReapplier {
       return false;
     }
 
+    ensureResarePatternsAdded(map);
+
     const candidateLayerIds = this.getCandidateLayerIds(map, layerId, targetName);
     if (candidateLayerIds.length === 0) {
       return false;
@@ -195,7 +203,7 @@ export class StyleReapplier {
     return appliedCount;
   }
 
-  private buildPaintOps(style: GeoLibreNativeLayerStyle): Array<[string, unknown]> {
+  private buildPaintOps(style: ExtendedLayerStyle): Array<[string, unknown]> {
     const paintOps: Array<[string, unknown]> = [];
 
     if (style.fillColor) {
@@ -257,6 +265,14 @@ export class StyleReapplier {
 
     if (style.textAnchor) {
       paintOps.push(['text-anchor', style.textAnchor]);
+    }
+
+    if (style.fillPattern) {
+      paintOps.push(['fill-pattern', style.fillPattern]);
+    }
+
+    if (style.textColor) {
+      paintOps.push(['text-color', style.textColor]);
     }
 
     return paintOps;
@@ -486,13 +502,22 @@ function buildContourStyle(attributes: Record<string, unknown>): GeoLibreNativeL
   };
 }
 
-function buildRestrictedStyle(): GeoLibreNativeLayerStyle {
+function buildRestrictedStyle(attributes: Record<string, unknown>): ExtendedLayerStyle {
+  const restrn = asString(attributes.RESTRN) ?? '';
+  let fillPattern = 'RESARE_pattern';
+
+  if (restrn.includes('14')) {
+    fillPattern = 'ENTPRO_pattern';
+  } else if (restrn.includes('1')) {
+    fillPattern = 'NOANCHR_pattern';
+  }
+
   return {
-    fillColor: COLORS.TRFCD,
-    fillOpacity: 0.2,
+    fillPattern,
     strokeColor: COLORS.TRFCD,
-    strokeWidth: 1.5,
-    strokeDasharray: '6,4',
+    strokeWidth: 2,
+    strokeDasharray: '4,4',
+    textColor: COLORS.TRFCD,
   };
 }
 
@@ -658,7 +683,8 @@ export function selectS57LayerStyle(
       priority: 35000,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
-      style: buildRestrictedStyle(),
+      style: buildRestrictedStyle(normalizedAttributes),
+      labelField: asString(normalizedAttributes.OBJNAM) ?? undefined,
     };
   }
 
