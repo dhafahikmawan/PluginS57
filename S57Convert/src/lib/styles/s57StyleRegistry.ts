@@ -15,6 +15,7 @@ export type S57LayerFamily =
   | 'routing'
   | 'sounding'
   | 'label'
+  | 'other'
   | 'tsslpt'
   | 'tss_arrows';
 
@@ -356,7 +357,7 @@ const NAVIGATION_CLASSES = new Set(['LIGHTS', 'BOYINB', 'BOYISD', 'BCNARE', 'BCN
 const ROUTING_CLASSES = new Set(['SEAARE', 'TSSRON', 'TSELNE', 'TSSBND', 'TRFLNE']);
 const SOUNDING_CLASSES = new Set(['SOUNDG', 'SOUNDG_PROCESSED']);
 const LANDMARK_CLASSES = new Set(['LNDMRK']);
-const LABEL_CLASSES = new Set(['TEXT', 'M_ACCY', 'M_NPUB']);
+const LABEL_CLASSES = new Set(['TEXT', 'M_ACCY']);
 const TSSLPT_CLASSES = new Set(['TSSLPT']);
 const TSS_ARROW_CLASSES = new Set(['TSS_ARROWS']);
 const BASE_CHART_CLASSES = new Set(['LNDARE', 'DEPARE', 'DRGARE', 'COALNE', 'FLODOC', 'PONTON', 'UNSARE', 'HULKES', 'LAKARE', 'BUAARE', 'RIVERS', 'CANALS', 'ROADWY', 'SLCONS', 'BRIDGE']);
@@ -646,6 +647,15 @@ function buildLabelStyle(): GeoLibreNativeLayerStyle {
   };
 }
 
+function buildMNPUBStyle(): GeoLibreNativeLayerStyle {
+  return {
+    strokeColor: COLORS.CHGRY,
+    strokeWidth: 1,
+    strokeDasharray: '4,4',
+    fillOpacity: 0,
+  };
+}
+
 export function selectS57LayerStyle(
   classCode: string,
   attributes: Record<string, unknown> = {},
@@ -786,6 +796,16 @@ export function selectS57LayerStyle(
       maxZoom: zoomRange.maxZoom,
       style: buildLandmarkSymbolStyle(normalizedAttributes),
       labelField: asString(normalizedAttributes.OBJNAM) ?? undefined,
+    };
+  }
+
+  if (normalizedCode === 'M_NPUB') {
+    return {
+      family: 'other',
+      priority: 40000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildMNPUBStyle(),
     };
   }
 

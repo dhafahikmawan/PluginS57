@@ -51,6 +51,17 @@ describe('selectS57LayerStyle', () => {
     expect(style.style.textColor).toBe('#c545c3');
   });
 
+  it('renders M_NPUB as an outline-only dashed grey layer', () => {
+    const style = selectS57LayerStyle('M_NPUB', {});
+
+    expect(style.family).toBe('other');
+    expect(style.priority).toBe(40000);
+    expect(style.style.strokeColor).toBe('#a3b4b7');
+    expect(style.style.strokeWidth).toBe(1);
+    expect(style.style.strokeDasharray).toBe('4,4');
+    expect(style.style.fillOpacity).toBe(0);
+  });
+
   it('selects the correct pattern for entry prohibited restricted areas', () => {
     const style = selectS57LayerStyle('RESARE', { RESTRN: '14' });
 

@@ -428,7 +428,7 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number,
 
   const resolvedPurposeCode = purposeCode ?? 1;
   const map = appAPI.getMap?.();
-  const sourceLayers = [...layers].filter((layer) => layer.layerName !== 'M_NPUB');
+  const sourceLayers = layers;
 
   if (sourceLayers.length === 0) {
     return undefined;
