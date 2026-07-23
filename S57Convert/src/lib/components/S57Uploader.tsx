@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import { buildS57ConversionBundle, buildConversionBundleFromGeoJSON, S57ConversionBundle, S57LayerData } from '../utils/s57Converter';
 import { triggerGeoJsonZipDownload } from '../utils/downloadZip';
 
+// ── ENC Purpose Labels ───────────────────────────────────────────────────────
+
+const ENC_PURPOSE_LABELS: Record<number, string> = {
+  1: 'Overview',
+  2: 'General',
+  3: 'Coastal',
+  4: 'Approach',
+  5: 'Harbour',
+  6: 'Berthing',
+};
+
 // ── Types ────────────────────────────────────────────────────────────────────
 
 type ConversionMode = 'local' | 'api';
@@ -19,6 +30,7 @@ interface KeyValuePair {
 interface LoadedFileItem {
   id: number;
   name: string;
+  purposeCode: number;
 }
 
 interface S57UploaderProps {
@@ -80,7 +92,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
           setConversionBundle(bundle);
           
           if (loadedFile) {
-            setLoadedFiles(prev => [...prev, loadedFile]);
+            setLoadedFiles(prev => [...prev, { ...loadedFile, purposeCode }]);
           }
         } catch (err: any) {
           setError(err.message || "Gagal mengurai file S-57.");
@@ -230,7 +242,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
       const loadedFile = onLayersLoaded(bundle.processedLayers, purposeCode, sourceFileName);
       setConversionBundle(bundle);
       if (loadedFile) {
-        setLoadedFiles(prev => [...prev, loadedFile]);
+        setLoadedFiles(prev => [...prev, { ...loadedFile, purposeCode }]);
       }
 
     } catch (err: any) {
@@ -504,7 +516,15 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
             <ul className="loaded-list">
               {loadedFiles.map((file) => (
                 <li key={file.id} className={`loaded-file-item ${hiddenFileIds.has(file.id) ? 'is-hidden' : ''}`}>
-                  <span className="file-name">📄 {file.name}</span>
+                  <div className="file-info">
+                    <span className="file-name">📄 {file.name}</span>
+                    <span
+                      className={`enc-purpose-badge enc-purpose-${file.purposeCode}`}
+                      title={`ENC Purpose ${file.purposeCode}`}
+                    >
+                      {file.purposeCode} · {ENC_PURPOSE_LABELS[file.purposeCode] ?? `Purpose ${file.purposeCode}`}
+                    </span>
+                  </div>
                   <div className="file-item-actions">
                     <button
                       type="button"

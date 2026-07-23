@@ -420,6 +420,7 @@ export function handleDeleteFileLayer(fileId: number) {
 export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number, fileName?: string) {
   if (!appAPI) return undefined;
 
+  const resolvedPurposeCode = purposeCode ?? 1;
   const map = appAPI.getMap?.();
   const sourceLayers = [...layers].filter((layer) => layer.layerName !== 'M_NPUB');
 
@@ -535,7 +536,7 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number,
   fileLayerMap.set(fileId, { fileName: resolvedFileName, layerIds });
 
   writeDebug('++++++++++++++++++++++++++++++++++++++++++');
-  return { id: fileId, name: resolvedFileName };
+  return { id: fileId, name: resolvedFileName, purposeCode: resolvedPurposeCode };
 }
 
 // Default export untuk dibaca oleh bundling system GeoLibre
