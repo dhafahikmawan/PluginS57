@@ -1,60 +1,188 @@
-# Update RESARE Styling Implementation Plan
+# Implementation Plan: Update RESARE Layer Styling
 
-Updates the S-57 RESARE (Restricted Area) layer styling to match the rules defined in `/DOCS/Analysis/RESARE.md`.
+This document provides step-by-step instructions for updating the styling of the S-57 Restricted Area (`RESARE`) layer. Follow these instructions precisely to implement the rules from `/DOCS/Analysis/RESARE.md` without modifying the core `host-api.ts` file.
 
-## User Review Required
+## 1. Create the Pattern Generator
 
-Please review the proposed changes for dynamically generating patterns and applying the style without modifying `host-api.ts`.
+We need to dynamically generate the fill patterns on the MapLibre map instance using the HTML `<canvas>` API, so that they exist when the styles are applied.
 
-## Proposed Changes
+**File:** Create a new file at `S57Convert/src/lib/utils/patternGenerator.ts`
 
-### s57StyleRegistry.ts
+**Implementation:** Copy and paste the following code into the new file:
 
-Update the style registry to locally extend the style interface, map the new properties, and implement the RESARE logic, keeping the host API untouched.
+```typescript
+export function ensureResarePatternsAdded(map: any) {
+  // Check if the map supports the required methods
+  if (!map || typeof map.hasImage !== 'function' || typeof map.addImage !== 'function') return;
 
-#### [MODIFY] [s57StyleRegistry.ts](file:///c:/Users/erwin/OneDrive/Documents/Learning/Plugin%20000/S57Convert/src/lib/styles/s57StyleRegistry.ts)
-- Define a local type: `type ExtendedLayerStyle = GeoLibreNativeLayerStyle & { fillPattern?: string; textColor?: string; };`
-- Update `S57StyleSelection.style` to use `ExtendedLayerStyle` instead of `GeoLibreNativeLayerStyle`.
-- In `StyleReapplier.buildPaintOps`:
-  - Accept `style: ExtendedLayerStyle`.
-  - Map `style.fillPattern` to `['fill-pattern', style.fillPattern]`.
-  - Map `style.textColor` to `['text-color', style.textColor]`.
-- In `buildRestrictedStyle`:
-  - Add `attributes: Record<string, unknown>` as a parameter.
-  - Return `ExtendedLayerStyle`.
-  - Update line boundary: `strokeWidth: 2` and `strokeDasharray: '4,4'`.
-  - Implement fill pattern logic based on the `RESTRN` attribute string:
-    - If `RESTRN` includes `'1'`, use `fillPattern: 'NOANCHR_pattern'`.
-    - If `RESTRN` includes `'14'`, use `fillPattern: 'ENTPRO_pattern'`.
-    - Otherwise, use a default base pattern `fillPattern: 'RESARE_pattern'`.
-  - Add `textColor: COLORS.TRFCD` to render the label in magenta.
-- In `selectS57LayerStyle`:
-  - Pass `normalizedAttributes` to `buildRestrictedStyle`.
-  - Set the `labelField` property of the `S57StyleSelection` to `asString(normalizedAttributes.OBJNAM) ?? undefined` for restricted classes.
+  const createPattern = (id: string, drawFn: (ctx: CanvasRenderingContext2D, size: number) => void) => {
+    if (map.hasImage(id)) return; // Skip if already added
+    
+    const size = 32;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    drawFn(ctx, size);
+    
+    const imageData = ctx.getImageData(0, 0, size, size);
+    map.addImage(id, imageData);
+  };
 
-### Pattern Generation
+  // 1. Base pattern: magenta diagonal hash
+  createPattern('RESARE_pattern', (ctx, size) => {
+    ctx.strokeStyle = 'rgba(197, 69, 195, 0.4)'; // Magenta with opacity
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, size);
+    ctx.lineTo(size, 0);
+    ctx.stroke();
+  });
 
-Generate the required map fill patterns dynamically when the map loads so they are available in the sprite sheet.
+  // 2. Anchoring Prohibited pattern (Placeholder: Red Cross)
+  createPattern('NOANCHR_pattern', (ctx, size) => {
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(4, 4);
+    ctx.lineTo(size - 4, size - 4);
+    ctx.moveTo(size - 4, 4);
+    ctx.lineTo(4, size - 4);
+    ctx.stroke();
+  });
 
-#### [NEW] [patternGenerator.ts](file:///c:/Users/erwin/OneDrive/Documents/Learning/Plugin%20000/S57Convert/src/lib/utils/patternGenerator.ts)
-- Create a utility `ensureResarePatternsAdded(map)` that checks if the patterns exist via `map.hasImage`.
-- If missing, use the HTML `<canvas>` API to draw:
-  - `RESARE_pattern`: A dynamically generated magenta hash/diagonal pattern (`rgba(197, 69, 195, 0.4)`).
-  - `NOANCHR_pattern`: A placeholder pattern (e.g., a circle with an anchor or a cross).
-  - `ENTPRO_pattern`: A placeholder pattern (e.g., a "no entry" circle).
-- Extract `ImageData` from the canvas and add them to the map using `map.addImage(id, imageData)`.
+  // 3. Entry Prohibited pattern (Placeholder: Red Circle)
+  createPattern('ENTPRO_pattern', (ctx, size) => {
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, (size / 2) - 4, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+}
+```
 
-#### [MODIFY] Map Initialization Context (e.g., plugin activation or style reapplication)
-- Call `ensureResarePatternsAdded(map)` when the map instance is available to ensure the dynamically generated patterns are registered before the styles are applied.
+## 2. Update Style Definitions
 
-## Verification Plan
+We need to add support for `fillPattern` and `textColor` locally without changing `host-api.ts`.
 
-### Manual Verification
-- Render a chart with RESARE areas.
-- Verify the restricted area boundary is a 2px magenta dashed line (4px on, 4px off).
-- Verify the dynamically generated patterns are successfully applied:
-  - Default magenta hash pattern.
-  - NOANCHR_pattern for areas where `RESTRN` contains `'1'`.
-  - ENTPRO_pattern for areas where `RESTRN` contains `'14'`.
-- Verify text labels display the `OBJNAM` attribute in magenta.
-- Verify that `host-api.ts` remains unmodified.
+**File:** `S57Convert/src/lib/styles/s57StyleRegistry.ts`
+
+**Step 2.1: Create Local Type**
+Find the `S57StyleSelection` interface. Immediately above it, define the new `ExtendedLayerStyle` type, and update `S57StyleSelection` to use it:
+
+```typescript
+// Add this above S57StyleSelection
+export type ExtendedLayerStyle = GeoLibreNativeLayerStyle & { 
+  fillPattern?: string; 
+  textColor?: string; 
+};
+
+// Update S57StyleSelection to use it:
+export interface S57StyleSelection {
+  family: S57LayerFamily;
+  priority: number;
+  minZoom: number;
+  maxZoom?: number;
+  style: ExtendedLayerStyle; // Changed from GeoLibreNativeLayerStyle
+  labelField?: string;
+}
+```
+
+**Step 2.2: Update Paint Ops**
+Find the `buildPaintOps` function inside `StyleReapplier`. Update its signature to use `ExtendedLayerStyle` and add logic to push the new properties:
+
+```typescript
+  // Change signature
+  private buildPaintOps(style: ExtendedLayerStyle): Array<[string, unknown]> {
+    const paintOps: Array<[string, unknown]> = [];
+
+    // ... existing if statements ...
+
+    // ADD THESE NEW BLOCKS AT THE END BEFORE RETURN:
+    if (style.fillPattern) {
+      paintOps.push(['fill-pattern', style.fillPattern]);
+    }
+    
+    if (style.textColor) {
+      paintOps.push(['text-color', style.textColor]);
+    }
+
+    return paintOps;
+  }
+```
+
+**Step 2.3: Update `buildRestrictedStyle`**
+Replace the existing `buildRestrictedStyle` function with the following implementation:
+
+```typescript
+// Replace the existing function
+function buildRestrictedStyle(attributes: Record<string, unknown>): ExtendedLayerStyle {
+  const restrn = asString(attributes.RESTRN) ?? '';
+  let fillPattern = 'RESARE_pattern'; // Default hash pattern
+
+  // 14 is Entry Prohibited, 1 is Anchoring Prohibited
+  if (restrn.includes('14')) {
+    fillPattern = 'ENTPRO_pattern';
+  } else if (restrn.includes('1')) {
+    fillPattern = 'NOANCHR_pattern';
+  }
+
+  return {
+    fillPattern,
+    strokeColor: COLORS.TRFCD,
+    strokeWidth: 2,
+    strokeDasharray: '4,4',
+    textColor: COLORS.TRFCD, // Labels will be magenta
+  };
+}
+```
+
+**Step 2.4: Update `selectS57LayerStyle`**
+Find the `RESTRICTED_CLASSES` block inside `selectS57LayerStyle` and update it to pass the attributes and set the `labelField`:
+
+```typescript
+  if (RESTRICTED_CLASSES.has(normalizedCode)) {
+    return {
+      family: 'restricted',
+      priority: 35000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildRestrictedStyle(normalizedAttributes),
+      labelField: asString(normalizedAttributes.OBJNAM) ?? undefined, // Added this line
+    };
+  }
+```
+
+## 3. Register Patterns Before Styling
+
+We must ensure our new patterns are added to the map before any styles try to use them. 
+
+**File:** `S57Convert/src/lib/styles/s57StyleRegistry.ts`
+
+**Step 3.1: Add Import**
+At the top of the file, add:
+```typescript
+import { ensureResarePatternsAdded } from '../utils/patternGenerator';
+```
+
+**Step 3.2: Call in `reapplyStyle`**
+Find the `reapplyStyle` function in `StyleReapplier`. Add a call to `ensureResarePatternsAdded` near the beginning, right after checking if the map exists:
+
+```typescript
+  async reapplyStyle(
+    map: { /* ... */ },
+    // ...
+  ): Promise<boolean> {
+    const trackedStyle = // ...
+    if (!trackedStyle || !map || typeof map.getStyle !== 'function') {
+      return false;
+    }
+
+    // ADD THIS LINE
+    ensureResarePatternsAdded(map);
+
+    const candidateLayerIds = // ...
+```
