@@ -9,9 +9,8 @@ import { generateTSSArrows, type GeneratedArrow } from './lib/utils/tssArrowsGen
 import type { ProcessedTSSLPT } from './lib/utils/tsslptProcessor';
 import { selectS57LayerStyle, StyleReapplier, StyleTracker, type S57StyleSelection } from './lib/styles/s57StyleRegistry';
 import './lib/styles/uploader.css';
-//import { PluginControlOptions } from './react';
-
-const PLUGIN_ID = 'geolibre-s57-reader';
+import { SPRITE_PNG_BASE64 } from './lib/assets/spritePng';
+import { spriteManifest } from './lib/assets/spriteManifest';
 
 let appAPI: GeoLibreAppAPI | null = null;
 let styleTracker = new StyleTracker();
@@ -37,7 +36,7 @@ const fileLayerMap = new Map<number, { fileName: string; layerIds: string[] }>()
 function createControl(app: GeoLibreAppAPI): PluginControl{
   const nextControl = new PluginControl({
     collapsed : pendingState?.collapsed ?? true,
-    panelWidth: pendingState?.panelWidth ?? 300,
+    panelWidth: pendingState?.panelWidth ?? 500,
     registerNativeLayer: (layer) => app.registerExternalNativeLayer?.(layer),
 
   });
@@ -83,88 +82,37 @@ function isPluginState(value: unknown): value is Partial<PluginState>{
  *   2. Relative path inferred from the plugin bundle's own script URL.
  *   3. null (graceful degradation — no icons).
  */
-function resolveSpriteBaseUrl(app: GeoLibreAppAPI): string | null {
-  // Attempt 1 — host API
-  if (typeof app.resolvePluginAssetUrl === 'function') {
-    const url = app.resolvePluginAssetUrl(PLUGIN_ID, 'icons/sprite.json');
-    if (url) {
-      const base = url.replace(/\/sprite\.json$/, '');
-      writeDebug(`[sprite] Resolved via host API: ${base}`);
-      return base;
-    }
-    writeDebug('[sprite] resolvePluginAssetUrl returned null — trying fallback.');
-  } else {
-    writeDebug('[sprite] Host does not expose resolvePluginAssetUrl — trying fallback.');
-  }
-
-  // Attempt 2 — derive from the current script URL (works when plugin is served
-  // from a URL, not a local file:// path).
-  try {
-    // import.meta.url is the URL of this compiled bundle (dist/index.js).
-    const scriptUrl = new URL(import.meta.url);
-    const base = scriptUrl.href.replace(/\/index\.js$/, '/icons');
-    if (!base.startsWith('file://')) {
-      writeDebug(`[sprite] Resolved via script URL fallback: ${base}`);
-      return base;
-    }
-    writeDebug('[sprite] Script URL is a file:// path — cannot serve sprites over HTTP.');
-  } catch {
-    writeDebug('[sprite] Could not determine script URL.');
-  }
-
-  writeDebug('[sprite] No sprite base URL could be resolved. Icons will be absent.');
-  return null;
-}
-
 /**
- * Load sprite.json + sprite.png from baseUrl, then register every icon in the
- * sprite sheet with the MapLibre map via map.addImage().
- * Safe to call multiple times — skips images already registered.
+ * Load the embedded sprite manifest and sprite image, then register every icon
+ * in the sprite sheet with the MapLibre map via map.addImage(). Safe to call
+ * multiple times — skips images already registered.
  */
-async function registerSpriteWithMap(map: any, baseUrl: string): Promise<void> {
-  const jsonUrl = `${baseUrl}/sprite.json`;
-  const pngUrl  = `${baseUrl}/sprite.png`;
-
-  let manifest: Record<string, { x: number; y: number; width: number; height: number; pixelRatio?: number }>;
+async function registerSpriteWithMap(map: any): Promise<void> {
   let image: ImageBitmap;
 
   try {
-    const jsonRes = await fetch(jsonUrl);
-    if (!jsonRes.ok) {
-      writeDebug(`[sprite] Failed to fetch sprite.json (${jsonRes.status}): ${jsonUrl}`);
+    const res = await fetch(SPRITE_PNG_BASE64);
+    if (!res.ok) {
+      writeDebug(`[sprite] Failed to load embedded sprite image: ${res.status}`);
       return;
     }
-    manifest = await jsonRes.json();
-    writeDebug(`[sprite] Loaded sprite manifest — ${Object.keys(manifest).length} icons from ${jsonUrl}`);
-  } catch (err) {
-    writeDebug(`[sprite] Error fetching sprite.json: ${err}`);
-    return;
-  }
-
-  try {
-    const pngRes = await fetch(pngUrl);
-    if (!pngRes.ok) {
-      writeDebug(`[sprite] Failed to fetch sprite.png (${pngRes.status}): ${pngUrl}`);
-      return;
-    }
-    const blob = await pngRes.blob();
+    const blob = await res.blob();
     image = await createImageBitmap(blob);
-    writeDebug(`[sprite] Loaded sprite image (${image.width}×${image.height}px) from ${pngUrl}`);
+    writeDebug(`[sprite] Loaded embedded sprite image (${image.width}×${image.height}px)`);
   } catch (err) {
-    writeDebug(`[sprite] Error fetching/decoding sprite.png: ${err}`);
+    writeDebug(`[sprite] Error decoding embedded sprite image: ${err}`);
     return;
   }
 
   let registered = 0;
   let skipped = 0;
 
-  for (const [key, entry] of Object.entries(manifest)) {
+  for (const [key, entry] of Object.entries(spriteManifest)) {
     if (typeof map.hasImage === 'function' && map.hasImage(key)) {
       skipped++;
       continue;
     }
     try {
-      // Crop the icon's sub-image from the sprite sheet.
       const sub = await createImageBitmap(image, entry.x, entry.y, entry.width, entry.height);
       map.addImage(key, sub, { pixelRatio: entry.pixelRatio ?? 1 });
       registered++;
@@ -180,10 +128,8 @@ async function registerSpriteWithMap(map: any, baseUrl: string): Promise<void> {
  * Resolve sprite URL and register icons with the map.
  * Called on activation and after every style reload.
  */
-function ensureSpriteRegistered(app: GeoLibreAppAPI, map: any) {
-  const baseUrl = resolveSpriteBaseUrl(app);
-  if (!baseUrl) return;
-  void registerSpriteWithMap(map, baseUrl);
+function ensureSpriteRegistered(_app: GeoLibreAppAPI, map: any) {
+  void registerSpriteWithMap(map);
 }
 
 

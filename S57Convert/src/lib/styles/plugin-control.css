@@ -437,7 +437,7 @@
     --panel-shadow: 0 16px 38px rgba(2, 6, 23, 0.4);
   }
 }
-}
+
 
 /* Demo floating panel body (see src/lib/geolibre/floating-panel.ts). The host
    provides the draggable card chrome and theme; the plugin styles its body. */
