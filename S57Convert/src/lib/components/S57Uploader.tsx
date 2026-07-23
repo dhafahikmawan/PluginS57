@@ -22,20 +22,22 @@ interface LoadedFileItem {
 }
 
 interface S57UploaderProps {
-  // Callback untuk meregistrasikan layer baru ke GeoLibre Host
+  // Callback para meregistrasikan layer baru ke GeoLibre Host
   onLayersLoaded: (layers: S57LayerData[], purposeCode?: number, fileName?: string) => LoadedFileItem | undefined;
   // Callback untuk menghapus layer yang terdaftar sebelumnya
   onDeleteFile: (fileId: number) => void;
+  onToggleFileVisibility?: (fileId: number, hide?: boolean) => boolean;
   onClearLayers: () => void;
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDeleteFile, onClearLayers }) => {
+export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDeleteFile, onToggleFileVisibility, onClearLayers }) => {
   // Shared state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadedFiles, setLoadedFiles] = useState<LoadedFileItem[]>([]);
+  const [hiddenFileIds, setHiddenFileIds] = useState<Set<number>>(new Set());
   const [conversionBundle, setConversionBundle] = useState<S57ConversionBundle | null>(null);
   const [purposeCode, setPurposeCode] = useState<number>(1);
 
@@ -244,6 +246,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
   const handleReset = () => {
     onClearLayers();
     setLoadedFiles([]);
+    setHiddenFileIds(new Set());
     setConversionBundle(null);
     setError(null);
   };
@@ -251,6 +254,25 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
   const handleDeleteFile = (fileId: number) => {
     onDeleteFile(fileId);
     setLoadedFiles(prev => prev.filter(file => file.id !== fileId));
+    setHiddenFileIds(prev => {
+      const next = new Set(prev);
+      next.delete(fileId);
+      return next;
+    });
+  };
+
+  const handleToggleVisibility = (fileId: number) => {
+    if (!onToggleFileVisibility) return;
+    const isNowHidden = onToggleFileVisibility(fileId);
+    setHiddenFileIds(prev => {
+      const next = new Set(prev);
+      if (isNowHidden) {
+        next.add(fileId);
+      } else {
+        next.delete(fileId);
+      }
+      return next;
+    });
   };
 
   // ── Download handler ─────────────────────────────────────────────────────
@@ -481,16 +503,26 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
             <h4>Loaded layers</h4>
             <ul className="loaded-list">
               {loadedFiles.map((file) => (
-                <li key={file.id} className="loaded-file-item">
+                <li key={file.id} className={`loaded-file-item ${hiddenFileIds.has(file.id) ? 'is-hidden' : ''}`}>
                   <span className="file-name">📄 {file.name}</span>
-                  <button
-                    type="button"
-                    className="delete-file-button"
-                    onClick={() => handleDeleteFile(file.id)}
-                    title={`Delete ${file.name}`}
-                  >
-                    🗑️
-                  </button>
+                  <div className="file-item-actions">
+                    <button
+                      type="button"
+                      className="toggle-visibility-button"
+                      onClick={() => handleToggleVisibility(file.id)}
+                      title={hiddenFileIds.has(file.id) ? `Show ${file.name}` : `Hide ${file.name}`}
+                    >
+                      {hiddenFileIds.has(file.id) ? '🙈' : '👁️'}
+                    </button>
+                    <button
+                      type="button"
+                      className="delete-file-button"
+                      onClick={() => handleDeleteFile(file.id)}
+                      title={`Delete ${file.name}`}
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>

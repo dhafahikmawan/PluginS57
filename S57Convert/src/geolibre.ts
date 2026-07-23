@@ -29,7 +29,7 @@ const everyloadedlayers : Array<string> = [];
 const tsslptCache = new Map<string, ProcessedTSSLPT[]>();
 const tssArrowCache = new Map<string, GeneratedArrow[]>();
 let nextFileId = 1;
-const fileLayerMap = new Map<number, { fileName: string; layerIds: string[] }>();
+const fileLayerMap = new Map<number, { fileName: string; layerIds: string[]; hidden?: boolean }>();
 
 
 
@@ -138,6 +138,15 @@ function writeDebug(message : any){
     console.log(message);
 }
 
+function isAnyFileLayerHidden(trackedLayerId: string): boolean {
+  for (const entry of fileLayerMap.values()) {
+    if (entry.hidden && entry.layerIds.includes(trackedLayerId)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function queueStyleReapply(map: any) {
   if (!map) {
     return;
@@ -149,7 +158,7 @@ function queueStyleReapply(map: any) {
 
   pendingReapplyTimer = setTimeout(() => {
     pendingReapplyTimer = null;
-    void styleReapplier.reapplyAllStyles(map);
+    void styleReapplier.reapplyAllStyles(map, isAnyFileLayerHidden);
   }, 125);
 }
 
@@ -229,6 +238,7 @@ export const s57ReaderPlugin: GeoLibrePlugin = {
             React.createElement(S57Uploader, {
               onLayersLoaded: handleLayersLoaded,
               onDeleteFile: handleDeleteFileLayer,
+              onToggleFileVisibility: handleToggleFileVisibility,
               onClearLayers: handleClearLayers,
             })
           );
@@ -318,6 +328,61 @@ function removeTrackedLayer(layerId: string) {
     everyloadedlayers.splice(index, 1);
   }
   styleTracker.removeStyle(layerId);
+}
+
+/**
+ * Toggles or sets the visibility state of all MapLibre layers associated with a file.
+ * @param fileId The ID of the loaded file.
+ * @param hide Optional explicit boolean (true to hide, false to show). If omitted, toggles current state.
+ * @returns boolean The new hidden state (true if hidden, false if visible).
+ */
+export function handleToggleFileVisibility(fileId: number, hide?: boolean): boolean {
+  const entry = fileLayerMap.get(fileId);
+  if (!entry || !appAPI) return false;
+
+  const map = appAPI.getMap?.();
+  const targetHiddenState = hide !== undefined ? hide : !entry.hidden;
+  entry.hidden = targetHiddenState;
+
+  const visibilityValue = targetHiddenState ? 'none' : 'visible';
+
+  if (map) {
+    const styleLayers: Array<{ id?: string; source?: string }> = map.getStyle?.()?.layers ?? [];
+    const targetCandidateIds = new Set<string>();
+
+    // Seed with direct hosted layer IDs
+    entry.layerIds.forEach(id => targetCandidateIds.add(id));
+
+    // Resolve candidate MapLibre layers whose id or source matches any tracked layer ID
+    styleLayers.forEach(layer => {
+      if (!layer?.id) return;
+      const layerMapId = layer.id;
+      const sourceName = layer.source ?? '';
+
+      const matchesEntry = entry.layerIds.some(id =>
+        layerMapId === id ||
+        sourceName === id ||
+        layerMapId.startsWith(`${id}-`) ||
+        layerMapId.includes(id)
+      );
+
+      if (matchesEntry) {
+        targetCandidateIds.add(layerMapId);
+      }
+    });
+
+    targetCandidateIds.forEach((candidateId) => {
+      try {
+        if (typeof map.setLayoutProperty === 'function') {
+          map.setLayoutProperty(candidateId, 'visibility', visibilityValue);
+        }
+      } catch (error) {
+        console.error(`Error updating visibility for layer ${candidateId}:`, error);
+      }
+    });
+  }
+
+  return entry.hidden;
 }
 
 export function handleClearLayers() {

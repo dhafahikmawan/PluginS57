@@ -73,16 +73,35 @@ export class StyleTracker {
   }
 }
 
+const LAYOUT_PROPERTIES = new Set([
+  'icon-image',
+  'icon-size',
+  'icon-allow-overlap',
+  'icon-ignore-placement',
+  'text-field',
+  'text-size',
+  'text-offset',
+  'text-anchor',
+]);
+
 export class StyleReapplier {
   constructor(private readonly tracker: StyleTracker = new StyleTracker()) {}
 
   async reapplyStyle(
-    map: { getStyle?: () => { layers?: Array<{ id?: string; source?: string }> }; setPaintProperty?: (layerId: string, property: string, value: unknown) => void; getPaintProperty?: (layerId: string, property: string) => unknown; setLayerZoomRange?: (layerId: string, minZoom: number, maxZoom?: number) => void },
+    map: {
+      getStyle?: () => { layers?: Array<{ id?: string; source?: string }> };
+      setPaintProperty?: (layerId: string, property: string, value: unknown) => void;
+      getPaintProperty?: (layerId: string, property: string) => unknown;
+      setLayoutProperty?: (layerId: string, property: string, value: unknown) => void;
+      getLayoutProperty?: (layerId: string, property: string) => unknown;
+      setLayerZoomRange?: (layerId: string, minZoom: number, maxZoom?: number) => void;
+    },
     layerId: string,
     styleSelection?: S57StyleSelection | null,
     classCode?: string,
     attributes: Record<string, unknown> = {},
     targetName?: string,
+    isLayerHidden?: (trackedLayerId: string) => boolean,
   ): Promise<boolean> {
     const trackedStyle = styleSelection
       ? { layerId, styleSelection, classCode: classCode ?? '', attributes }
@@ -119,9 +138,16 @@ export class StyleReapplier {
 
       paintOps.forEach(([property, value]) => {
         try {
-          const currentValue = map.getPaintProperty?.(candidateLayerId, property);
-          if (currentValue !== value) {
-            map.setPaintProperty?.(candidateLayerId, property, value);
+          if (LAYOUT_PROPERTIES.has(property)) {
+            const currentValue = map.getLayoutProperty?.(candidateLayerId, property);
+            if (currentValue !== value) {
+              map.setLayoutProperty?.(candidateLayerId, property, value);
+            }
+          } else {
+            const currentValue = map.getPaintProperty?.(candidateLayerId, property);
+            if (currentValue !== value) {
+              map.setPaintProperty?.(candidateLayerId, property, value);
+            }
           }
           applied = true;
         } catch {
@@ -130,15 +156,37 @@ export class StyleReapplier {
       });
     });
 
+    // After style reapplication, re-enforce visibility: none for layers belonging
+    // to a file that the user has toggled off. This prevents style-reload events
+    // from inadvertently resetting hidden layers back to visible.
+    if (isLayerHidden?.(layerId)) {
+      candidateLayerIds.forEach((candidateLayerId) => {
+        try {
+          map.setLayoutProperty?.(candidateLayerId, 'visibility', 'none');
+        } catch {
+          // Ignore transient setter failures.
+        }
+      });
+    }
+
     return applied;
   }
 
-  async reapplyAllStyles(map: { getStyle?: () => { layers?: Array<{ id?: string; source?: string }> }; setPaintProperty?: (layerId: string, property: string, value: unknown) => void; getPaintProperty?: (layerId: string, property: string) => unknown }): Promise<number> {
+  async reapplyAllStyles(
+    map: {
+      getStyle?: () => { layers?: Array<{ id?: string; source?: string }> };
+      setPaintProperty?: (layerId: string, property: string, value: unknown) => void;
+      getPaintProperty?: (layerId: string, property: string) => unknown;
+      setLayoutProperty?: (layerId: string, property: string, value: unknown) => void;
+      getLayoutProperty?: (layerId: string, property: string) => unknown;
+    },
+    isLayerHidden?: (trackedLayerId: string) => boolean,
+  ): Promise<number> {
     const trackedLayers = this.tracker.getAllTrackedLayers();
     let appliedCount = 0;
 
     for (const trackedLayerId of trackedLayers) {
-      const applied = await this.reapplyStyle(map, trackedLayerId);
+      const applied = await this.reapplyStyle(map, trackedLayerId, null, undefined, {}, undefined, isLayerHidden);
       if (applied) {
         appliedCount += 1;
       }

@@ -436,3 +436,41 @@
   animation: pulse 1.5s infinite;
 }
 
+/* ── File Item Actions (visibility toggle + delete) ────────────────────── */
+
+.s57-uploader-panel .file-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.s57-uploader-panel .toggle-visibility-button {
+  border: none;
+  background: transparent;
+  color: var(--pc-muted, #6b7280);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.s57-uploader-panel .toggle-visibility-button:hover {
+  background: rgba(74, 144, 217, 0.12);
+  color: var(--pc-accent, #4a90d9);
+  transform: scale(1.05);
+}
+
+.s57-uploader-panel .toggle-visibility-button:active {
+  transform: scale(0.95);
+}
+
+.s57-uploader-panel .loaded-file-item.is-hidden {
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.s57-uploader-panel .loaded-file-item.is-hidden .file-name {
+  text-decoration: line-through;
+}
+
