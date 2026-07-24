@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "RECTRC",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 2074, "PRIM": 2, "GRUP": 2, "OBJL": 109, "RVER": 1, "AGEN": 230, "FIDN": 706286, "FIDS": 1, "LNAM": "00E6000AC6EE0001", "CATTRK": 1, "ORIENT": 136.0, "TRAFIC": 1, "SCAMIN": 499999, "SORDAT": "20170801", "SORIND": "ID,ID,graph,Peta 95R6" }, "geometry": { "type": "LineString", "coordinates": [ [ 105.9494744, -6.0110303 ], [ 105.9569555, -6.0187766 ] ] } },
+{ "type": "Feature", "properties": { "RCID": 5453, "PRIM": 2, "GRUP": 2, "OBJL": 109, "RVER": 1, "AGEN": 230, "FIDN": 1475132, "FIDS": 1, "LNAM": "00E60016823C0001", "CATTRK": 2, "ORIENT": 179.6, "TRAFIC": 1, "SCAMIN": 499999 }, "geometry": { "type": "LineString", "coordinates": [ [ 105.2950676, -5.4641453 ], [ 105.2952163, -5.4861446 ] ] } },
+{ "type": "Feature", "properties": { "RCID": 5465, "PRIM": 2, "GRUP": 2, "OBJL": 109, "RVER": 1, "AGEN": 230, "FIDN": 1475121, "FIDS": 1, "LNAM": "00E6001682310001", "CATTRK": 2, "ORIENT": 79.0, "TRAFIC": 1, "SCAMIN": 499999 }, "geometry": { "type": "LineString", "coordinates": [ [ 105.2950676, -5.4641453 ], [ 105.3099801, -5.4613053 ] ] } },
+{ "type": "Feature", "properties": { "RCID": 5490, "PRIM": 2, "GRUP": 2, "OBJL": 109, "RVER": 1, "AGEN": 230, "FIDN": 1475138, "FIDS": 1, "LNAM": "00E6001682420001", "CATTRK": 2, "ORIENT": 158.2, "TRAFIC": 1, "SCAMIN": 499999 }, "geometry": { "type": "LineString", "coordinates": [ [ 105.2952163, -5.4861446 ], [ 105.3418811, -5.603015 ] ] } }
+]
+}

@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "BOYLAT",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 520, "PRIM": 1, "GRUP": 2, "OBJL": 17, "RVER": 1, "AGEN": 230, "FIDN": 466865, "FIDS": 1, "LNAM": "00E600071FB10001", "BOYSHP": 2, "CATLAM": 1, "COLOUR": [ "3" ], "SCAMIN": 499999, "SORDAT": "20170401", "SORIND": "ID,ID,graph,peta 71 edisi xiv cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 104.589127, -5.6012254 ] } },
+{ "type": "Feature", "properties": { "RCID": 5448, "PRIM": 1, "GRUP": 2, "OBJL": 17, "RVER": 1, "AGEN": 230, "FIDN": 1475041, "FIDS": 1, "LNAM": "00E6001681E10001", "LNAM_REFS": [ "00E6001681E20001", "00E6001681E30001" ], "FFPT_RIND": [ 2, 2 ], "BOYSHP": 2, "CATLAM": 1, "COLOUR": [ "3" ], "INFORM": "Survey Teluk Lampung 2017", "SCAMIN": 499999 }, "geometry": { "type": "Point", "coordinates": [ 105.3713993, -5.5977633 ] } },
+{ "type": "Feature", "properties": { "RCID": 5510, "PRIM": 1, "GRUP": 2, "OBJL": 17, "RVER": 1, "AGEN": 230, "FIDN": 1475044, "FIDS": 1, "LNAM": "00E6001681E40001", "LNAM_REFS": [ "00E6001681E50001", "00E6001681E60001" ], "FFPT_RIND": [ 2, 2 ], "BOYSHP": 1, "CATLAM": 2, "COLOUR": [ "4" ], "INFORM": "Survey Teluk Lampung 2017", "SCAMIN": 499999 }, "geometry": { "type": "Point", "coordinates": [ 105.3746096, -5.6026991 ] } }
+]
+}

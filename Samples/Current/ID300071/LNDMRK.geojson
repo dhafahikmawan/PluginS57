@@ -1,0 +1,13 @@
+{
+"type": "FeatureCollection",
+"name": "LNDMRK",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 968, "PRIM": 1, "GRUP": 2, "OBJL": 74, "RVER": 1, "AGEN": 230, "FIDN": 706476, "FIDS": 1, "LNAM": "00E6000AC7AC0001", "CATLMK": [ "17" ], "COLOUR": [ "6" ], "CONVIS": 1, "SCAMIN": 499999, "SORDAT": "20170801", "SORIND": "ID,ID,graph,peta95r1 edisi xiv cetakan 1- dikoreksi sd bpi-10-2017" }, "geometry": { "type": "Point", "coordinates": [ 105.749483, -5.8654431 ] } },
+{ "type": "Feature", "properties": { "RCID": 1143, "PRIM": 1, "GRUP": 2, "OBJL": 74, "RVER": 1, "AGEN": 230, "FIDN": 706098, "FIDS": 1, "LNAM": "00E6000AC6320001", "CATLMK": [ "17" ], "CONVIS": 1, "FUNCTN": [ "33" ], "SCAMIN": 499999, "SORDAT": "20170801", "SORIND": "ID,ID,graph,Peta 95R6" }, "geometry": { "type": "Point", "coordinates": [ 105.983344, -5.9960203 ] } },
+{ "type": "Feature", "properties": { "RCID": 1323, "PRIM": 1, "GRUP": 2, "OBJL": 74, "RVER": 1, "AGEN": 230, "FIDN": 951896, "FIDS": 1, "LNAM": "00E6000E86580001", "LNAM_REFS": [ "00E6000E836A0001" ], "FFPT_RIND": [ 2 ], "CATLMK": [ "17" ], "COLOUR": [ "1" ], "CONVIS": 1, "FUNCTN": [ "33" ], "SCAMIN": 499999, "SORDAT": "20080501", "SORIND": "ID,ID,graph,peta 94" }, "geometry": { "type": "Point", "coordinates": [ 105.2527287, -5.5978506 ] } },
+{ "type": "Feature", "properties": { "RCID": 1649, "PRIM": 1, "GRUP": 2, "OBJL": 74, "RVER": 1, "AGEN": 230, "FIDN": 706380, "FIDS": 1, "LNAM": "00E6000AC74C0001", "CATLMK": [ "3" ], "CONVIS": 2, "SCAMIN": 259999, "SORDAT": "20170801", "SORIND": "ID,ID,graph,Peta 95R6" }, "geometry": { "type": "Point", "coordinates": [ 105.9329239, -6.0346868 ] } },
+{ "type": "Feature", "properties": { "RCID": 1746, "PRIM": 1, "GRUP": 2, "OBJL": 74, "RVER": 1, "AGEN": 230, "FIDN": 706292, "FIDS": 1, "LNAM": "00E6000AC6F40001", "LNAM_REFS": [ "00E6000AC6F50001" ], "FFPT_RIND": [ 2 ], "CATLMK": [ "7" ], "CONVIS": 1, "FUNCTN": [ "30", "31" ], "NATCON": [ "7" ], "SCAMIN": 499999, "SORDAT": "20170801", "SORIND": "ID,ID,graph,Peta 95R6" }, "geometry": { "type": "Point", "coordinates": [ 105.9558074, -6.0226796 ] } },
+{ "type": "Feature", "properties": { "RCID": 2256, "PRIM": 1, "GRUP": 2, "OBJL": 74, "RVER": 1, "AGEN": 230, "FIDN": 712916, "FIDS": 1, "LNAM": "00E6000AE0D40001", "CATLMK": [ "3" ], "COLOUR": [ "3", "1" ], "COLPAT": [ "1" ], "CONVIS": 1, "OBJNAM": "PLTU Tarahan", "SCAMIN": 499999, "SORDAT": "20170701", "SORIND": "ID,ID,graph,peta 94r1 edisi iv cetakan III bpi no. 22-2017" }, "geometry": { "type": "Point", "coordinates": [ 105.3523939, -5.5225733 ] } }
+]
+}

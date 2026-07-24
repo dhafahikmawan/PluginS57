@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "NAVLNE",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 816, "PRIM": 2, "GRUP": 2, "OBJL": 85, "RVER": 1, "AGEN": 230, "FIDN": 706285, "FIDS": 1, "LNAM": "00E6000AC6ED0001", "CATNAV": 3, "ORIENT": 136.0, "SCAMIN": 499999, "SORDAT": "20170801", "SORIND": "ID,ID,graph,Peta 95R6" }, "geometry": { "type": "LineString", "coordinates": [ [ 105.9582802, -6.0201483 ], [ 105.9569555, -6.0187766 ], [ 105.9494744, -6.0110303 ] ] } }
+]
+}

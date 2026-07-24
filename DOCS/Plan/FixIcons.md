@@ -1,69 +1,140 @@
-# Implementation Plan: Fix Icons
+# Implementation Plan: Fix Point Icons Rendering
 
-## Purpose
-Restore S-57 symbol icons in the plugin by ensuring the icon sprite assets are bundled with the plugin and loaded into the host MapLibre style before symbol layers render.
+## Problem Description
+In the S-57 GeoLibre plugin, point features (such as buoys like `BOYSPP` in purpose band 3) are loaded onto the map but do not display their corresponding icons. 
+This occurs because the plugin's `StyleReapplier` (located in [s57StyleRegistry.ts](file:///c:/Users/erwin/OneDrive/Documents/Learning/Plugin%20000/S57Convert/src/lib/styles/s57StyleRegistry.ts)) treats all visual attributes as paint properties. It applies style properties using `map.setPaintProperty`:
 
-## Diagnosis
-- The plugin already selects sprite keys via `src/lib/utils/iconHelper.ts` and assigns them to `iconImage` in `src/lib/styles/s57StyleRegistry.ts`.
-- However, the plugin does not currently make the corresponding sprite sheet available to the host or register icon images in the map style at runtime.
-- The repository contains `Samples/Icons/sprite.png` and `Samples/Icons/sprite.json`, but the build config does not yet bundle or resolve these assets for runtime use.
+```typescript
+paintOps.forEach(([property, value]) => {
+  try {
+    const currentValue = map.getPaintProperty?.(candidateLayerId, property);
+    if (currentValue !== value) {
+      map.setPaintProperty?.(candidateLayerId, property, value);
+    }
+    applied = true;
+  } catch { ... }
+});
+```
 
-## Scope
-- `S57Convert/vite.geolibre.config.ts`
-- `S57Convert/src/geolibre.ts`
-- `S57Convert/src/lib/styles/s57StyleRegistry.ts`
-- `S57Convert/src/lib/geolibre/host-api.ts` (if host contract updates are needed)
-- `S57Convert/src/lib/utils/iconHelper.ts`
-- `S57Convert/tests/iconHelper.test.ts`
-- plugin asset packaging for sprite resources
+However, MapLibre GL / Mapbox GL treats symbol/icon styling attributes (such as `icon-image`, `icon-size`, `icon-allow-overlap`, `icon-ignore-placement`, `text-field`, `text-size`, `text-offset`, `text-anchor`) as **layout properties**, not paint properties. Attempting to get or set them via `getPaintProperty`/`setPaintProperty` fails silently or throws errors, preventing the icons from rendering.
+
+This plan details how to resolve this bug by properly separating layout and paint properties in `StyleReapplier` and using the correct MapLibre API methods (`setLayoutProperty` and `getLayoutProperty`).
+
+---
 
 ## Proposed Changes
 
-### 1. Bundle the sprite assets with the plugin
-- Add `Samples/Icons/sprite.png` and `Samples/Icons/sprite.json` into the plugin asset pipeline.
-- Update `S57Convert/vite.geolibre.config.ts` to include a build step that copies icon assets into `geolibre-plugin/dist`.
-- Prefer a dedicated `public/` or `assets/` folder for plugin runtime assets and configure Vite to preserve them.
+### [s57StyleRegistry.ts](file:///c:/Users/erwin/OneDrive/Documents/Learning/Plugin%20000/S57Convert/src/lib/styles/s57StyleRegistry.ts)
 
-### 2. Resolve sprite asset URLs at runtime
-- Add a new helper in `src/geolibre.ts` to resolve the packaged sprite asset URLs using `app.resolvePluginAssetUrl?.(pluginId, relativePath)`.
-- If the host does not support `resolvePluginAssetUrl`, fall back to a safe built-in URL path or gracefully degrade.
-- Ensure the helper is invoked during plugin activation and when a map instance is available.
-- Write to the console on which method succeeds and which method fails
+We need to modify the type definitions of `map` passed to `reapplyStyle` and split the styling operations inside `StyleReapplier` into **paint properties** and **layout properties**.
 
-### 3. Register icon resources with the map style
-- Add runtime logic in `src/geolibre.ts` for the host map:
-  - Load `sprite.json` and `sprite.png` from the resolved asset URLs.
-  - Register the sprite assets so MapLibre can resolve `icon-image` values like `LIGHTS_RED`, `BOYLAT_RED`, `WRECKS`, etc.
-- If host support exists for image registration, use the native host API to attach these sprite resources; otherwise, use the map instance directly. Refer to how currently the plugin handles style drawing as reference on how to draw any style in the plugin.
-- Ensure this registration happens before any S-57 symbol layers are added.
+#### 1. Update `reapplyStyle` Signature
+Update the `map` argument type declaration to include MapLibre layout setters/getters:
+- `setLayoutProperty?: (layerId: string, property: string, value: unknown) => void`
+- `getLayoutProperty?: (layerId: string, property: string) => unknown`
 
-### 4. Confirm style generation and fallback behavior
-- Review `src/lib/styles/s57StyleRegistry.ts` and verify the symbol style builders always provide:
-  - `iconImage`
-  - `iconSize`
-  - `iconAllowOverlap`
-  - `iconIgnorePlacement`
-- Confirm `selectIconMapping` in `src/lib/utils/iconHelper.ts` returns valid sprite keys for all supported classes, including:
-  - `LIGHTS`, `LITFLT`
-  - `BOYLAT`, `BOYCAR`, `BOYSPP`, `BOYISD`, `BOYSAW`
-  - `BCNLAT`, `BCNCAR`, `BCNSPP`, `BCNISD`
-  - `WRECKS`, `UWTROC`, `OBSTRN`, `LNDMRK`
-- Add a fallback sprite key for unknown point classes so missing class handling degrades gracefully.
+```typescript
+// Replace:
+async reapplyStyle(
+  map: { getStyle?: () => { layers?: Array<{ id?: string; source?: string }> }; setPaintProperty?: (layerId: string, property: string, value: unknown) => void; getPaintProperty?: (layerId: string, property: string) => unknown; setLayerZoomRange?: (layerId: string, minZoom: number, maxZoom?: number) => void },
+  layerId: string,
+  ...
+)
 
-### 5. Adjust or extend host contract if needed
-- If the host does not currently expose sprite registration, document the needed host API behavior in `src/lib/geolibre/host-api.ts`.
-- Ensure `GeoLibreNativeLayerStyle` carries the icon hints the host uses to create a symbol layer.
+// With:
+async reapplyStyle(
+  map: { 
+    getStyle?: () => { layers?: Array<{ id?: string; source?: string }> }; 
+    setPaintProperty?: (layerId: string, property: string, value: unknown) => void; 
+    getPaintProperty?: (layerId: string, property: string) => unknown; 
+    setLayoutProperty?: (layerId: string, property: string, value: unknown) => void; 
+    getLayoutProperty?: (layerId: string, property: string) => unknown; 
+    setLayerZoomRange?: (layerId: string, minZoom: number, maxZoom?: number) => void 
+  },
+  layerId: string,
+  ...
+)
+```
 
-### 6. Add tests and verification
-- Add or extend `S57Convert/tests/iconHelper.test.ts` to cover:
-  - sprite key selection for lights, buoys, beacons, wrecks, underwater rocks, obstructions, landmarks
-  - fallback behavior for unknown classes
-- Add a runtime or manual verification checklist that includes:
-  1. Build the plugin and confirm `sprite.png` and `sprite.json` are present in `geolibre-plugin/dist`.
-  2. Load an S-57 chart and verify lights, buoys, and landmark icons appear.
-  3. Confirm no console errors related to missing sprite assets or unresolved `icon-image` names.
+#### 2. Update `reapplyAllStyles` Signature
+Similarly update the signature of `reapplyAllStyles` to declare layout methods.
 
-## Manual Verification
-- Upload a sample S-57 `.000` file in the plugin.
-- Verify visual icons appear for point-type features such as lights, buoys, beacons, and landmarks.
-- If icons still do not appear, inspect the map style layer entries for `icon-image` values and ensure the sprite names match the registered asset keys.
+```typescript
+// Replace:
+async reapplyAllStyles(map: { getStyle?: () => { layers?: Array<{ id?: string; source?: string }> }; setPaintProperty?: (layerId: string, property: string, value: unknown) => void; getPaintProperty?: (layerId: string, property: string) => unknown }): Promise<number>
+
+// With:
+async reapplyAllStyles(map: { 
+  getStyle?: () => { layers?: Array<{ id?: string; source?: string }> }; 
+  setPaintProperty?: (layerId: string, property: string, value: unknown) => void; 
+  getPaintProperty?: (layerId: string, property: string) => unknown;
+  setLayoutProperty?: (layerId: string, property: string, value: unknown) => void; 
+  getLayoutProperty?: (layerId: string, property: string) => unknown; 
+}): Promise<number>
+```
+
+#### 3. Separate Paint and Layout Operations
+Inside `StyleReapplier`, change `buildPaintOps` to return two separate lists (one for paint properties and one for layout properties), or classify each property type dynamically.
+
+##### Define lists of Layout Properties:
+```typescript
+const LAYOUT_PROPERTIES = new Set([
+  'icon-image',
+  'icon-size',
+  'icon-allow-overlap',
+  'icon-ignore-placement',
+  'text-field',
+  'text-size',
+  'text-offset',
+  'text-anchor',
+  'visibility'
+]);
+```
+
+##### Refactor the apply loop:
+Modify `reapplyStyle` to check the property type and invoke the correct MapLibre method:
+
+```typescript
+// Refactored property application loop in reapplyStyle:
+paintOps.forEach(([property, value]) => {
+  try {
+    if (LAYOUT_PROPERTIES.has(property)) {
+      const currentValue = map.getLayoutProperty?.(candidateLayerId, property);
+      if (currentValue !== value) {
+        map.setLayoutProperty?.(candidateLayerId, property, value);
+      }
+    } else {
+      const currentValue = map.getPaintProperty?.(candidateLayerId, property);
+      if (currentValue !== value) {
+        map.setPaintProperty?.(candidateLayerId, property, value);
+      }
+    }
+    applied = true;
+  } catch {
+    // Ignore transient MapLibre setter failures and retry later.
+  }
+});
+```
+
+---
+
+## Verification Plan
+
+### Automated Verification
+1. Run compilation to ensure TypeScript checks pass:
+   ```bash
+   npm run build
+   ```
+2. Run any unit/integration tests to ensure no regressions:
+   ```bash
+   npm run test
+   ```
+
+### Manual Verification
+1. Open the plugin interface in the host application.
+2. Upload the raw S-57 sample chart file: [ID300071.000](file:///c:/Users/erwin/OneDrive/Documents/Learning/Plugin%20000/Samples/S57/ID300071.000).
+3. Select **Purpose 3** in the UI.
+4. Zoom in on a coordinate containing a special buoy (e.g., coordinates `[105.3916667, -6.1305556]` from `BOYSPP.geojson` corresponding to the "Tsunami RWVS" buoy).
+5. Verify that:
+   - The buoy shows up as an icon from the sprite sheet (e.g. `BOYSPP11`).
+   - Console logs do not print any errors related to layout/paint property mismatch on MapLibre.

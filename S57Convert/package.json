@@ -38,6 +38,10 @@
     "*.css"
   ],
   "scripts": {
+    "generate:sprite-assets": "node scripts/generate-sprite-assets.mjs",
+    "prebuild": "npm run generate:sprite-assets",
+    "prebuild:lib": "npm run generate:sprite-assets",
+    "prebuild:geolibre": "npm run generate:sprite-assets",
     "dev": "vite",
     "build": "npm run build:lib && npm run build:geolibre",
     "build:lib": "tsc -p tsconfig.json && vite build",

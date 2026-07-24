@@ -15,19 +15,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // and falls back to loading from the map instance directly if the host does
 // not support resolvePluginAssetUrl.
 // ---------------------------------------------------------------------------
-const ICON_SRC  = resolve(__dirname, "../Samples/Icons");
-const ICON_DEST = resolve(__dirname, "geolibre-plugin/dist/icons");
-
-function bundleIconAssets(): Plugin {
-  return {
-    name: "geolibre-plugin:bundle-icons",
-    async closeBundle() {
-      await rm(ICON_DEST, { recursive: true, force: true });
-      await cp(ICON_SRC, ICON_DEST, { recursive: true });
-      console.log(`[bundle-icons] Copied sprite assets → geolibre-plugin/dist/icons/`);
-    },
-  };
-}
+// Sprite assets are embedded into the geolibre plugin bundle at build time.
+// No runtime HTTP/file requests are required for sprite.json or sprite.png.
 
 export default defineConfig({
   publicDir: false, // prevent Vite from also copying an unrelated public/ dir
@@ -58,5 +47,5 @@ export default defineConfig({
     sourcemap: false,
     minify: false,
   },
-  plugins: [bundleIconAssets()],
+  plugins: [],
 });

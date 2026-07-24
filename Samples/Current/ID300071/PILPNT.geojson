@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "PILPNT",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 1109, "PRIM": 1, "GRUP": 2, "OBJL": 90, "RVER": 1, "AGEN": 230, "FIDN": 469644, "FIDS": 1, "LNAM": "00E600072A8C0001", "CATPLE": 1, "SCAMIN": 349999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.2814817, -5.6189323 ] } }
+]
+}

@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import { buildS57ConversionBundle, buildConversionBundleFromGeoJSON, S57ConversionBundle, S57LayerData } from '../utils/s57Converter';
-import { triggerGeoJsonZipDownload } from '../utils/downloadZip';
+import { triggerGeoJsonZipDownload, triggerGeoJsonZipDownloadForBundles } from '../utils/downloadZip';
+
+// ── ENC Purpose Labels ───────────────────────────────────────────────────────
+
+const ENC_PURPOSE_LABELS: Record<number, string> = {
+  1: 'Overview',
+  2: 'General',
+  3: 'Coastal',
+  4: 'Approach',
+  5: 'Harbour',
+  6: 'Berthing',
+};
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -19,24 +30,28 @@ interface KeyValuePair {
 interface LoadedFileItem {
   id: number;
   name: string;
+  purposeCode: number;
 }
 
 interface S57UploaderProps {
-  // Callback untuk meregistrasikan layer baru ke GeoLibre Host
+  // Callback para meregistrasikan layer baru ke GeoLibre Host
   onLayersLoaded: (layers: S57LayerData[], purposeCode?: number, fileName?: string) => LoadedFileItem | undefined;
   // Callback untuk menghapus layer yang terdaftar sebelumnya
   onDeleteFile: (fileId: number) => void;
+  onToggleFileVisibility?: (fileId: number, hide?: boolean) => boolean;
   onClearLayers: () => void;
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDeleteFile, onClearLayers }) => {
+export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDeleteFile, onToggleFileVisibility, onClearLayers }) => {
   // Shared state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadedFiles, setLoadedFiles] = useState<LoadedFileItem[]>([]);
+  const [hiddenFileIds, setHiddenFileIds] = useState<Set<number>>(new Set());
   const [conversionBundle, setConversionBundle] = useState<S57ConversionBundle | null>(null);
+  const [conversionBundles, setConversionBundles] = useState<Array<{ id: number; bundle: S57ConversionBundle }>>([]);
   const [purposeCode, setPurposeCode] = useState<number>(1);
 
   // Mode selection state
@@ -78,7 +93,8 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
           setConversionBundle(bundle);
           
           if (loadedFile) {
-            setLoadedFiles(prev => [...prev, loadedFile]);
+            setLoadedFiles(prev => [...prev, { ...loadedFile, purposeCode }]);
+            setConversionBundles(prev => [...prev, { id: loadedFile.id, bundle }]);
           }
         } catch (err: any) {
           setError(err.message || "Gagal mengurai file S-57.");
@@ -228,7 +244,8 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
       const loadedFile = onLayersLoaded(bundle.processedLayers, purposeCode, sourceFileName);
       setConversionBundle(bundle);
       if (loadedFile) {
-        setLoadedFiles(prev => [...prev, loadedFile]);
+        setLoadedFiles(prev => [...prev, { ...loadedFile, purposeCode }]);
+        setConversionBundles(prev => [...prev, { id: loadedFile.id, bundle }]);
       }
 
     } catch (err: any) {
@@ -244,20 +261,52 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
   const handleReset = () => {
     onClearLayers();
     setLoadedFiles([]);
+    setHiddenFileIds(new Set());
     setConversionBundle(null);
+    setConversionBundles([]);
     setError(null);
   };
 
   const handleDeleteFile = (fileId: number) => {
     onDeleteFile(fileId);
     setLoadedFiles(prev => prev.filter(file => file.id !== fileId));
+    setConversionBundles(prev => prev.filter((entry) => entry.id !== fileId));
+    setHiddenFileIds(prev => {
+      const next = new Set(prev);
+      next.delete(fileId);
+      return next;
+    });
+  };
+
+  const handleToggleVisibility = (fileId: number) => {
+    if (!onToggleFileVisibility) return;
+    const isNowHidden = onToggleFileVisibility(fileId);
+    setHiddenFileIds(prev => {
+      const next = new Set(prev);
+      if (isNowHidden) {
+        next.add(fileId);
+      } else {
+        next.delete(fileId);
+      }
+      return next;
+    });
   };
 
   // ── Download handler ─────────────────────────────────────────────────────
 
   const handleDownloadZip = async () => {
-    if (!conversionBundle) return;
-    await triggerGeoJsonZipDownload(conversionBundle, conversionBundle.sourceFileName.replace(/\.000$/i, ''));
+    if (conversionBundles.length === 0) return;
+
+    if (conversionBundles.length === 1) {
+      const bundle = conversionBundles[0].bundle;
+      await triggerGeoJsonZipDownload(bundle, bundle.sourceFileName.replace(/\.000$/i, ''));
+      return;
+    }
+
+    await triggerGeoJsonZipDownloadForBundles(
+      conversionBundles.map((entry) => entry.bundle),
+      'all-converted-files',
+    );
   };
 
   // ── Render ───────────────────────────────────────────────────────────────
@@ -455,7 +504,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
                         className="remove-param-button"
                         title="Delete parameter"
                       >
-                        🗑️
+                        <span aria-hidden="true">✕</span>
                       </button>
                     </div>
                   ))}
@@ -481,16 +530,37 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
             <h4>Loaded layers</h4>
             <ul className="loaded-list">
               {loadedFiles.map((file) => (
-                <li key={file.id} className="loaded-file-item">
-                  <span className="file-name">📄 {file.name}</span>
-                  <button
-                    type="button"
-                    className="delete-file-button"
-                    onClick={() => handleDeleteFile(file.id)}
-                    title={`Delete ${file.name}`}
-                  >
-                    🗑️
-                  </button>
+                <li key={file.id} className={`loaded-file-item ${hiddenFileIds.has(file.id) ? 'is-hidden' : ''}`}>
+                  <div className="file-info">
+                    <span className="file-name">📄 {file.name}</span>
+                    <span
+                      className={`enc-purpose-badge enc-purpose-${file.purposeCode}`}
+                      title={`ENC Purpose ${file.purposeCode}`}
+                    >
+                      {file.purposeCode} · {ENC_PURPOSE_LABELS[file.purposeCode] ?? `Purpose ${file.purposeCode}`}
+                    </span>
+                  </div>
+                  <div className="file-item-actions">
+                    <label
+                      className="toggle-visibility-checkbox-label"
+                      title={hiddenFileIds.has(file.id) ? `Show ${file.name}` : `Hide ${file.name}`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="toggle-visibility-checkbox"
+                        checked={!hiddenFileIds.has(file.id)}
+                        onChange={() => handleToggleVisibility(file.id)}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="delete-file-button"
+                      onClick={() => handleDeleteFile(file.id)}
+                      title={`Delete ${file.name}`}
+                    >
+                      <span aria-hidden="true">✕</span>
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>

@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "PIPSOL",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 568, "PRIM": 2, "GRUP": 2, "OBJL": 94, "RVER": 1, "AGEN": 230, "FIDN": 586965, "FIDS": 1, "LNAM": "00E60008F4D50001", "SCAMIN": 499999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "LineString", "coordinates": [ [ 106.0000025, -5.9160525 ], [ 105.9996112, -5.9155798 ] ] } },
+{ "type": "Feature", "properties": { "RCID": 905, "PRIM": 2, "GRUP": 2, "OBJL": 94, "RVER": 1, "AGEN": 230, "FIDN": 587093, "FIDS": 1, "LNAM": "00E60008F5550001", "CATPIP": [ "6" ], "SCAMIN": 499999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "LineString", "coordinates": [ [ 106.0000025, -5.4319973 ], [ 105.9859537, -5.4166747 ] ] } },
+{ "type": "Feature", "properties": { "RCID": 1028, "PRIM": 2, "GRUP": 2, "OBJL": 94, "RVER": 1, "AGEN": 230, "FIDN": 587127, "FIDS": 1, "LNAM": "00E60008F5770001", "CATPIP": [ "6" ], "SCAMIN": 499999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "LineString", "coordinates": [ [ 105.923349, -5.4166747 ], [ 105.9328863, -5.4296872 ], [ 105.9386003, -5.4374832 ], [ 105.9416666, -5.4416667 ] ] } },
+{ "type": "Feature", "properties": { "RCID": 2111, "PRIM": 2, "GRUP": 2, "OBJL": 94, "RVER": 1, "AGEN": 230, "FIDN": 587095, "FIDS": 1, "LNAM": "00E60008F5570001", "CATPIP": [ "6" ], "SCAMIN": 499999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "LineString", "coordinates": [ [ 106.0000025, -5.4353457 ], [ 105.9828878, -5.4166747 ] ] } }
+]
+}

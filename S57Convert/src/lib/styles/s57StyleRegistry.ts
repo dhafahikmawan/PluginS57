@@ -1,5 +1,8 @@
 import type { GeoLibreNativeLayerStyle } from '../geolibre/host-api';
 import { selectIconMapping } from '../utils/iconHelper';
+import { ensureResarePatternsAdded } from '../utils/patternGenerator';
+
+//Style flag: StyleApplicationMode 'all' | 'zoom-only' | 'none'
 
 export type S57LayerFamily =
   | 'base'
@@ -12,17 +15,25 @@ export type S57LayerFamily =
   | 'routing'
   | 'sounding'
   | 'label'
+  | 'other'
   | 'tsslpt'
   | 'tss_arrows';
+
+export type ExtendedLayerStyle = GeoLibreNativeLayerStyle & {
+  fillPattern?: string;
+  textColor?: string;
+};
 
 export interface S57StyleSelection {
   family: S57LayerFamily;
   priority: number;
   minZoom: number;
   maxZoom?: number;
-  style: GeoLibreNativeLayerStyle;
+  style: ExtendedLayerStyle;
   labelField?: string;
 }
+
+export type StyleApplicationMode = 'all' | 'zoom-only' | 'none';
 
 interface TrackedS57Style {
   layerId: string;
@@ -73,16 +84,36 @@ export class StyleTracker {
   }
 }
 
+const LAYOUT_PROPERTIES = new Set([
+  'icon-image',
+  'icon-size',
+  'icon-allow-overlap',
+  'icon-ignore-placement',
+  'text-field',
+  'text-size',
+  'text-offset',
+  'text-anchor',
+]);
+
 export class StyleReapplier {
   constructor(private readonly tracker: StyleTracker = new StyleTracker()) {}
 
   async reapplyStyle(
-    map: { getStyle?: () => { layers?: Array<{ id?: string; source?: string }> }; setPaintProperty?: (layerId: string, property: string, value: unknown) => void; getPaintProperty?: (layerId: string, property: string) => unknown; setLayerZoomRange?: (layerId: string, minZoom: number, maxZoom?: number) => void },
+    map: {
+      getStyle?: () => { layers?: Array<{ id?: string; source?: string }> };
+      setPaintProperty?: (layerId: string, property: string, value: unknown) => void;
+      getPaintProperty?: (layerId: string, property: string) => unknown;
+      setLayoutProperty?: (layerId: string, property: string, value: unknown) => void;
+      getLayoutProperty?: (layerId: string, property: string) => unknown;
+      setLayerZoomRange?: (layerId: string, minZoom: number, maxZoom?: number) => void;
+    },
     layerId: string,
     styleSelection?: S57StyleSelection | null,
     classCode?: string,
     attributes: Record<string, unknown> = {},
     targetName?: string,
+    isLayerHidden?: (trackedLayerId: string) => boolean,
+    mode: StyleApplicationMode = 'all',
   ): Promise<boolean> {
     const trackedStyle = styleSelection
       ? { layerId, styleSelection, classCode: classCode ?? '', attributes }
@@ -90,6 +121,13 @@ export class StyleReapplier {
 
     if (!trackedStyle || !map || typeof map.getStyle !== 'function') {
       return false;
+    }
+
+    const applyZoomRange = mode !== 'none';
+    const applyPaintOps = mode === 'all';
+
+    if (applyPaintOps) {
+      ensureResarePatternsAdded(map);
     }
 
     const candidateLayerIds = this.getCandidateLayerIds(map, layerId, targetName);
@@ -104,7 +142,7 @@ export class StyleReapplier {
       const minZoom = trackedStyle.styleSelection.minZoom;
       const maxZoom = trackedStyle.styleSelection.maxZoom;
 
-      if (minZoom !== undefined) {
+      if (applyZoomRange && minZoom !== undefined) {
         try {
           if (maxZoom !== undefined) {
             map.setLayerZoomRange?.(candidateLayerId, minZoom, maxZoom);
@@ -117,28 +155,61 @@ export class StyleReapplier {
         }
       }
 
-      paintOps.forEach(([property, value]) => {
-        try {
-          const currentValue = map.getPaintProperty?.(candidateLayerId, property);
-          if (currentValue !== value) {
-            map.setPaintProperty?.(candidateLayerId, property, value);
+      if (applyPaintOps) {
+        paintOps.forEach(([property, value]) => {
+          try {
+            if (LAYOUT_PROPERTIES.has(property)) {
+              const currentValue = map.getLayoutProperty?.(candidateLayerId, property);
+              if (currentValue !== value) {
+                map.setLayoutProperty?.(candidateLayerId, property, value);
+              }
+            } else {
+              const currentValue = map.getPaintProperty?.(candidateLayerId, property);
+              if (currentValue !== value) {
+                map.setPaintProperty?.(candidateLayerId, property, value);
+              }
+            }
+            applied = true;
+          } catch {
+            // Ignore transient MapLibre setter failures and retry later.
           }
-          applied = true;
+        });
+      }
+    });
+
+    // After style reapplication, re-enforce visibility: none for layers belonging
+    // to a file that the user has toggled off. This prevents style-reload events
+    // from inadvertently resetting hidden layers back to visible.
+    if (isLayerHidden?.(layerId)) {
+      candidateLayerIds.forEach((candidateLayerId) => {
+        try {
+          map.setLayoutProperty?.(candidateLayerId, 'visibility', 'none');
         } catch {
-          // Ignore transient MapLibre setter failures and retry later.
+          // Ignore transient setter failures.
         }
       });
-    });
+    }
 
     return applied;
   }
 
-  async reapplyAllStyles(map: { getStyle?: () => { layers?: Array<{ id?: string; source?: string }> }; setPaintProperty?: (layerId: string, property: string, value: unknown) => void; getPaintProperty?: (layerId: string, property: string) => unknown }): Promise<number> {
+  async reapplyAllStyles(
+    map: {
+      getStyle?: () => { layers?: Array<{ id?: string; source?: string }> };
+      setPaintProperty?: (layerId: string, property: string, value: unknown) => void;
+      getPaintProperty?: (layerId: string, property: string) => unknown;
+      setLayoutProperty?: (layerId: string, property: string, value: unknown) => void;
+      getLayoutProperty?: (layerId: string, property: string) => unknown;
+      setLayerZoomRange?: (layerId: string, minZoom: number, maxZoom?: number) => void;
+    },
+    isLayerHidden?: (trackedLayerId: string) => boolean,
+    mode: StyleApplicationMode = 'all',
+  ): Promise<number> {
     const trackedLayers = this.tracker.getAllTrackedLayers();
     let appliedCount = 0;
 
     for (const trackedLayerId of trackedLayers) {
-      const applied = await this.reapplyStyle(map, trackedLayerId);
+      const applied = await this.reapplyStyle(map, trackedLayerId, null, undefined, {}, undefined, isLayerHidden, mode);
       if (applied) {
         appliedCount += 1;
       }
@@ -147,7 +218,7 @@ export class StyleReapplier {
     return appliedCount;
   }
 
-  private buildPaintOps(style: GeoLibreNativeLayerStyle): Array<[string, unknown]> {
+  private buildPaintOps(style: ExtendedLayerStyle): Array<[string, unknown]> {
     const paintOps: Array<[string, unknown]> = [];
 
     if (style.fillColor) {
@@ -209,6 +280,14 @@ export class StyleReapplier {
 
     if (style.textAnchor) {
       paintOps.push(['text-anchor', style.textAnchor]);
+    }
+
+    if (style.fillPattern) {
+      paintOps.push(['fill-pattern', style.fillPattern]);
+    }
+
+    if (style.textColor) {
+      paintOps.push(['text-color', style.textColor]);
     }
 
     return paintOps;
@@ -278,7 +357,7 @@ const NAVIGATION_CLASSES = new Set(['LIGHTS', 'BOYINB', 'BOYISD', 'BCNARE', 'BCN
 const ROUTING_CLASSES = new Set(['SEAARE', 'TSSRON', 'TSELNE', 'TSSBND', 'TRFLNE']);
 const SOUNDING_CLASSES = new Set(['SOUNDG', 'SOUNDG_PROCESSED']);
 const LANDMARK_CLASSES = new Set(['LNDMRK']);
-const LABEL_CLASSES = new Set(['TEXT', 'M_ACCY', 'M_NPUB']);
+const LABEL_CLASSES = new Set(['TEXT', 'M_ACCY']);
 const TSSLPT_CLASSES = new Set(['TSSLPT']);
 const TSS_ARROW_CLASSES = new Set(['TSS_ARROWS']);
 const BASE_CHART_CLASSES = new Set(['LNDARE', 'DEPARE', 'DRGARE', 'COALNE', 'FLODOC', 'PONTON', 'UNSARE', 'HULKES', 'LAKARE', 'BUAARE', 'RIVERS', 'CANALS', 'ROADWY', 'SLCONS', 'BRIDGE']);
@@ -351,7 +430,6 @@ function getLayerZoomRange(classCode: string, purposeCode?: string | number): { 
   if (normalizedCode === 'DEPCNT') {
     return { minZoom: Math.max(purposeRange.minZoom, 5), maxZoom: purposeRange.maxZoom };
   }
-
   if (normalizedCode === 'SOUNDG' || normalizedCode === 'SOUNDG_PROCESSED') {
     return { minZoom: Math.max(purposeRange.minZoom, 7), maxZoom: purposeRange.maxZoom };
   }
@@ -389,7 +467,8 @@ function getLayerZoomRange(classCode: string, purposeCode?: string | number): { 
   }
 
   if (normalizedCode === 'LIGHT_SECTORS' || normalizedCode.startsWith('LIGHT_SECTORS--')) {
-    return { minZoom: Math.min(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
+    //if(Math.min(purposeRange.minZoom, 9))
+    return { minZoom: purposeRange.minZoom === 0?0:Math.max(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
   }
 
   if (normalizedCode === 'LITFLT' || normalizedCode === 'MORFAC') {
@@ -438,13 +517,22 @@ function buildContourStyle(attributes: Record<string, unknown>): GeoLibreNativeL
   };
 }
 
-function buildRestrictedStyle(): GeoLibreNativeLayerStyle {
+function buildRestrictedStyle(attributes: Record<string, unknown>): ExtendedLayerStyle {
+  const restrn = asString(attributes.RESTRN) ?? '';
+  let fillPattern = 'RESARE_pattern';
+
+  if (restrn.includes('14')) {
+    fillPattern = 'ENTPRO_pattern';
+  } else if (restrn.includes('1')) {
+    fillPattern = 'NOANCHR_pattern';
+  }
+
   return {
-    fillColor: COLORS.TRFCD,
-    fillOpacity: 0.2,
+    fillPattern,
     strokeColor: COLORS.TRFCD,
-    strokeWidth: 1.5,
-    strokeDasharray: '6,4',
+    strokeWidth: 2,
+    strokeDasharray: '4,4',
+    textColor: COLORS.TRFCD,
   };
 }
 
@@ -559,6 +647,27 @@ function buildLabelStyle(): GeoLibreNativeLayerStyle {
   };
 }
 
+function buildMNPUBStyle(): GeoLibreNativeLayerStyle {
+  return {
+    strokeColor: COLORS.CHGRY,
+    strokeWidth: 1,
+    strokeDasharray: '4,4',
+    fillOpacity: 0,
+  };
+}
+
+function buildCtnareStyle(): GeoLibreNativeLayerStyle {
+  // CTNARE (Cable Area): outline-only, matching Samples/MAP areaOutlines behavior.
+  // Rendered as a dashed magenta line (TRFCD) with no fill, consistent with the
+  // generic polygon viewing group (39000) used by Samples/MAP.
+  return {
+    strokeColor: COLORS.TRFCD,
+    strokeWidth: 2,
+    strokeDasharray: '4,4',
+    fillOpacity: 0,
+  };
+}
+
 export function selectS57LayerStyle(
   classCode: string,
   attributes: Record<string, unknown> = {},
@@ -610,7 +719,8 @@ export function selectS57LayerStyle(
       priority: 35000,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
-      style: buildRestrictedStyle(),
+      style: buildRestrictedStyle(normalizedAttributes),
+      labelField: asString(normalizedAttributes.OBJNAM) ?? undefined,
     };
   }
 
@@ -653,7 +763,7 @@ export function selectS57LayerStyle(
     return {
       family: 'tsslpt',
       priority: 75000,
-      minZoom: 8,
+      minZoom: Math.max(zoomRange.minZoom, 8),
       maxZoom: zoomRange.maxZoom,
       style: buildTSSLPTStyle(normalizedAttributes),
     };
@@ -698,6 +808,26 @@ export function selectS57LayerStyle(
       maxZoom: zoomRange.maxZoom,
       style: buildLandmarkSymbolStyle(normalizedAttributes),
       labelField: asString(normalizedAttributes.OBJNAM) ?? undefined,
+    };
+  }
+
+  if (normalizedCode === 'CTNARE') {
+    return {
+      family: 'other',
+      priority: 39000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildCtnareStyle(),
+    };
+  }
+
+  if (normalizedCode === 'M_NPUB') {
+    return {
+      family: 'other',
+      priority: 40000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildMNPUBStyle(),
     };
   }
 

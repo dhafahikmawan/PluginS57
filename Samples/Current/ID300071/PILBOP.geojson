@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "PILBOP",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 1042, "PRIM": 1, "GRUP": 2, "OBJL": 91, "RVER": 1, "AGEN": 230, "FIDN": 586744, "FIDS": 1, "LNAM": "00E60008F3F80001", "CATPIL": 1, "OBJNAM": "Cigading (Cape Size)", "INFORM": "Waiting Area", "SCAMIN": 499999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.916648, -6.0249925 ] } },
+{ "type": "Feature", "properties": { "RCID": 2112, "PRIM": 1, "GRUP": 2, "OBJL": 91, "RVER": 1, "AGEN": 230, "FIDN": 672928, "FIDS": 1, "LNAM": "00E6000A44A00001", "CATPIL": 1, "SCAMIN": 499999, "SORDAT": "20170401", "SORIND": "ID,ID,graph,peta 71 edisi xiv cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 104.6346853, -5.5631851 ] } },
+{ "type": "Feature", "properties": { "RCID": 5012, "PRIM": 1, "GRUP": 2, "OBJL": 91, "RVER": 1, "AGEN": 230, "FIDN": 1512417, "FIDS": 1, "LNAM": "00E6001713E10001", "CATPIL": 1, "INFORM": "Lokasi naik turun Pandu", "SCAMIN": 499999, "SORDAT": "20210719", "SORIND": "ID,ID,publn,26/354-2021" }, "geometry": { "type": "Point", "coordinates": [ 104.7083333, -5.6527778 ] } }
+]
+}

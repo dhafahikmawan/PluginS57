@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "ASLXIS",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 2430, "PRIM": 2, "GRUP": 2, "OBJL": 162, "RVER": 1, "AGEN": 230, "FIDN": 1036577, "FIDS": 1, "LNAM": "00E6000FD1210001", "NATION": "ID", "INFORM": "Archipelagic Sea Lane Axis Line", "NINFOM": "Garis Aksis Alur Laut Kepulauan Indonesia", "SCAMIN": 699999, "TXTDSC": "IDD11B03.TXT" }, "geometry": { "type": "LineString", "coordinates": [ [ 104.622622, -6.42068 ], [ 104.6902778, -6.4125 ], [ 105.5541667, -6.3083333 ], [ 105.7722222, -5.9541667 ], [ 105.8093687, -5.8941881 ], [ 105.8216865, -5.8742991 ], [ 105.8340044, -5.8544101 ], [ 106.0000025, -5.5863813 ] ] } }
+]
+}

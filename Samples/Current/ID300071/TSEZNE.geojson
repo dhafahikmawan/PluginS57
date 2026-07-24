@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "TSEZNE",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 135, "PRIM": 3, "GRUP": 2, "OBJL": 150, "RVER": 1, "AGEN": 230, "FIDN": 786416, "FIDS": 1, "LNAM": "00E6000BFFF00001", "CATTSS": 1, "DATSTA": "20200701", "STATUS": [ "1" ], "INFORM": "TRAFFIC SEPARATION SCHEME IN THE SUNDA STRAIT IS IMO ADOPTED AND IT WILL BE COME INTO FORCE ON 1ST JULY 2020. VESSELS USING THE TRAFFIC LANES MUST COMPLY WITH RULE 10 OF THE COLREG 1972.", "TXTDSC": "IDTSS170.TXT" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 105.8596667, -5.8176667 ], [ 105.836, -5.8556667 ], [ 105.8340044, -5.8544101 ], [ 105.8340043, -5.8544101 ], [ 105.8315, -5.8528333 ], [ 105.8551667, -5.8148333 ], [ 105.8575545, -5.8163328 ], [ 105.8596667, -5.8176667 ] ] ] } }
+]
+}

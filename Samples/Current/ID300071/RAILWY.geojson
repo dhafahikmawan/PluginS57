@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "RAILWY",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 2214, "PRIM": 2, "GRUP": 2, "OBJL": 106, "RVER": 1, "AGEN": 230, "FIDN": 468699, "FIDS": 1, "LNAM": "00E6000726DB0001", "INFORM": "To Jakarta", "NINFOM": "Ke Jakarta", "SCAMIN": 259999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "LineString", "coordinates": [ [ 105.8261501, -6.3807031 ], [ 105.8355266, -6.3871223 ], [ 105.856247, -6.3876557 ], [ 105.8625164, -6.3916469 ], [ 105.8740257, -6.3917756 ] ] } },
+{ "type": "Feature", "properties": { "RCID": 2247, "PRIM": 2, "GRUP": 2, "OBJL": 106, "RVER": 1, "AGEN": 230, "FIDN": 586843, "FIDS": 1, "LNAM": "00E60008F45B0001", "SCAMIN": 259999, "SORDAT": "20180101", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "LineString", "coordinates": [ [ 105.8992304, -6.0671056 ], [ 105.9102948, -6.0613583 ], [ 105.9164338, -6.0586178 ], [ 105.9193374, -6.0573721 ], [ 105.9350997, -6.0404304 ], [ 105.9453867, -6.0300491 ], [ 105.9575818, -6.0233993 ], [ 105.9690303, -6.0229841 ], [ 105.9811424, -6.0168382 ], [ 105.9821379, -6.0156698 ], [ 105.9974026, -6.014507 ] ] } }
+]
+}

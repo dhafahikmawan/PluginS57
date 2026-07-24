@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+"name": "C_AGGR",
+"features": [
+{ "type": "Feature", "properties": { "RCID": 5702, "PRIM": 255, "GRUP": 2, "OBJL": 400, "RVER": 1, "AGEN": 230, "FIDN": 714247, "FIDS": 1, "LNAM": "00E6000AE6070001", "LNAM_REFS": [ "00E6000AC6ED0001", "00E6000AC6F20001", "00E6000AC6EE0001" ], "FFPT_RIND": [ 3, 3, 3 ], "OBJNAM": "Ciwandan Port Leading Lights" }, "geometry": null }
+]
+}

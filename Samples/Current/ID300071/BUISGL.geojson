@@ -1,0 +1,14 @@
+{
+"type": "FeatureCollection",
+"name": "BUISGL",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 317, "PRIM": 1, "GRUP": 2, "OBJL": 12, "RVER": 1, "AGEN": 230, "FIDN": 673257, "FIDS": 1, "LNAM": "00E6000A45E90001", "INFORM": "House with a zinc roof", "NINFOM": "Rumah Beratap Seng", "SCAMIN": 259999, "SORDAT": "20170401", "SORIND": "ID,ID,graph,peta 71 edisi xiv cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 104.7011381, -5.824143 ] } },
+{ "type": "Feature", "properties": { "RCID": 1209, "PRIM": 1, "GRUP": 2, "OBJL": 12, "RVER": 1, "AGEN": 230, "FIDN": 590958, "FIDS": 1, "LNAM": "00E60009046E0001", "OBJNAM": "PLTU", "SCAMIN": 259999, "SORDAT": "20170401", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.9846133, -5.9942982 ] } },
+{ "type": "Feature", "properties": { "RCID": 1260, "PRIM": 1, "GRUP": 2, "OBJL": 12, "RVER": 1, "AGEN": 230, "FIDN": 892282, "FIDS": 1, "LNAM": "00E6000D9D7A0001", "OBJNAM": "Karya Tani", "SCAMIN": 259999 }, "geometry": { "type": "Point", "coordinates": [ 105.78957, -5.451549 ] } },
+{ "type": "Feature", "properties": { "RCID": 1453, "PRIM": 1, "GRUP": 2, "OBJL": 12, "RVER": 1, "AGEN": 230, "FIDN": 472270, "FIDS": 1, "LNAM": "00E6000734CE0001", "FUNCTN": [ "26" ], "SCAMIN": 259999, "SORDAT": "20170401", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.5915501, -5.7396455 ] } },
+{ "type": "Feature", "properties": { "RCID": 1718, "PRIM": 1, "GRUP": 2, "OBJL": 12, "RVER": 1, "AGEN": 230, "FIDN": 467109, "FIDS": 1, "LNAM": "00E6000720A50001", "FUNCTN": [ "26" ], "SCAMIN": 259999, "SORDAT": "20170401", "SORIND": "ID,ID,graph,peta 71 Edisi XIV Cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 105.5228622, -5.6915595 ] } },
+{ "type": "Feature", "properties": { "RCID": 1865, "PRIM": 1, "GRUP": 2, "OBJL": 12, "RVER": 1, "AGEN": 230, "FIDN": 892286, "FIDS": 1, "LNAM": "00E6000D9D7E0001", "OBJNAM": "Bunut", "SCAMIN": 259999 }, "geometry": { "type": "Point", "coordinates": [ 105.7713015, -5.6333667 ] } },
+{ "type": "Feature", "properties": { "RCID": 2433, "PRIM": 1, "GRUP": 2, "OBJL": 12, "RVER": 1, "AGEN": 230, "FIDN": 672979, "FIDS": 1, "LNAM": "00E6000A44D30001", "SCAMIN": 259999, "SORDAT": "20170401", "SORIND": "ID,ID,graph,peta 71 edisi xiv cetakan 3, bpi no 35 2016" }, "geometry": { "type": "Point", "coordinates": [ 104.6021183, -5.4956671 ] } }
+]
+}

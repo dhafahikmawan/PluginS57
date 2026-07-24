@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "PRCARE",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "RCID": 639, "PRIM": 3, "GRUP": 2, "OBJL": 96, "RVER": 1, "AGEN": 230, "FIDN": 786420, "FIDS": 1, "LNAM": "00E6000BFFF40001", "DATSTA": "20200701", "STATUS": [ "1" ], "INFORM": "PRECAUTIONARY AREA WITH RECOMMENDED DIRECTIONS OF TRAFFIC FLOW \"IN THE SUNDA STRAIT\"", "TXTDSC": "ID0PA170.TXT" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 105.8315, -5.8528333 ], [ 105.8153333, -5.8428333 ], [ 105.8101702, -5.8594635 ], [ 105.808162, -5.8659316 ], [ 105.801, -5.889 ], [ 105.8093333, -5.8941667 ], [ 105.8093687, -5.8941881 ], [ 105.8181667, -5.8995 ], [ 105.8351322, -5.8826177 ], [ 105.8521667, -5.8656667 ], [ 105.836, -5.8556667 ], [ 105.8340044, -5.8544101 ], [ 105.8340043, -5.8544101 ], [ 105.8315, -5.8528333 ] ] ] } }
+]
+}

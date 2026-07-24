@@ -1,4 +1,4 @@
-import type { IControl, Map as MapLibreMap, MapMouseEvent } from 'maplibre-gl';
+import type { GeoJSONFeature, IControl, Map as MapLibreMap, MapMouseEvent } from 'maplibre-gl';
 import type {
   PluginControlOptions,
   PluginState,
@@ -8,6 +8,7 @@ import type {
 import type { DeepLinkConsumer } from '../utils/deep-link';
 import type { GeoLibreNativeLayerRegistration } from '../geolibre/host-api';
 import { getS57Acronym } from '../utils/s57ObjectClasses';
+
 
 
 
@@ -24,7 +25,7 @@ import { getS57Acronym } from '../utils/s57ObjectClasses';
 const DEFAULT_OPTIONS: Required<PluginControlOptions> = {
   collapsed: true,
   position: 'top-right',
-  title: 'S-57 Marine Chart Reader Feature Selector',
+  title: 'S-57 Feature Selector',
   panelWidth: 300,
   className: '',
   pickFiles: () => Promise.resolve(null),
@@ -57,10 +58,14 @@ export class PluginControl implements IControl, DeepLinkConsumer {
   private _panel?: HTMLElement;
   private _status?: HTMLElement;
   private _getFeaturesButton?: HTMLElement;
+  private _featuresDisplay?: HTMLElement;
+  private _featuresDisplaySelect?: HTMLSelectElement;
+  private _featuresDisplayContent?: HTMLElement;
   private _options: Required<PluginControlOptions>;
   private _state: PluginState;
   private _eventHandlers: EventHandlersMap = new globalThis.Map();
   private _selectActive : boolean;
+  private _featureCollection : Array<GeoJSONFeature["properties"]> = []; 
 
   // Ids of native layers this control has registered with the host, so they can
   // be unregistered when the control is removed.
@@ -220,6 +225,8 @@ export class PluginControl implements IControl, DeepLinkConsumer {
       this._getFeaturesButton.style.background = "var(--pc-accent)";
       this._getFeaturesButton.textContent = "Start Selecting Features";
     }
+    this.removeAllChildNodes(this._featuresDisplay);
+    this.removeAllChildNodes(this._featuresDisplayContent);
   }
 
   /**
@@ -406,6 +413,126 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     return container;
   }
 
+
+  private removeAllChildNodes(parent? : HTMLElement){
+    if(parent){
+      while(parent.firstChild){
+        parent.removeChild(parent.firstChild);
+      }
+    }
+  }
+
+  private drawFeatureProperties(){
+    const placeholder = document.createElement("option");
+    placeholder.text = "Select the feature to show";
+    placeholder.value = "placeholder";
+    this._featuresDisplaySelect?.appendChild(placeholder);
+    this._featureCollection.forEach((feature)=>{
+      const option = document.createElement("option");
+      option.style.backgroundColor = "black";
+      option.text = feature.ACRONYM + ": RCID - " + feature.RCID;
+      option.value = feature.OBJL;
+      if(this._featuresDisplaySelect){
+        this._featuresDisplaySelect.appendChild(option);
+      } 
+    })
+  }
+
+  private getDisplayedFeature(event : Event){
+    console.log("Event");
+    console.log(event);
+    const target = event.target as HTMLSelectElement;
+    console.log("displaying feature");
+    let displayedFeature : GeoJSONFeature["properties"] = {};
+    /*
+    if(!this._featuresDisplaySelect){
+      console.log("!_featuresDisplaySelect");
+      console.log(this,this._featuresDisplaySelect);
+      console.log("search by id:");
+      console.log(document.getElementById("feature-select"))
+      return;
+    }
+    const objlquery = this._featuresDisplaySelect.value;
+    */
+   if(!target || target.value === "placeholder") return;
+   const objlquery = target.value;
+    console.log("Objlquery: ", objlquery);
+    for(const feature of this._featureCollection){
+      console.log("collection objl: ");
+      console.log(feature.OBJL);
+      if(String(feature.OBJL) === objlquery){
+        displayedFeature = feature;
+        break;
+      }
+    }
+    console.log("displayed feature: ");
+    console.log(displayedFeature);
+    if(!displayedFeature) return;
+    const featureTable = document.createElement("table");
+    featureTable.style.width = "100%";
+    featureTable.style.margin = "5px";
+    this.removeAllChildNodes(this._featuresDisplayContent);
+    /*
+    const thead = document.createElement("th");
+    const title = document.createElement("tr");
+    title.textContent = displayedFeature.ACRONYM;
+
+    thead.appendChild(title);
+    featureTable.appendChild(thead);
+
+    */
+    Object.entries(displayedFeature).forEach(([key, value])=>{
+      if(key !== "ACRONYM"){
+        const row = document.createElement("tr");
+        row.style.border = "1px solid #6b7280";
+        row.style.paddingTop = "5px";
+        row.style.paddingBottom = "5px"
+        const _key = document.createElement("td");
+        _key.style.width = "25%";
+        const _value = document.createElement("td");
+        _value.style.width = "75%"
+        _key.textContent = key;
+        _value.textContent = String(value);
+        row.appendChild(_key);
+        row.appendChild(_value);
+        featureTable.appendChild(row);
+      }
+    })
+    this._featuresDisplayContent?.appendChild(featureTable);
+
+  }
+
+  private displayFeatures(){
+    //cleanup
+    this.removeAllChildNodes(this._featuresDisplay)
+    const featuresDisplaySelect = document.createElement("select");
+    featuresDisplaySelect.className="feature-select";
+    featuresDisplaySelect.id="feature-select";
+    featuresDisplaySelect.style.width = "100%";
+    featuresDisplaySelect.style.border = "1px solid #6b7280";
+    featuresDisplaySelect.style.textAlign = "center";
+    featuresDisplaySelect.style.marginBottom = "2px";
+    featuresDisplaySelect.style.marginLeft = "5px";
+    featuresDisplaySelect.style.marginRight = "5px";
+    featuresDisplaySelect.style.fontSize = "16px";
+    featuresDisplaySelect.style.fontWeight = "bold";
+    featuresDisplaySelect.style.paddingTop = "5px";
+    featuresDisplaySelect.style.paddingBottom = "5px";
+    this._featuresDisplaySelect = featuresDisplaySelect;
+    if(!this._featuresDisplaySelect){
+      console.log("!_featuresDisplaySelect");
+      return;
+    }else{
+      console.log("Exists");
+      console.log(this._featuresDisplaySelect);
+    }
+    this._featuresDisplaySelect.addEventListener('change', (event) => this.getDisplayedFeature(event));
+    
+
+    this._featuresDisplay?.appendChild(this._featuresDisplaySelect);
+    this.drawFeatureProperties();
+
+  }
   /**
    * Creates the panel element with header and content areas.
    * Panel is positioned as a dropdown below the toggle button.
@@ -443,6 +570,23 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     placeholder.className = 'plugin-control-placeholder';
     placeholder.textContent = 'This will display the properties of the features clicked on the map';
 
+    const featureContent = document.createElement('div');
+    //featureContent.style.justifyContent = "center";
+    featureContent.style.width = "80%";
+    featureContent.style.margin = "auto"
+
+
+    const featureDisplay = document.createElement('div');
+    this._featuresDisplay = featureDisplay;
+
+    const featureDisplayContent = document.createElement('div');
+    this._featuresDisplayContent = featureDisplayContent;
+
+    featureContent.appendChild(featureDisplay);
+    featureContent.appendChild(featureDisplayContent);
+    
+
+
     // Demonstrate the GeoLibre host callbacks end to end. These buttons drive
     // `openFiles()` and `loadFromUrl()`, which call the host-provided pickers
     // and native-layer registration. Outside GeoLibre they fall back to no-ops.
@@ -466,7 +610,10 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     status.textContent = '';
     this._status = status;
 
+    //content.appendChild(featureDisplayContent);
+
     content.appendChild(placeholder);
+    content.appendChild(featureContent)
     content.appendChild(actions);
     content.appendChild(status);
 
@@ -593,7 +740,8 @@ export class PluginControl implements IControl, DeepLinkConsumer {
       return;
     }
     try{
-        const featureProperties : Array<object> = [];
+        this._featureCollection = [];
+        //const featureProperties : Array<object> = [];
         const features = map.queryRenderedFeatures(event.point);
         if(!features || features.length === 0) return;
         
@@ -602,15 +750,15 @@ export class PluginControl implements IControl, DeepLinkConsumer {
           const rawCode: any = feature.properties?.OBJL || feature.properties?.OBJ_CLASS;
           const codeStr = rawCode != null ? String(rawCode) : "UNKNOWN"; 
           feature.properties.ACRONYM = getS57Acronym(codeStr);
-          if(feature.properties.OBJL) featureProperties.push(feature.properties);
+          if(feature.properties.OBJL) this._featureCollection.push(feature.properties);
         });
-        console.log(featureProperties);
+        if(this._featureCollection && this._featureCollection.length > 0){
+          this.displayFeatures();
+        }
+        this.removeAllChildNodes(this._featuresDisplayContent);
       }catch(err){
         console.log("Error: " + err);
       }
-  }
-  flushSelectionEvent(){
-
   }
   async _getFeatures(map? : MapLibreMap){
     if(!map){
