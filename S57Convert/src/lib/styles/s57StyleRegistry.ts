@@ -430,7 +430,6 @@ function getLayerZoomRange(classCode: string, purposeCode?: string | number): { 
   if (normalizedCode === 'DEPCNT') {
     return { minZoom: Math.max(purposeRange.minZoom, 5), maxZoom: purposeRange.maxZoom };
   }
-
   if (normalizedCode === 'SOUNDG' || normalizedCode === 'SOUNDG_PROCESSED') {
     return { minZoom: Math.max(purposeRange.minZoom, 7), maxZoom: purposeRange.maxZoom };
   }
@@ -468,7 +467,8 @@ function getLayerZoomRange(classCode: string, purposeCode?: string | number): { 
   }
 
   if (normalizedCode === 'LIGHT_SECTORS' || normalizedCode.startsWith('LIGHT_SECTORS--')) {
-    return { minZoom: Math.min(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
+    //if(Math.min(purposeRange.minZoom, 9))
+    return { minZoom: purposeRange.minZoom === 0?0:Math.max(purposeRange.minZoom, 9), maxZoom: purposeRange.maxZoom };
   }
 
   if (normalizedCode === 'LITFLT' || normalizedCode === 'MORFAC') {
@@ -656,6 +656,18 @@ function buildMNPUBStyle(): GeoLibreNativeLayerStyle {
   };
 }
 
+function buildCtnareStyle(): GeoLibreNativeLayerStyle {
+  // CTNARE (Cable Area): outline-only, matching Samples/MAP areaOutlines behavior.
+  // Rendered as a dashed magenta line (TRFCD) with no fill, consistent with the
+  // generic polygon viewing group (39000) used by Samples/MAP.
+  return {
+    strokeColor: COLORS.TRFCD,
+    strokeWidth: 2,
+    strokeDasharray: '4,4',
+    fillOpacity: 0,
+  };
+}
+
 export function selectS57LayerStyle(
   classCode: string,
   attributes: Record<string, unknown> = {},
@@ -751,7 +763,7 @@ export function selectS57LayerStyle(
     return {
       family: 'tsslpt',
       priority: 75000,
-      minZoom: 8,
+      minZoom: Math.max(zoomRange.minZoom, 8),
       maxZoom: zoomRange.maxZoom,
       style: buildTSSLPTStyle(normalizedAttributes),
     };
@@ -796,6 +808,16 @@ export function selectS57LayerStyle(
       maxZoom: zoomRange.maxZoom,
       style: buildLandmarkSymbolStyle(normalizedAttributes),
       labelField: asString(normalizedAttributes.OBJNAM) ?? undefined,
+    };
+  }
+
+  if (normalizedCode === 'CTNARE') {
+    return {
+      family: 'other',
+      priority: 39000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildCtnareStyle(),
     };
   }
 
