@@ -9,6 +9,7 @@ import { generateTSSArrows, type GeneratedArrow } from './lib/utils/tssArrowsGen
 import type { ProcessedTSSLPT } from './lib/utils/tsslptProcessor';
 import { selectS57LayerStyle, StyleReapplier, StyleTracker, type S57StyleSelection, type StyleApplicationMode } from './lib/styles/s57StyleRegistry';
 import './lib/styles/uploader.css';
+import './lib/styles/plugin-control.css';
 import { SPRITE_PNG_BASE64 } from './lib/assets/spritePng';
 import { spriteManifest } from './lib/assets/spriteManifest';
 
