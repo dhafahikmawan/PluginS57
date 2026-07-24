@@ -69,6 +69,36 @@ describe('selectS57LayerStyle', () => {
     expect(style.style.fillPattern).toBe('ENTPRO_pattern');
   });
 
+  it('matches the sample styling expectations for remapped layer families', () => {
+    const airare = selectS57LayerStyle('AIRARE', {});
+    const bridge = selectS57LayerStyle('BRIDGE', {});
+    const cblohd = selectS57LayerStyle('CBLOHD', {});
+    const drgare = selectS57LayerStyle('DRGARE', { DRVAL1: 5 });
+    const rivers = selectS57LayerStyle('RIVERS', { OBJNAM: 'Test River' });
+
+    expect(airare.family).toBe('land');
+    expect(airare.style.fillColor).toBe('#AB9D68');
+    expect(airare.style.strokeColor).toBeUndefined();
+
+    expect(bridge.family).toBe('base');
+    expect(bridge.style.strokeColor).toBe('#7D898C');
+    expect(bridge.style.strokeWidth).toBe(5);
+
+    expect(cblohd.family).toBe('other');
+    expect(cblohd.style.strokeColor).toBe('#7D898C');
+    expect(cblohd.style.strokeWidth).toBe(4);
+    expect(cblohd.style.strokeDasharray).toBe('4,4');
+
+    expect(drgare.family).toBe('depth');
+    expect(drgare.style.strokeColor).toBe('#8B999B');
+    expect(drgare.style.strokeDasharray).toBe('4,4');
+
+    expect(rivers.family).toBe('depth');
+    expect(rivers.style.fillColor).toBe('#73B6EF');
+    expect(rivers.style.strokeColor).toBe('#070707');
+    expect(rivers.style.strokeWidth).toBe(1);
+  });
+
   it('does not attempt zoom-range updates for non-existent layers', async () => {
     const reapply = new StyleReapplier();
     const style = selectS57LayerStyle('DEPARE', { DRVAL1: 1 });

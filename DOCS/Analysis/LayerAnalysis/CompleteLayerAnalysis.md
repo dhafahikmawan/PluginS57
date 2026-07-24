@@ -714,6 +714,722 @@ This document compares the layer-level styling choices made by the plugin in `S5
   - Zoom: starts at zoom `9`
 - **Difference**: The plugin renders wreck symbols starting at zoom 10. Samples/MAP labels them starting at zoom 9.
 
+### ACHARE (Anchor Berth / Anchorage Area)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Type: fill + stroke
+  - Fill: `CHGRY` (#a3b4b7), opacity `0.4`
+  - Stroke: `DEPCN` (#7D898C), width `1`
+  - Priority: `10000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 8)`
+- **Samples/MAP**:
+  - Type: area outline
+  - Color: `RADHI` (#d3a6e9)
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+  - Label: `OBJNAM` attribute, color `CHBLK`
+  - Zoom: starts at zoom `8`
+- **Difference**: Samples/MAP outlines anchorages in dashed magenta (`RADHI`, width 2) with labels, while the plugin falls back to a filled grey area.
+
+### ARCSLN (Archipelagic Sea Lane)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Type: fill + stroke
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: area outline
+  - Color: `DEPCN`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP outlines archipelagic sea lanes with a thin dashed grey line, while the plugin falls back to the generic `base` style.
+
+### ASLXIS (Archipelagic Sea Lane Axis)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Type: fill + stroke
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `RADHI`
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP renders ASLXIS as a dashed magenta line, while the plugin falls back to `base`.
+
+### BCNCAR (Beacon Cardinal)
+- **Plugin**:
+  - Family: `navigation`
+  - Type: symbol (icon mapping)
+  - Priority: `70000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 10)`
+- **Samples/MAP**:
+  - Type: symbol
+  - Label: `OBJNAM` attribute, color `CHBLK`
+  - Zoom: starts at zoom `10`
+- **Difference**: Aligned. Both start at zoom 10.
+
+### BCNISD (Beacon Isolated Danger)
+- **Plugin**:
+  - Family: `navigation`
+  - Type: symbol (icon mapping)
+  - Priority: `70000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 10)`
+- **Samples/MAP**:
+  - Type: symbol
+  - Label: `OBJNAM` attribute, color `CHBLK`
+  - Zoom: starts at zoom `10`
+- **Difference**: Aligned.
+
+### BOYISD (Buoy Isolated Danger)
+- **Plugin**:
+  - Family: `navigation`
+  - Type: symbol
+  - Priority: `70000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 10)`
+- **Samples/MAP**:
+  - Type: symbol
+  - Label: `OBJNAM` attribute, color `CHBLK`
+  - Zoom: starts at zoom `10`
+- **Difference**: Aligned.
+
+### BOYSAW (Buoy Safe Water)
+- **Plugin**:
+  - Family: `navigation`
+  - Type: symbol
+  - Priority: `70000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 10)`
+- **Samples/MAP**:
+  - Type: symbol
+  - Label: `OBJNAM` attribute, color `CHBLK`
+  - Zoom: starts at zoom `10`
+- **Difference**: Aligned.
+
+### CANALS (Canal)
+- **Plugin**:
+  - Family: `depth`
+  - Type: fill + stroke
+  - Fill: dynamic depth shading
+  - Stroke: `DEPCN`, width `0.5`
+  - Priority: `30000`
+  - Zoom: purposeRange default
+- **Samples/MAP**:
+  - Type: fill + line
+  - Fill: `DEPVS`
+  - Stroke: `CHBLK`, width `1`
+  - Zoom: starts at zoom `0`
+- **Difference**: The plugin uses dynamic depth coloring, while Samples/MAP uses flat shallow blue (`DEPVS`) with a thin solid black outline (`CHBLK`, width 1).
+
+### CAUSWY (Causeway)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Type: fill + stroke
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill + line
+  - Fill: `DEPIT` (intertidal green/grey)
+  - Stroke: `LANDF` (brown), width `3`, dashed `true`
+- **Difference**: Samples/MAP renders causeways with intertidal fill and a dashed brown outline, while the plugin falls back to standard `base` grey.
+
+### CHNWIR (Check / Wire)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Type: fill + stroke
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CHBLK`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP renders it as a thin dashed black line, while the plugin falls back.
+
+### CONVYR (Conveyor)
+- **Plugin**:
+  - Family: `land`
+  - Type: fill + stroke
+  - Fill: `LANDA`
+  - Stroke: `CSTLN`
+  - Priority: `20000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `DEPCN`
+  - Width: `4`
+  - Dash: `true` -> `[4, 4]`
+  - Label: `VERCLR` attribute (prefixed with 'clr ', suffixed with 'm'), color `CHBLK`
+- **Difference**: Samples/MAP renders conveyors as dashed grey lines (width 4) with clearance labels, while the plugin treats them as land areas.
+
+### CONZNE (Contiguous Zone)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 7)`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CHGRY`
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+  - Zoom: starts at zoom `7`
+- **Difference**: Samples/MAP renders it as a dashed grey line, while the plugin falls back.
+
+### COSARE (Continental Shelf Area)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 7)`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CHGRY`
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+  - Zoom: starts at zoom `7`
+- **Difference**: Samples/MAP renders it as a dashed grey line, while the plugin falls back.
+
+### CRANES (Cranes)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 12)`
+- **Samples/MAP**:
+  - Type: fill
+  - Color: `CHBRN`
+  - Zoom: starts at zoom `12`
+- **Difference**: Samples/MAP renders cranes as brown land fills, while the plugin falls back.
+
+### DAMCON (Dam)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill + line
+  - Fill: `CHBRN`
+  - Stroke: `CSTLN`, width `2`
+- **Difference**: Samples/MAP renders dams as brown fills with solid coastline outlines, while the plugin falls back.
+
+### DOCARE (Dock Area)
+- **Plugin**:
+  - Family: `depth`
+  - Type: fill + stroke
+  - Fill: dynamic depth shading
+  - Stroke: `DEPCN`, width `0.5`
+  - Priority: `30000`
+- **Samples/MAP**:
+  - Type: fill
+  - Fill: `DEPVS`
+- **Difference**: The plugin uses dynamic depth shading, while Samples/MAP uses flat `DEPVS`.
+
+### DRYDOC (Dry Dock)
+- **Plugin**:
+  - Family: `land`
+  - Type: fill + stroke
+  - Fill: `LANDA`
+  - Stroke: `CSTLN`
+  - Priority: `20000`
+- **Samples/MAP**:
+  - Type: fill
+  - Fill: `LANDA`
+- **Difference**: Aligned. Both color dry docks as land fill.
+
+### DYKCON (Dyke)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill + line
+  - Fill: `CHBRN`
+  - Stroke: `CHBLK`, width `2`
+- **Difference**: Samples/MAP renders dykes as brown fills with solid black outlines, while the plugin falls back.
+
+### EXEZNE (Exclusive Economic Zone)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 7)`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CHGRY`
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+  - Zoom: starts at zoom `7`
+- **Difference**: Samples/MAP renders EXEZNE as a dashed grey line, while the plugin falls back.
+
+### FLODOC (Floating Dock)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill + line
+  - Fill: `CHBRN`
+  - Stroke: `CSTLN`, width `3`
+  - Zoom: starts at zoom `0`
+- **Difference**: Samples/MAP renders floating docks with brown fill and a solid coastline outline, while the plugin falls back to `base`.
+
+### FNCLNE (Fence/Wall Line)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CHBLK`
+  - Width: `1`
+- **Difference**: Samples/MAP renders it as a thin solid black line, while the plugin falls back.
+
+### GATCON (Gate)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill + line
+  - Fill: `CHBRN`
+  - Stroke: `CSTLN`, width `2`
+- **Difference**: Samples/MAP renders gates as brown fills with solid coastline outlines, while the plugin falls back.
+
+### HULKES (Hulks)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+  - Zoom: purposeRange default
+- **Samples/MAP**:
+  - Type: fill
+  - Color: `CHBRN`
+  - Zoom: starts at zoom `0`
+- **Difference**: Samples/MAP renders hulks as brown land fills, while the plugin falls back to `base` grey.
+
+### ICEARE (Ice Area)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill
+  - Color: `CHGRY`
+- **Difference**: Both use grey (`CHGRY`), but Samples/MAP renders it specifically as a solid fill, while the plugin uses `base` fallback (with outline).
+
+### ISTZNE (Inshore Traffic Zone)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 7)`
+- **Samples/MAP**:
+  - Type: area outline
+  - Color: `TRFCD`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+  - Zoom: starts at zoom `7`
+- **Difference**: Samples/MAP outlines ISTZNE in dashed magenta, while the plugin falls back.
+
+### LAKARE (Lake Area)
+- **Plugin**:
+  - Family: `land`
+  - Type: fill + stroke
+  - Fill: `LANDA`
+  - Stroke: `CSTLN`
+  - Priority: `20000`
+- **Samples/MAP**:
+  - Type: fill
+  - Fill: `DEPVS`
+  - Label: `OBJNAM`, color `CSTLN`
+  - Zoom: starts at zoom `0`
+- **Difference**: The plugin colors lakes as land fill (`LANDA`), while Samples/MAP colors them as water fill (`DEPVS`) and includes labels.
+
+### LAKSHR (Lake Shore)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CSTLN`
+  - Width: `1`
+- **Difference**: Samples/MAP renders lake shores as solid coastline outlines, while the plugin falls back.
+
+### LNDELV (Land Elevation Contour)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `LANDF` (brown)
+  - Width: `1`
+- **Difference**: Samples/MAP renders land elevation contours as solid brown lines, while the plugin falls back to `base` grey.
+
+### LOKBSN (Lock Basin)
+- **Plugin**:
+  - Family: `depth`
+  - Type: fill + stroke
+  - Fill: dynamic depth shading
+  - Stroke: `DEPCN`, width `0.5`
+  - Priority: `30000`
+- **Samples/MAP**:
+  - Type: fill
+  - Fill: `DEPVS`
+- **Difference**: The plugin uses dynamic depth shading, while Samples/MAP uses flat `DEPVS`.
+
+### MARCUL (Marine Farm/Culture)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CHGRY`
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP renders it as a dashed grey outline, while the plugin falls back.
+
+### M_SREL (Survey Reliability)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: area outline
+  - Color: `CHGRY`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP outlines it in dashed grey, while the plugin falls back.
+
+### NAVLNE (Navigation Line)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `DEPCN`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+  - Label: `ORIENT` (suffixed with '°'), color `DEPCN`
+- **Difference**: Samples/MAP renders nav lines as dashed grey with orientation labels, while the plugin falls back.
+
+### OFSPLF (Offshore Platform)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill
+  - Fill: `CHBRN`
+  - Label: `OBJNAM` (prefixed with 'Prod '), color `CHBLK`
+- **Difference**: Samples/MAP renders platforms with brown fill and name labels prefixed with 'Prod ', while the plugin falls back.
+
+### OILBAR (Oil Barrier)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CHBLK`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP renders it as a thin dashed black line, while the plugin falls back.
+
+### PILBOP (Pilot Boarding Place / Pilotage District)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 12)`
+- **Samples/MAP**:
+  - Type: symbol (labels)
+  - Label: `OBJNAM` (prefixed with 'Plt '), color `CHBLK`
+  - Zoom: starts at zoom `10`
+- **Difference**: Samples/MAP renders it as labels starting at zoom 10, whereas the plugin falls back starting at zoom 12.
+
+### PIPOHD (Pipeline Overhead)
+- **Plugin**:
+  - Family: `restricted`
+  - Priority: `35000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 10)`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `DEPCN`
+  - Width: `3`
+  - Label: `VERCLR` (prefixed with 'clr ', suffixed with 'm'), color `CHBLK`
+  - Zoom: starts at zoom `10`
+- **Difference**: Samples/MAP renders it as a solid grey line (width 3) with clearance labels, while the plugin applies restricted area pattern fills and magenta outlines.
+
+### PRCARE (Precautionary Area)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 7)`
+- **Samples/MAP**:
+  - Type: area outline
+  - Color: `TRFCD`
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+  - Zoom: starts at zoom `7`
+- **Difference**: Samples/MAP renders it as a dashed magenta outline (width 2), while the plugin falls back.
+
+### PRDARE (Production Area)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: area outline
+  - Color: `CHBLK`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP renders it as a dashed black outline, while the plugin falls back.
+
+### RADLNE (Radar Line)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `TRFCD`
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP renders radar lines as dashed magenta, while the plugin falls back.
+
+### RAILWY (Railway)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `LANDF`
+  - Width: `2`
+- **Difference**: Samples/MAP renders railways as solid brown lines, while the plugin falls back.
+
+### RAPIDS (Rapids)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill + line
+  - Fill: `DEPCN`
+  - Stroke: `DEPCN`, width `3`
+- **Difference**: Samples/MAP renders rapids with grey fill and thick solid grey outline, while the plugin falls back.
+
+### RDOCAL (Radio Calling-in Point)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `TRFCD`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+  - Label: `OBJNAM`, color `CHBLK`
+- **Difference**: Samples/MAP renders RDOCAL as a thin dashed magenta line with labels, while the plugin falls back.
+
+### RESTRC (Restricted Area - Custom)
+- **Plugin**:
+  - Family: `base` (fallback)
+- **Samples/MAP**:
+  - Type: line
+  - Color: `TRFCD`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP renders it as a thin dashed magenta line, while the plugin falls back.
+
+### RUNWAY (Runway)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill + line
+  - Fill: `CHBRN`
+  - Stroke: `LANDF`, width `3`
+- **Difference**: Samples/MAP renders runways as brown fills with solid brown outlines, while the plugin falls back.
+
+### SLOGRD (Slope / Ground)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill + line
+  - Fill: `DEPCN`
+  - Stroke: `CHBLK`, width `1`
+- **Difference**: Samples/MAP renders it with grey fill and thin black outline, while the plugin falls back.
+
+### SMCFAC (Small Craft Facility)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill
+  - Color: `CHBRN`
+- **Difference**: Samples/MAP renders it with brown land fill, while the plugin falls back.
+
+### SNDWAV (Sandwaves)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `DEPCN`
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP renders sandwaves as dashed grey outlines, while the plugin falls back.
+
+### STSLNE (Straight Line)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CHGRY`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP renders it as a dashed grey line, while the plugin falls back.
+
+### TESARE (Territorial Sea Area)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 7)`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CHGRY`
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+  - Zoom: starts at zoom `7`
+- **Difference**: Samples/MAP renders territorial sea borders as dashed grey lines, while the plugin falls back.
+
+### TIDEWY (Tideway)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CHGRY`
+  - Width: `1`
+- **Difference**: Samples/MAP renders tideways as thin solid grey lines, while the plugin falls back.
+
+### TOPMAR (Topmark)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 12)`
+- **Samples/MAP**:
+  - Type: symbol (labels)
+  - Label: `OBJNAM`, color `CHBLK`
+  - Zoom: starts at zoom `12`
+- **Difference**: Samples/MAP labels topmarks at zoom 12+, while the plugin falls back.
+
+### TRFLNE (Traffic Lane)
+- **Plugin**:
+  - Family: `routing`
+  - Type: line (no fill)
+  - Stroke: `TRFCD` (#c545c3), width `2`, dashed `6,4`
+  - Priority: `80000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `TRFCD`
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Aligned. Both style traffic lanes as dashed magenta outlines.
+
+### TSELNE (Traffic Separation Line)
+- **Plugin**:
+  - Family: `routing`
+  - Type: line
+  - Stroke: `TRFCD`, width `2`, dashed `6,4`
+  - Priority: `80000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 7)`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `RADHI`
+  - Width: `6`
+  - Zoom: starts at zoom `7`
+- **Difference**: Samples/MAP renders `TSELNE` as a very thick solid magenta line (width 6), while the plugin renders it as a standard dashed magenta routing line.
+
+### TSEZNE (Traffic Separation Zone)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 7)`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `RADHI`
+  - Width: `1`
+  - Zoom: starts at zoom `7`
+- **Difference**: Samples/MAP renders it as a thin solid magenta line, while the plugin falls back.
+
+### TSSBND (Traffic Separation Boundary)
+- **Plugin**:
+  - Family: `routing`
+  - Type: line
+  - Stroke: `TRFCD`, width `2`, dashed `6,4`
+  - Priority: `80000`
+  - Zoom: `minZoom: Math.max(purposeRange.minZoom, 7)`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `TRFCD`
+  - Width: `2`
+  - Dash: `true` -> `[4, 4]`
+  - Zoom: starts at zoom `7`
+- **Difference**: Aligned. Both style as dashed magenta.
+
+### TSSRON (Traffic Separation Scheme Roundabout)
+- **Plugin**:
+  - Family: `routing`
+  - Type: line
+  - Stroke: `TRFCD`, width `2`, dashed `6,4`
+  - Priority: `80000`
+- **Samples/MAP**:
+  - Type: fallback/generic
+- **Difference**: Plugin styles it as routing, while Samples/MAP falls back.
+
+### TUNNEL (Tunnel)
+- **Plugin**:
+  - Family: `depth`
+  - Type: fill + stroke
+  - Fill: dynamic depth shading
+  - Stroke: `DEPCN`, width `0.5`
+  - Priority: `30000`
+- **Samples/MAP**:
+  - Type: fill + line
+  - Fill: `DEPVS`
+  - Stroke: `CHBLK`, width `2`, dashed `true`
+- **Difference**: Samples/MAP renders tunnels with flat blue fill and dashed black outlines, while the plugin uses dynamic depth styling.
+
+### UNSARE (Unsurveyed Area)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: fill
+  - Color: `CHGRY`
+  - Zoom: starts at zoom `0`
+- **Difference**: Samples/MAP renders unsurveyed areas as grey fills, while the plugin uses general `base` style.
+
+### VEGATN (Vegetation)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `LANDF`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP renders vegetation lines as dashed brown outlines, while the plugin falls back.
+
+### WATFAL (Waterfall)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `DEPDW`
+  - Width: `3`
+- **Difference**: Samples/MAP renders waterfalls as solid blue lines (`DEPDW`), while the plugin falls back.
+
+### WATTUR (Water Turbulence)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `DEPCN`
+  - Width: `1`
+  - Dash: `true` -> `[4, 4]`
+- **Difference**: Samples/MAP renders water turbulence as dashed grey lines, while the plugin falls back.
+
+### ZEMCNT (Zero Contour / Zero Line)
+- **Plugin**:
+  - Family: `base` (fallback)
+  - Priority: `10000`
+- **Samples/MAP**:
+  - Type: line
+  - Color: `CHBLK`
+  - Width: `1`
+- **Difference**: Samples/MAP renders zero contours as solid black lines, while the plugin falls back.
+
 ---
 
 ## Zoom Behavior Comparison
