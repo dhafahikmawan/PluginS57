@@ -687,15 +687,581 @@ function buildCtnareStyle(): GeoLibreNativeLayerStyle {
   };
 }
 
+function resolveBasePriority(geometryHint?: string | boolean): number {
+  if (typeof geometryHint === 'boolean') {
+    return geometryHint ? 35000 : 40000;
+  }
+
+  const normalizedGeometry = String(geometryHint ?? '').toLowerCase();
+  if (normalizedGeometry.includes('polygon')) {
+    return 35000;
+  }
+
+  return 40000;
+}
+
 export function selectS57LayerStyle(
   classCode: string,
   attributes: Record<string, unknown> = {},
   purposeCode?: string | number,
+  geometryHint?: string | boolean,
 ): S57StyleSelection {
   const normalizedCode = String(classCode || '').toUpperCase();
   const normalizedAttributes = attributes ?? {};
+  const basePriority = resolveBasePriority(geometryHint);
   const purposeCandidate = normalizedAttributes.PURPOSE ?? normalizedAttributes.ENC_PURPOSE ?? normalizedAttributes.PURP ?? normalizedAttributes.M_HOPA ?? normalizedAttributes.HOPA ?? normalizedAttributes.M_COVR ?? normalizedAttributes.COVR;
   const zoomRange = getLayerZoomRange(normalizedCode, purposeCode ?? resolvePurposeCode(purposeCandidate));
+
+  if (normalizedCode === 'ACHARE') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.RADHI, 2, true),
+    };
+  }
+
+  if (normalizedCode === 'AIRARE') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildAreaFillStyle(COLORS.LANDA),
+    };
+  }
+
+  if (normalizedCode === 'ARCSLN') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.DEPCN, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'ASLXIS') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.RADHI, 2, true),
+    };
+  }
+
+  if (normalizedCode === 'CANALS') {
+    return {
+      family: 'depth',
+      priority: 30000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.DEPVS,
+        fillOpacity: 1.0,
+        strokeColor: COLORS.CHBLK,
+        strokeWidth: 1,
+      },
+    };
+  }
+
+  if (normalizedCode === 'CAUSWY') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.DEPIT,
+        fillOpacity: 1.0,
+        strokeColor: COLORS.LANDF,
+        strokeWidth: 3,
+        strokeDasharray: '4,4',
+      },
+    };
+  }
+
+  if (normalizedCode === 'CHNWIR') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.CHBLK, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'CONVYR') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.DEPCN, 4, true),
+    };
+  }
+
+  if (normalizedCode === 'CRANES') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildAreaFillStyle(COLORS.CHBRN),
+    };
+  }
+
+  if (normalizedCode === 'DAMCON') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.CHBRN,
+        fillOpacity: 1.0,
+        strokeColor: COLORS.CSTLN,
+        strokeWidth: 2,
+      },
+    };
+  }
+
+  if (normalizedCode === 'DOCARE') {
+    return {
+      family: 'depth',
+      priority: 30000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.DEPVS,
+        fillOpacity: 1.0,
+      },
+    };
+  }
+
+  if (normalizedCode === 'DYKCON') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.CHBRN,
+        fillOpacity: 1.0,
+        strokeColor: COLORS.CHBLK,
+        strokeWidth: 2,
+      },
+    };
+  }
+
+  if (normalizedCode === 'FLODOC') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.CHBRN,
+        fillOpacity: 1.0,
+        strokeColor: COLORS.CSTLN,
+        strokeWidth: 3,
+      },
+    };
+  }
+
+  if (normalizedCode === 'FNCLNE') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.CHBLK, 1),
+    };
+  }
+
+  if (normalizedCode === 'GATCON') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.CHBRN,
+        fillOpacity: 1.0,
+        strokeColor: COLORS.CSTLN,
+        strokeWidth: 2,
+      },
+    };
+  }
+
+  if (normalizedCode === 'HULKES') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildAreaFillStyle(COLORS.CHBRN),
+    };
+  }
+
+  if (normalizedCode === 'ICEARE') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildAreaFillStyle(COLORS.CHGRY),
+    };
+  }
+
+  if (normalizedCode === 'ISTZNE') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.TRFCD, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'LAKARE') {
+    return {
+      family: 'depth',
+      priority: 30000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.DEPVS,
+        fillOpacity: 1.0,
+      },
+    };
+  }
+
+  if (normalizedCode === 'LAKSHR') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.CSTLN, 1),
+    };
+  }
+
+  if (normalizedCode === 'LNDELV') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.LANDF, 1),
+    };
+  }
+
+  if (normalizedCode === 'LOKBSN') {
+    return {
+      family: 'depth',
+      priority: 30000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.DEPVS,
+        fillOpacity: 1.0,
+      },
+    };
+  }
+
+  if (normalizedCode === 'MARCUL') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.CHGRY, 2, true),
+    };
+  }
+
+  if (normalizedCode === 'M_SREL') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.CHGRY, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'NAVLNE') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.DEPCN, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'OFSPLF') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildAreaFillStyle(COLORS.CHBRN),
+    };
+  }
+
+  if (normalizedCode === 'OILBAR') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.CHBLK, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'PIPOHD') {
+    return {
+      family: 'other',
+      priority: 39000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.DEPCN, 3),
+    };
+  }
+
+  if (normalizedCode === 'PRCARE') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.TRFCD, 2, true),
+    };
+  }
+
+  if (normalizedCode === 'PRDARE') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.CHBLK, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'RADLNE') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.TRFCD, 2, true),
+    };
+  }
+
+  if (normalizedCode === 'RAILWY') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.LANDF, 2),
+    };
+  }
+
+  if (normalizedCode === 'RAPIDS') {
+    return {
+      family: 'depth',
+      priority: 30000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.DEPCN,
+        fillOpacity: 1.0,
+        strokeColor: COLORS.DEPCN,
+        strokeWidth: 3,
+      },
+    };
+  }
+
+  if (normalizedCode === 'RDOCAL') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.TRFCD, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'RESTRC') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.TRFCD, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'RUNWAY') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.CHBRN,
+        fillOpacity: 1.0,
+        strokeColor: COLORS.LANDF,
+        strokeWidth: 3,
+      },
+    };
+  }
+
+  if (normalizedCode === 'SLOGRD') {
+    return {
+      family: 'depth',
+      priority: 30000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.DEPCN,
+        fillOpacity: 1.0,
+        strokeColor: COLORS.CHBLK,
+        strokeWidth: 1,
+      },
+    };
+  }
+
+  if (normalizedCode === 'SMCFAC') {
+    return {
+      family: 'land',
+      priority: 20000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildAreaFillStyle(COLORS.CHBRN),
+    };
+  }
+
+  if (normalizedCode === 'SNDWAV') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.DEPCN, 2, true),
+    };
+  }
+
+  if (normalizedCode === 'STSLNE') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.CHGRY, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'TESARE') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.CHGRY, 2, true),
+    };
+  }
+
+  if (normalizedCode === 'TIDEWY') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.CHGRY, 1),
+    };
+  }
+
+  if (normalizedCode === 'TSELNE') {
+    return {
+      family: 'routing',
+      priority: 80000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.RADHI, 6),
+    };
+  }
+
+  if (normalizedCode === 'TSEZNE') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.RADHI, 1),
+    };
+  }
+
+  if (normalizedCode === 'TUNNEL') {
+    return {
+      family: 'depth',
+      priority: 30000,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: {
+        fillColor: COLORS.DEPVS,
+        fillOpacity: 1.0,
+        strokeColor: COLORS.CHBLK,
+        strokeWidth: 2,
+        strokeDasharray: '4,4',
+      },
+    };
+  }
+
+  if (normalizedCode === 'VEGATN') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.LANDF, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'WATFAL') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.DEPDW, 3),
+    };
+  }
+
+  if (normalizedCode === 'WATTUR') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.DEPCN, 1, true),
+    };
+  }
+
+  if (normalizedCode === 'ZEMCNT') {
+    return {
+      family: 'base',
+      priority: basePriority,
+      minZoom: zoomRange.minZoom,
+      maxZoom: zoomRange.maxZoom,
+      style: buildOutlineOnlyStyle(COLORS.CHBLK, 1),
+    };
+  }
 
   if (normalizedCode === 'AIRARE') {
     return {
@@ -730,7 +1296,7 @@ export function selectS57LayerStyle(
   if (normalizedCode === 'BRIDGE') {
     return {
       family: 'base',
-      priority: 10000,
+      priority: basePriority,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       style: buildOutlineOnlyStyle(COLORS.DEPCN, 5),
@@ -770,7 +1336,7 @@ export function selectS57LayerStyle(
   if (normalizedCode === 'ADMARE') {
     return {
       family: 'base',
-      priority: 10000,
+      priority: basePriority,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       style: buildOutlineOnlyStyle(COLORS.CHGRY, 2, true),
@@ -805,7 +1371,7 @@ export function selectS57LayerStyle(
   if (normalizedCode === 'FSHFAC') {
     return {
       family: 'base',
-      priority: 10000,
+      priority: basePriority,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       style: buildOutlineOnlyStyle(COLORS.DEPCN, 2, true),
@@ -815,7 +1381,7 @@ export function selectS57LayerStyle(
   if (normalizedCode === 'HRBFAC') {
     return {
       family: 'base',
-      priority: 10000,
+      priority: basePriority,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       style: buildOutlineOnlyStyle(COLORS.DEPCN, 2, true),
@@ -835,7 +1401,7 @@ export function selectS57LayerStyle(
   if (normalizedCode === 'LNDRGN') {
     return {
       family: 'base',
-      priority: 10000,
+      priority: basePriority,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       style: buildOutlineOnlyStyle(COLORS.LANDF, 1, true),
@@ -845,7 +1411,7 @@ export function selectS57LayerStyle(
   if (normalizedCode === 'MAGVAR') {
     return {
       family: 'base',
-      priority: 10000,
+      priority: basePriority,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       style: buildOutlineOnlyStyle(COLORS.RADHI, 2),
@@ -865,7 +1431,7 @@ export function selectS57LayerStyle(
   if (normalizedCode === 'RECTRC') {
     return {
       family: 'base',
-      priority: 10000,
+      priority: basePriority,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       style: buildOutlineOnlyStyle(COLORS.DEPCN, 1, true),
@@ -890,7 +1456,7 @@ export function selectS57LayerStyle(
   if (normalizedCode === 'SBDARE') {
     return {
       family: 'base',
-      priority: 10000,
+      priority: basePriority,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       style: buildOutlineOnlyStyle(COLORS.DEPCN, 1),
@@ -900,7 +1466,7 @@ export function selectS57LayerStyle(
   if (normalizedCode === 'SLOTOP') {
     return {
       family: 'base',
-      priority: 10000,
+      priority: basePriority,
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       style: buildOutlineOnlyStyle(COLORS.CHBLK, 1),
