@@ -42,6 +42,16 @@ describe('selectS57LayerStyle', () => {
     expect(hazardStyle.minZoom).toBe(9);
   });
 
+  it('assigns polygonal base layers to the 35000 band and non-polygonal base layers to 40000', () => {
+    const polygonStyle = selectS57LayerStyle('ACHARE', {}, undefined, 'Polygon');
+    const pointStyle = selectS57LayerStyle('ACHARE', {}, undefined, 'Point');
+
+    expect(polygonStyle.family).toBe('base');
+    expect(polygonStyle.priority).toBe(35000);
+    expect(pointStyle.family).toBe('base');
+    expect(pointStyle.priority).toBe(40000);
+  });
+
   it('uses dashed outlines with RESARE pattern fills for restricted areas', () => {
     const style = selectS57LayerStyle('RESARE', { RESTRN: '1' });
 
@@ -67,6 +77,76 @@ describe('selectS57LayerStyle', () => {
 
     expect(style.family).toBe('restricted');
     expect(style.style.fillPattern).toBe('ENTPRO_pattern');
+  });
+
+  it('matches the sample styling expectations for remapped layer families', () => {
+    const airare = selectS57LayerStyle('AIRARE', {});
+    const bridge = selectS57LayerStyle('BRIDGE', {});
+    const cblohd = selectS57LayerStyle('CBLOHD', {});
+    const drgare = selectS57LayerStyle('DRGARE', { DRVAL1: 5 });
+    const rivers = selectS57LayerStyle('RIVERS', { OBJNAM: 'Test River' });
+
+    expect(airare.family).toBe('land');
+    expect(airare.style.fillColor).toBe('#AB9D68');
+    expect(airare.style.strokeColor).toBeUndefined();
+
+    expect(bridge.family).toBe('base');
+    expect(bridge.style.strokeColor).toBe('#7D898C');
+    expect(bridge.style.strokeWidth).toBe(5);
+
+    expect(cblohd.family).toBe('other');
+    expect(cblohd.style.strokeColor).toBe('#7D898C');
+    expect(cblohd.style.strokeWidth).toBe(4);
+    expect(cblohd.style.strokeDasharray).toBe('4,4');
+
+    expect(drgare.family).toBe('depth');
+    expect(drgare.style.strokeColor).toBe('#8B999B');
+    expect(drgare.style.strokeDasharray).toBe('4,4');
+
+    expect(rivers.family).toBe('depth');
+    expect(rivers.style.fillColor).toBe('#73B6EF');
+    expect(rivers.style.strokeColor).toBe('#070707');
+    expect(rivers.style.strokeWidth).toBe(1);
+  });
+
+  it('matches the sample style expectations for the targeted layer families', () => {
+    const canals = selectS57LayerStyle('CANALS', { DRVAL1: 5 });
+    const cranes = selectS57LayerStyle('CRANES', {});
+    const floodoc = selectS57LayerStyle('FLODOC', {});
+    const pipohd = selectS57LayerStyle('PIPOHD', {});
+    const tunnel = selectS57LayerStyle('TUNNEL', { DRVAL1: 5 });
+    const achare = selectS57LayerStyle('ACHARE', {});
+
+    expect(canals.family).toBe('depth');
+    expect(canals.style.fillColor).toBe('#73B6EF');
+    expect(canals.style.strokeColor).toBe('#070707');
+    expect(canals.style.strokeWidth).toBe(1);
+
+    expect(cranes.family).toBe('land');
+    expect(cranes.style.fillColor).toBe('#b19139');
+    expect(cranes.style.strokeColor).toBeUndefined();
+
+    expect(floodoc.family).toBe('land');
+    expect(floodoc.style.fillColor).toBe('#b19139');
+    expect(floodoc.style.strokeColor).toBe('#525A5C');
+    expect(floodoc.style.strokeWidth).toBe(3);
+
+    expect(pipohd.family).toBe('other');
+    expect(pipohd.style.strokeColor).toBe('#7D898C');
+    expect(pipohd.style.strokeWidth).toBe(3);
+    expect(pipohd.style.strokeDasharray).toBe('none');
+
+    expect(tunnel.family).toBe('depth');
+    expect(tunnel.style.fillColor).toBe('#73B6EF');
+    expect(tunnel.style.strokeColor).toBe('#070707');
+    expect(tunnel.style.strokeWidth).toBe(2);
+    expect(tunnel.style.strokeDasharray).toBe('4,4');
+
+    expect(achare.family).toBe('base');
+    expect(achare.style.strokeColor).toBe('#d3a6e9');
+    expect(achare.style.strokeWidth).toBe(2);
+    expect(achare.style.strokeDasharray).toBe('4,4');
+    expect(achare.style.fillOpacity).toBe(0);
   });
 
   it('does not attempt zoom-range updates for non-existent layers', async () => {

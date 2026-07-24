@@ -9,6 +9,7 @@ import { generateTSSArrows, type GeneratedArrow } from './lib/utils/tssArrowsGen
 import type { ProcessedTSSLPT } from './lib/utils/tsslptProcessor';
 import { selectS57LayerStyle, StyleReapplier, StyleTracker, type S57StyleSelection, type StyleApplicationMode } from './lib/styles/s57StyleRegistry';
 import './lib/styles/uploader.css';
+import './lib/styles/plugin-control.css';
 import { SPRITE_PNG_BASE64 } from './lib/assets/spritePng';
 import { spriteManifest } from './lib/assets/spriteManifest';
 
@@ -74,6 +75,16 @@ function isPluginState(value: unknown): value is Partial<PluginState>{
   }
   return true;
 
+}
+
+function layerHasPolygonGeometry(layer: S57LayerData): boolean {
+  const featureCollection = layer.geojson as { features?: Array<{ geometry?: { type?: string } }> } | undefined;
+  const features = featureCollection?.features ?? [];
+
+  return features.some((feature) => {
+    const geometryType = feature?.geometry?.type;
+    return geometryType === 'Polygon' || geometryType === 'MultiPolygon';
+  });
 }
 
 
@@ -450,8 +461,10 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number,
   // the sequence present in the chart index for features within the same band.
   const indexed = sourceLayers.map((layer, idx) => ({ layer, idx }));
   indexed.sort((a, b) => {
-    const styleA = selectS57LayerStyle(a.layer.classCode, (a.layer.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
-    const styleB = selectS57LayerStyle(b.layer.classCode, (b.layer.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode);
+    const geometryHintA = layerHasPolygonGeometry(a.layer) ? 'Polygon' : 'Point';
+    const geometryHintB = layerHasPolygonGeometry(b.layer) ? 'Polygon' : 'Point';
+    const styleA = selectS57LayerStyle(a.layer.classCode, (a.layer.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode, geometryHintA);
+    const styleB = selectS57LayerStyle(b.layer.classCode, (b.layer.metadata?.sampleProperties as Record<string, unknown>) ?? {}, purposeCode, geometryHintB);
     if (styleA.priority !== styleB.priority) return styleA.priority - styleB.priority;
     return a.idx - b.idx;
   });
@@ -482,7 +495,8 @@ export function handleLayersLoaded(layers: S57LayerData[], purposeCode?: number,
     }
 
     const sampleProperties = (layer.metadata?.sampleProperties as Record<string, unknown>) ?? {};
-    const styleSelection = selectS57LayerStyle(layer.classCode, sampleProperties, purposeCode);
+    const geometryHint = layerHasPolygonGeometry(layer) ? 'Polygon' : 'Point';
+    const styleSelection = selectS57LayerStyle(layer.classCode, sampleProperties, purposeCode, geometryHint);
 
     const hostedLayerId = appAPI.addGeoJsonLayer(
       layer.fileName + '--' + layer.layerName,

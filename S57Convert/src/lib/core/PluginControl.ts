@@ -469,7 +469,8 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     console.log(displayedFeature);
     if(!displayedFeature) return;
     const featureTable = document.createElement("table");
-    featureTable.style.width = "100%";
+    featureTable.className="plugin-control-feature-table";
+    featureTable.style.width = "calc(100% - 10px)";
     featureTable.style.margin = "5px";
     this.removeAllChildNodes(this._featuresDisplayContent);
     /*
@@ -484,11 +485,13 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     Object.entries(displayedFeature).forEach(([key, value])=>{
       if(key !== "ACRONYM"){
         const row = document.createElement("tr");
+        row.className = "selected-feature-row";
         row.style.border = "1px solid #6b7280";
         row.style.paddingTop = "5px";
         row.style.paddingBottom = "5px"
         const _key = document.createElement("td");
         _key.style.width = "25%";
+        _key.style.color = "#0069a8"
         const _value = document.createElement("td");
         _value.style.width = "75%"
         _key.textContent = key;
@@ -506,10 +509,10 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     //cleanup
     this.removeAllChildNodes(this._featuresDisplay)
     const featuresDisplaySelect = document.createElement("select");
-    featuresDisplaySelect.className="feature-select";
-    featuresDisplaySelect.id="feature-select";
-    featuresDisplaySelect.style.width = "100%";
-    featuresDisplaySelect.style.border = "1px solid #6b7280";
+    featuresDisplaySelect.className="plugin-control-feature-select";
+    featuresDisplaySelect.id="plugin-control-feature-select";
+    featuresDisplaySelect.style.width = "calc(100% - 10px)";
+    featuresDisplaySelect.style.border = "1px solid #1f2937";
     featuresDisplaySelect.style.textAlign = "center";
     featuresDisplaySelect.style.marginBottom = "2px";
     featuresDisplaySelect.style.marginLeft = "5px";
@@ -571,9 +574,10 @@ export class PluginControl implements IControl, DeepLinkConsumer {
     placeholder.textContent = 'This will display the properties of the features clicked on the map';
 
     const featureContent = document.createElement('div');
+    featureContent.className = "plugin-control-feature-container"
     //featureContent.style.justifyContent = "center";
-    featureContent.style.width = "80%";
-    featureContent.style.margin = "auto"
+    //featureContent.style.width = "80%";
+    //featureContent.style.margin = "auto"
 
 
     const featureDisplay = document.createElement('div');
