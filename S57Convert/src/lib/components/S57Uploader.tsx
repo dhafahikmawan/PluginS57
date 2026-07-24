@@ -504,7 +504,7 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
                         className="remove-param-button"
                         title="Delete parameter"
                       >
-                        🗑️
+                        <span aria-hidden="true">✕</span>
                       </button>
                     </div>
                   ))}
@@ -541,21 +541,24 @@ export const S57Uploader: React.FC<S57UploaderProps> = ({ onLayersLoaded, onDele
                     </span>
                   </div>
                   <div className="file-item-actions">
-                    <button
-                      type="button"
-                      className="toggle-visibility-button"
-                      onClick={() => handleToggleVisibility(file.id)}
+                    <label
+                      className="toggle-visibility-checkbox-label"
                       title={hiddenFileIds.has(file.id) ? `Show ${file.name}` : `Hide ${file.name}`}
                     >
-                      {hiddenFileIds.has(file.id) ? '🙈' : '👁️'}
-                    </button>
+                      <input
+                        type="checkbox"
+                        className="toggle-visibility-checkbox"
+                        checked={!hiddenFileIds.has(file.id)}
+                        onChange={() => handleToggleVisibility(file.id)}
+                      />
+                    </label>
                     <button
                       type="button"
                       className="delete-file-button"
                       onClick={() => handleDeleteFile(file.id)}
                       title={`Delete ${file.name}`}
                     >
-                      🗑️
+                      <span aria-hidden="true">✕</span>
                     </button>
                   </div>
                 </li>

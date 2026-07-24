@@ -188,19 +188,22 @@
   background: transparent;
   color: #dc2626;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 6px;
+  padding: 2px 5px;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
   transition: background-color 0.2s, color 0.2s, transform 0.2s;
 }
 
 .s57-uploader-panel .delete-file-button:hover {
   background: rgba(220, 38, 38, 0.12);
   color: #b91c1c;
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .s57-uploader-panel .delete-file-button:active {
-  transform: scale(0.95);
+  transform: scale(0.9);
 }
 
 .s57-uploader-panel .s57-panel-actions {
@@ -426,16 +429,19 @@
 .s57-uploader-panel .remove-param-button {
   background: none;
   border: none;
-  font-size: 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
-  padding: 4px;
+  padding: 2px 5px;
   color: #dc2626;
-  transition: transform 0.15s;
+  transition: transform 0.15s, background-color 0.15s;
   line-height: 1;
+  border-radius: 4px;
 }
 
 .s57-uploader-panel .remove-param-button:hover {
-  transform: scale(1.2);
+  transform: scale(1.15);
+  background-color: rgba(220, 38, 38, 0.1);
 }
 
 /* ── Execute API Button ────────────────────────────────────────────────── */
@@ -482,25 +488,27 @@
   gap: 4px;
 }
 
-.s57-uploader-panel .toggle-visibility-button {
-  border: none;
-  background: transparent;
-  color: var(--pc-muted, #6b7280);
+/* ── Visibility checkbox ──────────────────────────────────────────────── */
+
+.s57-uploader-panel .toggle-visibility-checkbox-label {
+  display: inline-flex;
+  align-items: center;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  transition: background-color 0.2s, color 0.2s, transform 0.2s;
+  padding: 2px;
 }
 
-.s57-uploader-panel .toggle-visibility-button:hover {
-  background: rgba(74, 144, 217, 0.12);
-  color: var(--pc-accent, #4a90d9);
-  transform: scale(1.05);
+.s57-uploader-panel .toggle-visibility-checkbox {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--pc-accent, #4a90d9);
+  cursor: pointer;
+  margin: 0;
+  border-radius: 3px;
+  transition: transform 0.15s;
 }
 
-.s57-uploader-panel .toggle-visibility-button:active {
-  transform: scale(0.95);
+.s57-uploader-panel .toggle-visibility-checkbox:hover {
+  transform: scale(1.15);
 }
 
 .s57-uploader-panel .loaded-file-item.is-hidden {
