@@ -354,12 +354,17 @@ export function handleToggleFileVisibility(fileId: number, hide?: boolean): bool
 
   if (map) {
     const styleLayers: Array<{ id?: string; source?: string }> = map.getStyle?.()?.layers ?? [];
+
+    // Build a set of layer IDs that actually exist in the current map style
+    const existingLayerIds = new Set<string>(
+      styleLayers.flatMap(layer => (layer?.id ? [layer.id] : []))
+    );
+
     const targetCandidateIds = new Set<string>();
 
-    // Seed with direct hosted layer IDs
-    entry.layerIds.forEach(id => targetCandidateIds.add(id));
-
-    // Resolve candidate MapLibre layers whose id or source matches any tracked layer ID
+    // Resolve candidate MapLibre layers whose id or source matches any tracked layer ID.
+    // Direct hosted layer IDs are intentionally NOT seeded here — they may be source
+    // names that have no corresponding style layer, which would cause non-fatal errors.
     styleLayers.forEach(layer => {
       if (!layer?.id) return;
       const layerMapId = layer.id;
@@ -378,6 +383,9 @@ export function handleToggleFileVisibility(fileId: number, hide?: boolean): bool
     });
 
     targetCandidateIds.forEach((candidateId) => {
+      // Skip layers that don't exist in the current style to avoid non-fatal errors.
+      if (!existingLayerIds.has(candidateId)) return;
+
       try {
         if (typeof map.setLayoutProperty === 'function') {
           map.setLayoutProperty(candidateId, 'visibility', visibilityValue);
